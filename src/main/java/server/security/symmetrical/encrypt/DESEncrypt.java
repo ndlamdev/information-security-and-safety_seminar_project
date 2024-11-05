@@ -10,7 +10,9 @@ package main.java.server.security.symmetrical.encrypt;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
 
 public class DESEncrypt extends ASymmetricalEncrypt {
 
@@ -29,13 +31,7 @@ public class DESEncrypt extends ASymmetricalEncrypt {
     }
 
     @Override
-    public void loadKey(SecretKey key) {
-        super.loadKey(key);
-        try {
-            cipher = Cipher.getInstance("DES");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        cipher = Cipher.getInstance("DES");
     }
 }

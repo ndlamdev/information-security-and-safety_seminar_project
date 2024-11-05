@@ -9,14 +9,17 @@
 package main.java.server.security.symmetrical;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public abstract class ASymmetrical implements ISymmetrical {
     protected SecretKey key;
     protected Cipher cipher;
 
     @Override
-    public void loadKey(SecretKey key) {
+    public void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         this.key = key;
     }
 
@@ -24,4 +27,6 @@ public abstract class ASymmetrical implements ISymmetrical {
     public SecretKey getKey() {
         return this.key;
     }
+
+    protected abstract void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException;
 }

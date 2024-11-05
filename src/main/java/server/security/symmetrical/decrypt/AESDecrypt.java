@@ -9,22 +9,19 @@
 package main.java.server.security.symmetrical.decrypt;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class AESDecrypt extends ASymmetricalDecrypt {
 
-    public AESDecrypt(SecretKey key) {
-        loadKey(key);
+    public AESDecrypt(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        super(key);
     }
 
     @Override
-    public void loadKey(SecretKey key) {
-        super.loadKey(key);
-        try {
-            cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-        } catch (Exception e) {
-            System.out.println("Lỗi key không hợp lệ!");
-        }
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        cipher = Cipher.getInstance("AES");
     }
 }

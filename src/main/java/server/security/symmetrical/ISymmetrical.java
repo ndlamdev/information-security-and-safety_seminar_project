@@ -8,16 +8,22 @@
 
 package main.java.server.security.symmetrical;
 
+import main.java.server.security.symmetrical.decrypt.AESDecrypt;
+import main.java.server.security.symmetrical.decrypt.DESDecrypt;
+import main.java.server.security.symmetrical.decrypt.ISymmetricalDecrypt;
 import main.java.server.security.symmetrical.encrypt.AESEncrypt;
 import main.java.server.security.symmetrical.encrypt.DESEncrypt;
 import main.java.server.security.symmetrical.encrypt.ISymmetricalEncrypt;
 
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public interface ISymmetrical {
-    void loadKey(SecretKey key);
+    void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
 
     SecretKey getKey();
 
@@ -41,7 +47,7 @@ public interface ISymmetrical {
     }
 
     class Factory {
-        public static ISymmetricalEncrypt createEncrypt(ISymmetrical.SymmetricalAlgorithm algorithm, int keySize) {
+        public static ISymmetricalEncrypt createEncrypt(ISymmetrical.SymmetricalAlgorithm algorithm, int keySize) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
             return switch (algorithm) {
                 case AES -> {
                     var cipher = new AESEncrypt();
@@ -53,6 +59,13 @@ public interface ISymmetrical {
                     cipher.loadKey(cipher.generateKey(keySize));
                     yield cipher;
                 }
+            };
+        }
+
+        public static ISymmetricalDecrypt createDecrypt(ISymmetrical.SymmetricalAlgorithm algorithm, SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+            return switch (algorithm) {
+                case AES -> new AESDecrypt(key);
+                case DES -> new DESDecrypt(key);
             };
         }
     }

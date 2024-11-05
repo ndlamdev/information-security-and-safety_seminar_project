@@ -10,21 +10,36 @@ package main.java.server.security.symmetrical.decrypt;
 
 import main.java.server.security.symmetrical.ASymmetrical;
 
+import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public abstract class ASymmetricalDecrypt extends ASymmetrical implements ISymmetricalDecrypt {
+
+    public ASymmetricalDecrypt(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        loadKey(key);
+    }
+
+    @Override
+    public void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        super.loadKey(key);
+        initCipher();
+        cipher.init(Cipher.DECRYPT_MODE, key);
+    }
 
     @Override
     public String decrypt(byte[] data) {
         try {
             return new String(cipher.doFinal(data));
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }

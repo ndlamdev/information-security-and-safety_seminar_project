@@ -13,11 +13,14 @@ import main.java.server.security.symmetrical.decrypt.AESDecrypt;
 import main.java.server.security.symmetrical.decrypt.DESDecrypt;
 import main.java.server.security.symmetrical.decrypt.ISymmetricalDecrypt;
 
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public abstract class AASymmetricalDecrypt implements IASymmetricalDecrypt {
 
@@ -60,16 +63,8 @@ public abstract class AASymmetricalDecrypt implements IASymmetricalDecrypt {
         }
     }
 
-    private boolean decryptFileHelper(HeaderFileEncrypt header, String source, String dest) {
-        return initSymmetricalDecrypt(header.algorithm, header.key).decryptFile(source, dest, header.skip);
-    }
-
-    private ISymmetricalDecrypt initSymmetricalDecrypt(ISymmetrical.SymmetricalAlgorithm algorithm, SecretKey key) {
-        return switch (algorithm) {
-            case AES -> new AESDecrypt(key);
-            case DES -> new DESDecrypt(key);
-            default -> throw new IllegalArgumentException("Unsupported algorithm: " + algorithm);
-        };
+    private boolean decryptFileHelper(HeaderFileEncrypt header, String source, String dest) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        return ISymmetrical.Factory.createDecrypt(header.algorithm, header.key).decryptFile(source, dest, header.skip);
     }
 
     private record HeaderFileEncrypt(SecretKey key, ISymmetrical.SymmetricalAlgorithm algorithm, long skip) {
