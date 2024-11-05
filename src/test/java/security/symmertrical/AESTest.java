@@ -1,0 +1,49 @@
+/**
+ * Nguyen Dinh Lam
+ * Email: kiminonawa1305@gmail.com
+ * Phone number: +84 855354919
+ * Create at: 9:32 AM - 05/11/2024
+ * User: lam-nguyen
+ **/
+
+package test.java.security.symmertrical;
+
+import main.java.server.security.symmetrical.decrypt.AESDecrypt;
+import main.java.server.security.symmetrical.decrypt.ISymmetricalDecrypt;
+import main.java.server.security.symmetrical.encrypt.AESEncrypt;
+import main.java.server.security.symmetrical.encrypt.ISymmetricalEncrypt;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import javax.crypto.SecretKey;
+
+public class AESTest {
+    static ISymmetricalEncrypt encrypt;
+    static ISymmetricalDecrypt decrypt;
+
+    @BeforeAll
+    static void init() throws Exception {
+        encrypt = new AESEncrypt();
+        var key = encrypt.generateKey(128);
+        decrypt = new AESDecrypt(key);
+        encrypt.loadKey(key);
+    }
+
+    @Test
+    void testForText() throws Exception {
+        String data = "Nguyễn Đình Làm sinh ngày 13/05/2003!";
+        String datEncrypt = encrypt.encryptStringBase64(data);
+        String dataDecrypt = decrypt.decryptBase64ToString(datEncrypt);
+        Assertions.assertEquals(data, dataDecrypt);
+    }
+
+    @Test
+    void testForFile() throws Exception {
+        String file = "/home/lam-nguyen/Desktop/hinh.png";
+        String fileEncrypt = "/home/lam-nguyen/Desktop/hinh_encrypt.png";
+        String fileDecrypt = "/home/lam-nguyen/Desktop/hinh_decrypt.png";
+        Assertions.assertTrue(encrypt.encryptFile(file, fileEncrypt, false));
+        Assertions.assertTrue(decrypt.decryptFile(fileEncrypt, fileDecrypt, 0));
+    }
+}
