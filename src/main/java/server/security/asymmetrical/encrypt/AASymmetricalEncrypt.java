@@ -8,6 +8,8 @@
 
 package main.java.server.security.asymmetrical.encrypt;
 
+import main.java.server.security.asymmetrical.AAsymmetrical;
+import main.java.server.security.asymmetrical.ASymmetricalKey;
 import main.java.server.security.symmetrical.ISymmetrical;
 import main.java.server.security.symmetrical.encrypt.AESEncrypt;
 import main.java.server.security.symmetrical.encrypt.DESEncrypt;
@@ -20,12 +22,14 @@ import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.util.Base64;
 
-public abstract class AASymmetricalEncrypt implements IASymmetricalEncrypt {
-    protected Cipher cipher;
+public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASymmetricalEncrypt {
     protected PublicKey key;
 
     public AASymmetricalEncrypt(PublicKey key) {
@@ -36,14 +40,14 @@ public abstract class AASymmetricalEncrypt implements IASymmetricalEncrypt {
     }
 
     @Override
-    public void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public final void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         this.key = key;
-        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        initCipher();
         cipher.init(Cipher.ENCRYPT_MODE, key);
     }
 
     @Override
-    public boolean encryptFile(ISymmetrical.SymmetricalAlgorithm algorithm, int sizeKey, String source, String dest) throws Exception {
+    public final boolean encryptFile(ISymmetrical.SymmetricalAlgorithm algorithm, int sizeKey, String source, String dest) throws Exception {
         var cipherEncrypt = ISymmetrical.Factory.createEncrypt(algorithm, sizeKey);
         var key = cipherEncrypt.getKey();
         try {
@@ -64,5 +68,30 @@ public abstract class AASymmetricalEncrypt implements IASymmetricalEncrypt {
 
     private boolean encryptFileHelper(ISymmetricalEncrypt encrypt, String source, String dest) {
         return encrypt.encryptFile(source, dest, true);
+    }
+
+    protected abstract KeyPairGenerator initKeyPairGenerator() throws NoSuchAlgorithmException;
+
+    @Override
+    public final ASymmetricalKey generateKey(int size) throws Exception {
+        KeyPairGenerator generator = initKeyPairGenerator();
+        generator.initialize(size);
+        var keyPair = generator.generateKeyPair();
+        return new ASymmetricalKey(keyPair.getPrivate(), keyPair.getPublic());
+    }
+
+    @Override
+    public final byte[] encrypt(String data) throws Exception {
+        return cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public final String encryptToBase64(byte[] data) throws Exception {
+        return Base64.getEncoder().encodeToString(cipher.doFinal(data));
+    }
+
+    @Override
+    public final String encryptStringToBase64(String data) throws Exception {
+        return Base64.getEncoder().encodeToString(encrypt(data));
     }
 }

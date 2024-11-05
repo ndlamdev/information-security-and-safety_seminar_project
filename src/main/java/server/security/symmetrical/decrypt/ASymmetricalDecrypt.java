@@ -29,14 +29,14 @@ public abstract class ASymmetricalDecrypt extends ASymmetrical implements ISymme
     }
 
     @Override
-    public void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public final void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         super.loadKey(key);
         initCipher();
         cipher.init(Cipher.DECRYPT_MODE, key);
     }
 
     @Override
-    public String decrypt(byte[] data) {
+    public final String decrypt(byte[] data) {
         try {
             return new String(cipher.doFinal(data));
         } catch (Exception e) {
@@ -45,12 +45,12 @@ public abstract class ASymmetricalDecrypt extends ASymmetrical implements ISymme
     }
 
     @Override
-    public String decryptBase64ToString(String data) {
+    public final String decryptBase64ToString(String data) {
         return decrypt(Base64.getDecoder().decode(data));
     }
 
     @Override
-    public boolean decryptFile(String source, String dest, long skip) {
+    public final boolean decryptFile(String source, String dest, long skip) {
         try (BufferedInputStream bufferInput = new BufferedInputStream(new FileInputStream(source));
              CipherInputStream input = new CipherInputStream(bufferInput, cipher);
              BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dest))) {

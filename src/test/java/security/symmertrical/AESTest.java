@@ -26,8 +26,8 @@ public class AESTest {
     static void init() throws Exception {
         encrypt = new AESEncrypt();
         var key = encrypt.generateKey(128);
-        decrypt = new AESDecrypt(key);
         encrypt.loadKey(key);
+        decrypt = new AESDecrypt(key);
     }
 
     @Test

@@ -22,6 +22,6 @@ public class AESDecrypt extends ASymmetricalDecrypt {
 
     @Override
     protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        cipher = Cipher.getInstance("AES");
+        cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     }
 }

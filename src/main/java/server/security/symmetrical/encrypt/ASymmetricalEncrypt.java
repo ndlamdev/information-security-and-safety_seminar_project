@@ -10,10 +10,7 @@ package main.java.server.security.symmetrical.encrypt;
 
 import main.java.server.security.symmetrical.ASymmetrical;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -25,14 +22,14 @@ import java.util.Base64;
 public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymmetricalEncrypt {
 
     @Override
-    public void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public final void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         super.loadKey(key);
         initCipher();
         cipher.init(Cipher.ENCRYPT_MODE, key);
     }
 
     @Override
-    public byte[] encrypt(String data) {
+    public final byte[] encrypt(String data) {
         try {
             return cipher.doFinal(data.getBytes("UTF-8"));
         } catch (Exception e) {
@@ -42,12 +39,12 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
     }
 
     @Override
-    public String encryptStringBase64(String data) {
+    public final String encryptStringBase64(String data) {
         return Base64.getEncoder().encodeToString(encrypt(data));
     }
 
     @Override
-    public boolean encryptFile(String source, String dest, boolean append) {
+    public final boolean encryptFile(String source, String dest, boolean append) {
         try (BufferedInputStream bufferInput = new BufferedInputStream(new FileInputStream(source));
              CipherInputStream input = new CipherInputStream(bufferInput, cipher);
              BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dest, append))) {
@@ -70,5 +67,16 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
         return true;
     }
 
+    protected abstract KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException;
 
+    @Override
+    public final SecretKey generateKey(int size) {
+        try {
+            KeyGenerator keyGen = initKeyGenerator();
+            keyGen.init(size);
+            return keyGen.generateKey();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

@@ -8,24 +8,37 @@
 
 package main.java.server.security.asymmetrical.decrypt;
 
+import main.java.server.security.asymmetrical.AAsymmetrical;
 import main.java.server.security.symmetrical.ISymmetrical;
 import main.java.server.security.symmetrical.decrypt.AESDecrypt;
 import main.java.server.security.symmetrical.decrypt.DESDecrypt;
 import main.java.server.security.symmetrical.decrypt.ISymmetricalDecrypt;
 
+import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.util.Base64;
 
-public abstract class AASymmetricalDecrypt implements IASymmetricalDecrypt {
+public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASymmetricalDecrypt {
+    protected PrivateKey key;
+
+    public AASymmetricalDecrypt(PrivateKey key) throws Exception {
+        this.loadKey(key);
+    }
+
+    public AASymmetricalDecrypt() {
+    }
 
     @Override
-    public boolean decryptFile(String source, String dest) throws Exception {
+    public final boolean decryptFile(String source, String dest) throws Exception {
         HeaderFileEncrypt header = loadHeader(source);
         if (header == null) {
             return false;
@@ -67,6 +80,28 @@ public abstract class AASymmetricalDecrypt implements IASymmetricalDecrypt {
         return ISymmetrical.Factory.createDecrypt(header.algorithm, header.key).decryptFile(source, dest, header.skip);
     }
 
+    @Override
+    public final void loadKey(PrivateKey key) throws Exception {
+        this.key = key;
+        initCipher();
+        cipher.init(Cipher.DECRYPT_MODE, key);
+    }
+
     private record HeaderFileEncrypt(SecretKey key, ISymmetrical.SymmetricalAlgorithm algorithm, long skip) {
+    }
+
+    @Override
+    public final byte[] decrypt(byte[] data) throws Exception {
+        return cipher.doFinal(data);
+    }
+
+    @Override
+    public final String decryptToString(byte[] data) throws Exception {
+        return new String(decrypt(data), StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public final String decryptBase64ToString(String base64) throws Exception {
+        return decryptToString(Base64.getDecoder().decode(base64));
     }
 }

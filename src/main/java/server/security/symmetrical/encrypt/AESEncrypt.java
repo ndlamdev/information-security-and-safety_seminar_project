@@ -16,19 +16,14 @@ import java.security.NoSuchAlgorithmException;
 
 public class AESEncrypt extends ASymmetricalEncrypt {
 
-    @Override
-    public SecretKey generateKey(int size) {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-            keyGen.init(size);
-            return keyGen.generateKey();
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     @Override
     protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        cipher = Cipher.getInstance("AES");
+        cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+    }
+
+    @Override
+    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
+        return KeyGenerator.getInstance("AES");
     }
 }

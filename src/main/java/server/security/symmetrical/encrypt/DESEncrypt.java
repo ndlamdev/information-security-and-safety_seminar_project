@@ -17,17 +17,8 @@ import java.security.NoSuchAlgorithmException;
 public class DESEncrypt extends ASymmetricalEncrypt {
 
     @Override
-    public SecretKey generateKey(int size) {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("DES");
-            keyGen.init(size);
-            SecretKey key = keyGen.generateKey();
-            loadKey(key);
-            return key;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
+        return KeyGenerator.getInstance("DES");
     }
 
     @Override
