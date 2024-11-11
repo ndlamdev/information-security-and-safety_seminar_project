@@ -8,7 +8,7 @@
 
 package test.java.helper;
 
-import main.java.server.helper.MatrixHelper;
+import main.java.helper.MatrixHelper;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

@@ -8,15 +8,13 @@
 
 package test.java.security.symmertrical;
 
-import main.java.server.security.symmetrical.decrypt.AESDecrypt;
-import main.java.server.security.symmetrical.decrypt.ISymmetricalDecrypt;
-import main.java.server.security.symmetrical.encrypt.AESEncrypt;
-import main.java.server.security.symmetrical.encrypt.ISymmetricalEncrypt;
+import main.java.security.symmetrical.decrypt.AESDecrypt;
+import main.java.security.symmetrical.decrypt.ISymmetricalDecrypt;
+import main.java.security.symmetrical.encrypt.AESEncrypt;
+import main.java.security.symmetrical.encrypt.ISymmetricalEncrypt;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import javax.crypto.SecretKey;
 
 public class AESTest {
     static ISymmetricalEncrypt encrypt;

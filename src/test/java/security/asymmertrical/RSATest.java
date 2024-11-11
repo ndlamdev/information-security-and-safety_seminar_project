@@ -8,12 +8,11 @@
 
 package test.java.security.asymmertrical;
 
-import main.java.server.security.asymmetrical.decrypt.IASymmetricalDecrypt;
-import main.java.server.security.asymmetrical.decrypt.RSADecrypt;
-import main.java.server.security.asymmetrical.encrypt.IASymmetricalEncrypt;
-import main.java.server.security.asymmetrical.encrypt.RSAEncrypt;
-import main.java.server.security.symmetrical.ISymmetrical;
-import main.java.server.security.symmetrical.encrypt.AESEncrypt;
+import main.java.security.asymmetrical.decrypt.IASymmetricalDecrypt;
+import main.java.security.asymmetrical.decrypt.RSADecrypt;
+import main.java.security.asymmetrical.encrypt.IASymmetricalEncrypt;
+import main.java.security.asymmetrical.encrypt.RSAEncrypt;
+import main.java.security.symmetrical.ISymmetrical;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,7 @@ public class RSATest {
         String file = "/home/lam-nguyen/Desktop/hinh.png";
         String fileEncrypt = "/home/lam-nguyen/Desktop/hinh_encrypt.png";
         String fileDecrypt = "/home/lam-nguyen/Desktop/hinh_decrypt.png";
-        Assertions.assertTrue(encrypt.encryptFile(ISymmetrical.SymmetricalAlgorithm.DES, 56, file, fileEncrypt));
+        Assertions.assertTrue(encrypt.encryptFile(ISymmetrical.Algorithms.DES, 56, file, fileEncrypt));
         Assertions.assertTrue(decrypt.decryptFile(fileEncrypt, fileDecrypt));
     }
 }

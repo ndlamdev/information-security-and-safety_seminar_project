@@ -8,9 +8,9 @@
 
 package test.java.security.traditionalCipher;
 
-import main.java.server.security.traditionalCipher.ITraditionalCipher;
-import main.java.server.security.traditionalCipher.TraditionalKey;
-import main.java.server.security.traditionalCipher.algorithm.ShiftCipher;
+import main.java.security.traditionalCipher.ITraditionalCipher;
+import main.java.security.traditionalCipher.TraditionalKey;
+import main.java.security.traditionalCipher.algorithm.ShiftCipher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

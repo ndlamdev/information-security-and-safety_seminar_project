@@ -8,16 +8,12 @@
 
 package test.java.security.traditionalCipher;
 
-import main.java.server.security.traditionalCipher.ITraditionalCipher;
-import main.java.server.security.traditionalCipher.TraditionalKey;
-import main.java.server.security.traditionalCipher.algorithm.AffineCipher;
-import main.java.server.security.traditionalCipher.algorithm.AffineCipher;
+import main.java.security.traditionalCipher.ITraditionalCipher;
+import main.java.security.traditionalCipher.TraditionalKey;
+import main.java.security.traditionalCipher.algorithm.AffineCipher;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
 
 @DisplayName("AffineCipherTest")
 public class AffineCipherTest {

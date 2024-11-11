@@ -8,10 +8,10 @@
 
 package test.java.security.traditionalCipher;
 
-import main.java.server.helper.CharSetConfig;
-import main.java.server.security.traditionalCipher.ITraditionalCipher;
-import main.java.server.security.traditionalCipher.TraditionalKey;
-import main.java.server.security.traditionalCipher.algorithm.SubstitutionCipher;
+import main.java.helper.CharSetConfig;
+import main.java.security.traditionalCipher.ITraditionalCipher;
+import main.java.security.traditionalCipher.TraditionalKey;
+import main.java.security.traditionalCipher.algorithm.SubstitutionCipher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

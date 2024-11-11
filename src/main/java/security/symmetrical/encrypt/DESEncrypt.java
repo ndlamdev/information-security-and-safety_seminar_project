@@ -1,0 +1,27 @@
+/**
+ * Author: Nguyen Dinh Lam
+ * Email: kiminonawa1305@gmail.com
+ * Phone number: +84 855354919
+ * Create at: 5:14 AM - 15/10/2024
+ * User: lam-nguyen
+ **/
+
+package main.java.security.symmetrical.encrypt;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import java.security.NoSuchAlgorithmException;
+
+public class DESEncrypt extends ASymmetricalEncrypt {
+
+    @Override
+    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
+        return KeyGenerator.getInstance("DES");
+    }
+
+    @Override
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        cipher = Cipher.getInstance("DES");
+    }
+}
