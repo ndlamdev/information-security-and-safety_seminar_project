@@ -11,16 +11,21 @@ package main.java.security.symmetrical.encrypt;
 import main.java.security.symmetrical.ASymmetrical;
 
 import javax.crypto.*;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymmetricalEncrypt {
+
+    public ASymmetricalEncrypt(String mode, String padding) {
+        super(mode, padding);
+    }
+
+    public ASymmetricalEncrypt() {
+        super(null, null);
+    }
 
     /**
      * Tải khóa bí mật và khởi tạo đối tượng Cipher để mã hóa dữ liệu.
@@ -72,26 +77,22 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @return True nếu tệp được mã hóa thành công, false nếu không.
      */
     @Override
-    public final boolean encryptFile(String source, String dest, boolean append) {
-        try {
-            BufferedInputStream bufferInput = new BufferedInputStream(new FileInputStream(source));
-            CipherInputStream input = new CipherInputStream(bufferInput, cipher);
-            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dest, append));
+    public final boolean encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException {
+        BufferedInputStream bufferInput = new BufferedInputStream(new FileInputStream(source));
+        CipherInputStream input = new CipherInputStream(bufferInput, cipher);
+        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dest, append));
 
-            byte[] buffer = new byte[1024 * 10];
-            int i;
-            while ((i = input.read(buffer)) != -1)
-                output.write(buffer, 0, i);
+        byte[] buffer = new byte[1024 * 10];
+        int i;
+        while ((i = input.read(buffer)) != -1)
+            output.write(buffer, 0, i);
+        input.close();
 
+        byte[] finalBuffer = cipher.doFinal();
+        if (finalBuffer != null)
+            output.write(finalBuffer);
+        output.flush();
 
-            byte[] finalBuffer = cipher.doFinal();
-            if (finalBuffer != null)
-                output.write(finalBuffer);
-
-
-        } catch (Exception e) {
-            return false;
-        }
         return true;
     }
 

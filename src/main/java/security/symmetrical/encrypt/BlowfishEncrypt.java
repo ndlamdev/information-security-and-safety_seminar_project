@@ -17,24 +17,24 @@ import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 
 @NoArgsConstructor
-public class DESEncrypt extends ASymmetricalEncrypt {
-    public DESEncrypt(String mode, String padding) {
+public class BlowfishEncrypt extends ASymmetricalEncrypt {
+    public BlowfishEncrypt(String mode, String padding) {
         super(mode, padding);
     }
 
     @Override
-    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance("DES");
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        cipher = ISymmetrical.getCipherInstance(Algorithms.Blowfish, mode, padding);
     }
 
     /**
      * Tạo đối tượng KeyGenerator
      *
      * @return KeyGenerator
-     * @serialData Size key support: 56
+     * @serialData Size key support:  32 - 448
      */
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        cipher = ISymmetrical.getCipherInstance(Algorithms.DES, mode, padding);
+    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
+        return KeyGenerator.getInstance("Blowfish");
     }
 }

@@ -13,8 +13,10 @@ import main.java.ui.fileEncrypt.component.input.SelectFolderDest;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 
-public class OutputComponent extends JPanel {
+public class OutputComponent extends JPanel implements Observer {
     private final int RADIUS = 20;
     private final int STROKE_WIDTH = 2;
     private JTextField jtfFileDest;
@@ -28,21 +30,18 @@ public class OutputComponent extends JPanel {
     }
 
     private void init() {
-        this.setPreferredSize(new Dimension(1500, 110));
-
         this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
 
         jlbFolderDest = new SelectFolderDest();
         this.add(jlbFolderDest);
+
         this.add(new JLabel("/") {{
             setPreferredSize(new Dimension(20, 50));
             setFont(new Font("", Font.PLAIN, 40));
             setHorizontalAlignment(SwingConstants.CENTER);
         }});
 
-        jtfFileDest = new JTextField() {{
-            setPreferredSize(new Dimension(300, 50));
-        }};
+        jtfFileDest = new JTextField();
         this.add(jtfFileDest);
 
         jlbExtensionFile = new JLabel("") {{
@@ -73,7 +72,7 @@ public class OutputComponent extends JPanel {
         g2.drawRoundRect(0, heightTitle, getWidth() - STROKE_WIDTH, getHeight() - STROKE_WIDTH - heightTitle, RADIUS, RADIUS);
 
         g2.setColor(Color.white);
-        g2.fillRect(20, 0, 170, 28);
+        g2.fillRect(20, 0, 130, 28);
 
         g2.setColor(Color.BLACK);
         g2.drawString("Xuất kết quả!", 30, 18);
@@ -120,5 +119,13 @@ public class OutputComponent extends JPanel {
 
     public String getFullPath() {
         return getFolderDest() + getFileDest() + getExtensionFile();
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        var sizeParent = getParent().getWidth();
+        this.setPreferredSize(new Dimension(sizeParent - 200, 110));
+        jlbFolderDest.setPreferredSize(new Dimension(sizeParent - 800, 50));
+        jtfFileDest.setPreferredSize(new Dimension(sizeParent - 1100, 50));
     }
 }

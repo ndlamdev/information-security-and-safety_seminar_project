@@ -17,6 +17,12 @@ import java.security.NoSuchAlgorithmException;
 public abstract class ASymmetrical implements ISymmetrical {
     protected SecretKey key;
     protected Cipher cipher;
+    protected String mode, padding;
+
+    public ASymmetrical(String mode, String padding) {
+        this.mode = mode;
+        this.padding = padding;
+    }
 
     /**
      * Tải khóa bí mật vào cipher.
@@ -48,4 +54,9 @@ public abstract class ASymmetrical implements ISymmetrical {
      * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại
      */
     protected abstract void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException;
+
+
+    protected String getExtension() {
+        return (mode == null || mode.isBlank() ? "" : "/" + mode) + (padding == null || padding.isBlank() ? "" : "/" + padding);
+    }
 }

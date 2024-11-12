@@ -17,24 +17,24 @@ import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 
 @NoArgsConstructor
-public class DESEncrypt extends ASymmetricalEncrypt {
-    public DESEncrypt(String mode, String padding) {
+public class RC5Encrypt extends ASymmetricalEncrypt {
+    public RC5Encrypt(String mode, String padding) {
         super(mode, padding);
     }
 
     @Override
-    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance("DES");
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        cipher = ISymmetrical.getCipherInstance(Algorithms.RC5, mode, padding);
     }
 
     /**
      * Tạo đối tượng KeyGenerator
      *
      * @return KeyGenerator
-     * @serialData Size key support: 56
+     * @serialData Size key support:  0 - 2040, phổ biến là 128
      */
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        cipher = ISymmetrical.getCipherInstance(Algorithms.DES, mode, padding);
+    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
+        return KeyGenerator.getInstance("RC5");
     }
 }

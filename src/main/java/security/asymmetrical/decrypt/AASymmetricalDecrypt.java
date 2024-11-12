@@ -11,9 +11,7 @@ package main.java.security.asymmetrical.decrypt;
 import main.java.security.asymmetrical.AAsymmetrical;
 import main.java.security.symmetrical.ISymmetrical;
 
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,7 +71,7 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
         }
     }
 
-    private boolean decryptFileHelper(HeaderFileEncrypt header, String source, String dest) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    private boolean decryptFileHelper(HeaderFileEncrypt header, String source, String dest) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException {
         return ISymmetrical.Factory.createDecrypt(header.algorithm, header.key).decryptFile(source, dest, header.skip);
     }
 

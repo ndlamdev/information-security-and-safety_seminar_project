@@ -13,6 +13,8 @@ import main.java.security.symmetrical.ISymmetrical;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public interface ISymmetricalEncrypt extends ISymmetrical {
     /**
@@ -51,5 +53,5 @@ public interface ISymmetricalEncrypt extends ISymmetrical {
      * @param append Có thêm vào tệp đích nếu nó đã tồn tại hay không.
      * @return True nếu tệp được mã hóa thành công, false nếu không.
      */
-    boolean encryptFile(String source, String dest, boolean append);
+    boolean encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException;
 }

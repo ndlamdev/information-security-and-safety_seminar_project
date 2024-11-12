@@ -9,6 +9,7 @@
 package main.java.config;
 
 import lombok.Getter;
+import main.java.security.asymmetrical.IAsymmetrical;
 import main.java.security.symmetrical.ISymmetrical;
 
 import java.util.ArrayList;
@@ -36,6 +37,33 @@ public class KeyConfig {
             put(ISymmetrical.Algorithms.DES.name(), new ArrayList<>() {{
                 add("56");
             }});
+            put(ISymmetrical.Algorithms.ARCFOUR.name(), new ArrayList<>() {{
+                for (int i = 40; i <= 2048; i++)
+                    add(String.valueOf(i));
+            }});
+            put(ISymmetrical.Algorithms.Blowfish.name(), new ArrayList<>() {{
+                for (int i = 32; i <= 448; i++)
+                    add(String.valueOf(i));
+            }});
+            put(ISymmetrical.Algorithms.ChaCha20.name(), new ArrayList<>() {{
+                add("256");
+            }});
+            put(ISymmetrical.Algorithms.DESede.name(), new ArrayList<>() {{
+                add("112");
+                add("168");
+            }});
+            put(ISymmetrical.Algorithms.RC2.name(), new ArrayList<>() {{
+                for (int i = 40; i <= 1024; i++)
+                    add(String.valueOf(i));
+            }});
+            put(ISymmetrical.Algorithms.RC4.name(), new ArrayList<>() {{
+                for (int i = 40; i <= 2048; i++)
+                    add(String.valueOf(i));
+            }});
+            put(ISymmetrical.Algorithms.RC5.name(), new ArrayList<>() {{
+                for (int i = 0; i <= 2040; i++)
+                    add(String.valueOf(i));
+            }});
             put(ISymmetrical.Algorithms.AES.name(), new ArrayList<>() {{
                 add("128");
                 add("192");
@@ -46,9 +74,11 @@ public class KeyConfig {
 
     private void initMapAlgorithmAsymmetrical() {
         mapAlgorithmAsymmetrical = new HashMap<>() {{
-            put(ISymmetrical.Algorithms.DES.name(), new ArrayList<>() {{
-                add("56");
-            }});
+            put(IAsymmetrical.Algorithms.RSA.name(), new ArrayList<>() {
+                {
+                    add("2048");
+                }
+            });
             put(ISymmetrical.Algorithms.AES.name(), new ArrayList<>() {{
                 add("128");
                 add("192");

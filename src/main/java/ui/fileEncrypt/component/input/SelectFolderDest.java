@@ -27,7 +27,6 @@ public class SelectFolderDest extends JLabel {
     }
 
     private void init() {
-        setPreferredSize(new Dimension(800, 50));
         this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
     }
 

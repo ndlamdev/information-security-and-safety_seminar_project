@@ -2,6 +2,7 @@ package main.java.ui.fileEncrypt.component.dropAndDrag.ui;
 
 import main.java.ui.fileEncrypt.component.dropAndDrag.DropAndDragComponent;
 import main.java.ui.fileEncrypt.component.label.LabelBorder;
+import main.java.ui.fileEncrypt.controller.SubjectSizeController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,8 +14,10 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
 
-public class JPanelDisplayFile extends JPanel {
+public class JPanelDisplayFile extends JPanel implements Observer {
     private JButton jbtDeleteFile;
     private LabelBorder fileLabel;
     private DropAndDragComponent dropAndDragComponent;
@@ -39,7 +42,6 @@ public class JPanelDisplayFile extends JPanel {
         this.add(jbtDeleteFile);
 
         fileLabel = new LabelBorder("");
-        fileLabel.setPreferredSize(new Dimension(900, 50));
         this.add(fileLabel);
     }
 
@@ -55,5 +57,10 @@ public class JPanelDisplayFile extends JPanel {
 
     public String getFile() {
         return this.fileLabel.getText().isBlank() ? null : this.fileLabel.getText();
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        fileLabel.setPreferredSize(new Dimension(getParent().getWidth() - 100, 50));
     }
 }

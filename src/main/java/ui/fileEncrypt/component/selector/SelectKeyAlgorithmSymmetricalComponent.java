@@ -6,7 +6,7 @@
  * User: lam-nguyen
  **/
 
-package main.java.ui.fileEncrypt.component.algorithm;
+package main.java.ui.fileEncrypt.component.selector;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,16 +16,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.function.Function;
 
-public class SelectAlgorithmCipherSymmetricalComponent extends JPanel {
+public class SelectKeyAlgorithmSymmetricalComponent extends JPanel implements Observer {
     private final int RADIUS = 20;
     private final int STROKE_WIDTH = 2;
-    private JComboBox<String> jbcAlgorithms, jbcSizeKeyAlgorithms;
+    private JComboBox<String> jbcAlgorithms, jbcSizeKey;
     private Map<String, List<String>> mapAlgorithms;
     private Function<AlgorithmKey, Void> onAlgorithmKeyChanged;
+    private Dimension dimensionPanel, dimensionComboBox, dimensionLabel;
+    private JLabel labelSizeKey;
+    private JPanel panelSizeKey;
+    private JLabel labelAlgtithm;
+    private JPanel panelAlgorithm;
 
-    public SelectAlgorithmCipherSymmetricalComponent(Function<AlgorithmKey, Void> onAlgorithmKeyChanged) {
+    public SelectKeyAlgorithmSymmetricalComponent(Function<AlgorithmKey, Void> onAlgorithmKeyChanged) {
         this.onAlgorithmKeyChanged = onAlgorithmKeyChanged;
         this.setOpaque(false);
 
@@ -35,45 +42,42 @@ public class SelectAlgorithmCipherSymmetricalComponent extends JPanel {
     }
 
     private void init() {
-        this.setPreferredSize(new Dimension(1500, 150));
         this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
 
-        var dimensionPanel = new Dimension(720, 90);
-        var dimensionComboBox = new Dimension(700, 50);
-        var dimensionLabel = new Dimension(700, 30);
+        dimensionPanel = new Dimension(0, 90);
+        dimensionComboBox = new Dimension(0, 50);
+        dimensionLabel = new Dimension(0, 30);
 
         jbcAlgorithms = new JComboBox<>(mapAlgorithms.keySet().toArray(String[]::new)) {{
-            setPreferredSize(dimensionComboBox);
             addActionListener(itemEvent -> {
                 var algorithm = (String) jbcAlgorithms.getSelectedItem();
-                jbcSizeKeyAlgorithms.setModel(new DefaultComboBoxModel<>(mapAlgorithms.get(algorithm).toArray(String[]::new)));
+                jbcSizeKey.setModel(new DefaultComboBoxModel<>(mapAlgorithms.get(algorithm).toArray(String[]::new)));
                 onAlgorithmKeyChanged.apply(getAlgorithmKey());
             });
         }};
 
-        this.add(new JPanel() {{
-            setPreferredSize(dimensionPanel);
-            add(new JLabel("Thuật toán!") {{
-                setPreferredSize(dimensionLabel);
-            }});
+        labelAlgtithm = new JLabel("Thuật toán!");
+        panelAlgorithm = new JPanel() {{
+            add(labelAlgtithm);
             add(jbcAlgorithms);
-        }});
+            setOpaque(false);
+        }};
+        this.add(panelAlgorithm);
 
 
-        jbcSizeKeyAlgorithms = new JComboBox<>(mapAlgorithms.get(mapAlgorithms.keySet().iterator().next()).toArray(String[]::new)) {{
-            setPreferredSize(dimensionComboBox);
+        jbcSizeKey = new JComboBox<>(mapAlgorithms.get(mapAlgorithms.keySet().iterator().next()).toArray(String[]::new)) {{
             addActionListener(actionEvent -> {
                 onAlgorithmKeyChanged.apply(getAlgorithmKey());
             });
         }};
 
-        this.add(new JPanel() {{
-            setPreferredSize(dimensionPanel);
-            add(new JLabel("Kích thước khóa!") {{
-                setPreferredSize(dimensionLabel);
-            }});
-            add(jbcSizeKeyAlgorithms);
-        }});
+        labelSizeKey = new JLabel("Kích thước khóa!");
+        panelSizeKey = new JPanel() {{
+            add(labelSizeKey);
+            setOpaque(false);
+            add(jbcSizeKey);
+        }};
+        this.add(panelSizeKey);
     }
 
     @Override
@@ -91,14 +95,33 @@ public class SelectAlgorithmCipherSymmetricalComponent extends JPanel {
         g2.drawRoundRect(0, heightTitle, getWidth() - STROKE_WIDTH, getHeight() - STROKE_WIDTH - heightTitle, RADIUS, RADIUS);
 
         g2.setColor(Color.white);
-        g2.fillRect(20, 0, 230, 28);
+        g2.fillRect(20, 0, 190, 28);
 
         g2.setColor(Color.BLACK);
         g2.drawString("Lựa chọn thuật toán!", 30, 18);
     }
 
     public AlgorithmKey getAlgorithmKey() {
-        return new AlgorithmKey((String) jbcAlgorithms.getSelectedItem(), Integer.parseInt((String) jbcSizeKeyAlgorithms.getSelectedItem()));
+        return new AlgorithmKey((String) jbcAlgorithms.getSelectedItem(), Integer.parseInt((String) jbcSizeKey.getSelectedItem()));
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        var parentSize = getParent().getWidth();
+        this.setPreferredSize(new Dimension(parentSize - 200, 150));
+
+        dimensionPanel.width = (parentSize - 260) / 2;
+        panelAlgorithm.setPreferredSize(dimensionPanel);
+        panelSizeKey.setPreferredSize(dimensionPanel);
+
+        dimensionLabel.width = dimensionPanel.width - 20;
+        labelAlgtithm.setPreferredSize(dimensionLabel);
+        labelSizeKey.setPreferredSize(dimensionLabel);
+
+
+        dimensionComboBox.width = dimensionLabel.width;
+        jbcAlgorithms.setPreferredSize(dimensionComboBox);
+        jbcSizeKey.setPreferredSize(dimensionComboBox);
     }
 
     @Getter

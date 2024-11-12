@@ -20,29 +20,52 @@ public class MainMenu extends JMenuBar {
     private Application application;
     private MainMenuController mainMenuController;
     @Getter
-    private JMenuItem encryptMenuItem, decryptMenuItem, exitMenuItem, keySymmetrical, keyAsymmetrical;
+    private JMenuItem openWorkSpace, encryptSymmetricalMenuItem, decryptSymmetricalMenuItem, exitMenuItem, keySymmetrical, keyAsymmetrical;
+    @Getter
+    private JMenu symmetricalMenu, home, file, text;
 
     public MainMenu(IJNavigation navigation, Application application) {
         this.navigation = navigation;
         this.application = application;
-        this.init();
+        this.initMenu();
+        this.initMenuHome();
+        this.initMenuFile();
     }
 
-    private void init() {
+    private void initMenu() {
         this.mainMenuController = new MainMenuController(this);
 
-        JMenu home = new JMenu("Home");
+        home = new JMenu("Home");
         this.add(home);
 
-        encryptMenuItem = new JMenuItem("Mã hóa file") {{
-            addActionListener(mainMenuController);
-        }};
-        home.add(encryptMenuItem);
+        file = new JMenu("File");
+        this.add(file);
 
-        decryptMenuItem = new JMenuItem("Giải mã file") {{
+        text = new JMenu("Văn bản");
+        this.add(text);
+
+        JMenu about = new JMenu("About");
+        this.add(about);
+    }
+
+    private void initMenuFile() {
+        symmetricalMenu = new JMenu("Bất đối xứng!");
+        file.add(symmetricalMenu);
+
+        encryptSymmetricalMenuItem = new JMenuItem("Mã hóa!") {{
             addActionListener(mainMenuController);
         }};
-        home.add(decryptMenuItem);
+        symmetricalMenu.add(encryptSymmetricalMenuItem);
+
+        decryptSymmetricalMenuItem = new JMenuItem("Giải mã!") {{
+            addActionListener(mainMenuController);
+        }};
+        symmetricalMenu.add(decryptSymmetricalMenuItem);
+    }
+
+    private void initMenuHome() {
+        openWorkSpace = new JMenuItem("Mở không gian làm việc!");
+        home.add(openWorkSpace);
 
         home.addSeparator();
         var generateKeyMenu = new JMenu("Tạo key");
@@ -65,19 +88,16 @@ public class MainMenu extends JMenuBar {
             });
         }};
         home.add(exitMenuItem);
-
-        JMenu about = new JMenu("About");
-        this.add(about);
     }
 
-    public void changePageEncryptFile() {
+    public void changePageEncryptSymmetricalFile() {
         application.encryptFile();
-        navigation.push(IJNavigation.NamePage.MainPage);
+        navigation.push(IJNavigation.NamePage.SymmetricalPage);
     }
 
-    public void changePageDecryptFile() {
+    public void changePageDecryptSymmetricalFile() {
         application.decryptFile();
-        navigation.push(IJNavigation.NamePage.MainPage);
+        navigation.push(IJNavigation.NamePage.SymmetricalPage);
     }
 
     public void exit() {

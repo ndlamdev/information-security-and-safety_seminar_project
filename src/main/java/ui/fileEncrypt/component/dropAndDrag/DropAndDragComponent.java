@@ -10,18 +10,23 @@ package main.java.ui.fileEncrypt.component.dropAndDrag;
 
 import main.java.ui.fileEncrypt.component.dropAndDrag.ui.JPanelDisplayFile;
 import main.java.ui.fileEncrypt.component.dropAndDrag.ui.JPanelNoneFile;
+import main.java.ui.fileEncrypt.controller.SubjectSizeController;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.function.Function;
 
-public class DropAndDragComponent extends JPanel {
+public class DropAndDragComponent extends JPanel implements Observer {
     private final int RADIUS = 150;
     private final int STROKE_WIDTH = 2;
     private CardLayout cardLayout;
-    private JPanelDisplayFile jPanelDisplayFile;
+    private JPanelDisplayFile panelDisplayFile;
     private Function<String, Void> onFileChanged;
+    private JPanelNoneFile panelNoneFile;
+    private SubjectSizeController sizeController = SubjectSizeController.getInstance();
 
     public DropAndDragComponent(Function<String, Void> onFileChanged) {
         this.onFileChanged = onFileChanged;
@@ -30,14 +35,18 @@ public class DropAndDragComponent extends JPanel {
     }
 
     private void init() {
-        this.setPreferredSize(new Dimension(1000, 400));
+        this.setPreferredSize(new Dimension(800, 400));
 
         cardLayout = new CardLayout();
         this.setLayout(cardLayout);
-        this.add(JPanelNoneFile.class.getName(), new JPanelNoneFile(this));
 
-        jPanelDisplayFile = new JPanelDisplayFile(this);
-        this.add(JPanelDisplayFile.class.getName(), jPanelDisplayFile);
+        panelNoneFile = new JPanelNoneFile(this);
+        this.add(JPanelNoneFile.class.getName(), panelNoneFile);
+        sizeController.addObserver(panelNoneFile);
+
+        panelDisplayFile = new JPanelDisplayFile(this);
+        this.add(JPanelDisplayFile.class.getName(), panelDisplayFile);
+        sizeController.addObserver(panelDisplayFile);
     }
 
     @Override
@@ -56,7 +65,7 @@ public class DropAndDragComponent extends JPanel {
     }
 
     public void selectFile(String file) {
-        jPanelDisplayFile.setTextFileLabel(file);
+        panelDisplayFile.setTextFileLabel(file);
         cardLayout.show(this, JPanelDisplayFile.class.getName());
         onFileChanged.apply(file);
     }
@@ -67,12 +76,17 @@ public class DropAndDragComponent extends JPanel {
     }
 
     public String getPathFile() {
-        return this.jPanelDisplayFile.getFile();
+        return this.panelDisplayFile.getFile();
     }
 
     public File getFile() {
         String pathFile = getPathFile();
         return pathFile == null ? null : new File(pathFile);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        this.setPreferredSize(new Dimension(getParent().getWidth() - 500, 400));
     }
 }
 

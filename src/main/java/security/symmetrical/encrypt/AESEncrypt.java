@@ -8,19 +8,31 @@
 
 package main.java.security.symmetrical.encrypt;
 
+import lombok.NoArgsConstructor;
+import main.java.security.symmetrical.ISymmetrical;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 
+@NoArgsConstructor
 public class AESEncrypt extends ASymmetricalEncrypt {
-
+    public AESEncrypt(String mode, String padding) {
+        super(mode, padding);
+    }
 
     @Override
     protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher = ISymmetrical.getCipherInstance(Algorithms.AES, mode, padding);
     }
 
+    /**
+     * Tạo đối tượng KeyGenerator
+     *
+     * @return KeyGenerator
+     * @serialData Size key support:  128, 192, 256
+     */
     @Override
     protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
         return KeyGenerator.getInstance("AES");

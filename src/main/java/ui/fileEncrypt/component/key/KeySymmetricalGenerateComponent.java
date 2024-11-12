@@ -12,8 +12,10 @@ import main.java.ui.fileEncrypt.component.label.LabelBorder;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Observable;
+import java.util.Observer;
 
-public class KeySymmetricalGenerateComponent extends JPanel {
+public class KeySymmetricalGenerateComponent extends JPanel implements Observer {
     private final int STROKE_WIDTH = 2;
     private final int RADIUS = 10;
     private LabelBorder labelKey;
@@ -24,12 +26,9 @@ public class KeySymmetricalGenerateComponent extends JPanel {
     }
 
     private void init() {
-        this.setPreferredSize(new Dimension(1500, 110));
         this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
 
-        labelKey = new LabelBorder() {{
-            setPreferredSize(new Dimension(1300, 50));
-        }};
+        labelKey = new LabelBorder();
         this.add(labelKey);
     }
 
@@ -57,5 +56,12 @@ public class KeySymmetricalGenerateComponent extends JPanel {
         g2.drawString("Key generate!", 30, 18);
 
         super.paintComponent(g);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        var parentSize = getParent().getWidth();
+        this.setPreferredSize(new Dimension(parentSize - 200, 110));
+        labelKey.setPreferredSize(new Dimension(parentSize - 300, 50));
     }
 }

@@ -8,7 +8,6 @@
 
 package main.java.ui.fileEncrypt.controller;
 
-import main.java.ui.fileEncrypt.Application;
 import main.java.ui.fileEncrypt.component.menu.MainMenu;
 
 import javax.swing.*;
@@ -18,8 +17,7 @@ import java.awt.event.ActionListener;
 public class MainMenuController implements ActionListener {
     private MainMenu mainMenu;
 
-    public MainMenuController(MainMenu mainMenu
-    ) {
+    public MainMenuController(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
     }
 
@@ -31,13 +29,13 @@ public class MainMenuController implements ActionListener {
             return;
         }
 
-        if (jMenuItem.equals(mainMenu.getEncryptMenuItem())) {
-            mainMenu.changePageEncryptFile();
+        if (jMenuItem.equals(mainMenu.getEncryptSymmetricalMenuItem())) {
+            mainMenu.changePageEncryptSymmetricalFile();
             return;
         }
 
-        if (jMenuItem.equals(mainMenu.getDecryptMenuItem())) {
-            mainMenu.changePageDecryptFile();
+        if (jMenuItem.equals(mainMenu.getDecryptSymmetricalMenuItem())) {
+            mainMenu.changePageDecryptSymmetricalFile();
             return;
         }
 

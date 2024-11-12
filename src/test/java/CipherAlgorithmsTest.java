@@ -8,19 +8,15 @@
 
 package test.java;
 
-import java.security.Security;
-import java.util.Set;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.security.NoSuchAlgorithmException;
 
 public class CipherAlgorithmsTest {
-    public static void main(String[] args) {
-        // Lấy tất cả các thuật toán Cipher được hỗ trợ
-        Set<String> cipherAlgorithms = Security.getAlgorithms("Cipher");
-
-        // In danh sách các thuật toán Cipher
-        System.out.println("Các thuật toán Cipher hỗ trợ:");
-        for (String algorithm : cipherAlgorithms) {
-            if (algorithm.equals("RSA/ECB/PKCS1Padding")) System.out.println("Have");
-            System.out.println(algorithm);
-        }
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        KeyGenerator keyGen = KeyGenerator.getInstance("RC2");
+        keyGen.init(254); // Từ 40 đến 2048-bit, 128-bit là phổ biến
+        SecretKey key = keyGen.generateKey();
+        System.out.println(key);
     }
 }

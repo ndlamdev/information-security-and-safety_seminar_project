@@ -12,7 +12,7 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 
-public abstract class AAsymmetrical {
+public abstract class AAsymmetrical implements IAsymmetrical {
     protected Cipher cipher;
 
     protected abstract void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException;

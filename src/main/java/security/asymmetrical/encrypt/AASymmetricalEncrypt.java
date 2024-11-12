@@ -13,7 +13,9 @@ import main.java.security.asymmetrical.ASymmetricalKey;
 import main.java.security.symmetrical.ISymmetrical;
 import main.java.security.symmetrical.encrypt.ISymmetricalEncrypt;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -63,7 +65,7 @@ public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASy
         return encryptFileHelper(cipherEncrypt, source, dest);
     }
 
-    private boolean encryptFileHelper(ISymmetricalEncrypt encrypt, String source, String dest) {
+    private boolean encryptFileHelper(ISymmetricalEncrypt encrypt, String source, String dest) throws IllegalBlockSizeException, IOException, BadPaddingException {
         return encrypt.encryptFile(source, dest, true);
     }
 
