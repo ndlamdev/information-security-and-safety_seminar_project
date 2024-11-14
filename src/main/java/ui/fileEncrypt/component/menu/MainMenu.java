@@ -64,7 +64,9 @@ public class MainMenu extends JMenuBar {
     }
 
     private void initMenuHome() {
-        openWorkSpace = new JMenuItem("Mở không gian làm việc!");
+        openWorkSpace = new JMenuItem("Mở không gian làm việc!") {{
+            addActionListener(mainMenuController);
+        }};
         home.add(openWorkSpace);
 
         home.addSeparator();
@@ -106,5 +108,13 @@ public class MainMenu extends JMenuBar {
 
     public void changePageGenerateKeySymmetrical() {
         navigation.push(IJNavigation.NamePage.GenerateKeySymmetricalPage);
+    }
+
+    public void selectWorkSpace() {
+        application.selectWorkSpace();
+    }
+
+    public void changePageGenerateKeyAsymmetrical() {
+        navigation.push(IJNavigation.NamePage.GenerateKeyAsymmetricalPage);
     }
 }

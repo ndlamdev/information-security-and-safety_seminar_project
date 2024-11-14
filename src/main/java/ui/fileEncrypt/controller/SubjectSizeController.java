@@ -26,9 +26,7 @@ public class SubjectSizeController extends Observable {
         return instance;
     }
 
-    public void onChange(int widthPanelLeft, int widthPanelRight) {
-        size.widthLeft = widthPanelLeft;
-        size.widthRight = widthPanelRight;
+    public void onChange() {
         setChanged();
         notifyObservers(size);
     }

@@ -1,6 +1,7 @@
 package main.java.ui.fileEncrypt.component.dropAndDrag.ui;
 
 import main.java.helper.FileChooseHelper;
+import main.java.helper.IconResizeHelper;
 import main.java.ui.fileEncrypt.component.dropAndDrag.DropAndDragComponent;
 import main.java.ui.fileEncrypt.config.FontConfig;
 import main.java.ui.fileEncrypt.controller.SubjectSizeController;
@@ -34,10 +35,7 @@ public class JPanelNoneFile extends JPanel implements Observer {
     }
 
     private void init() {
-        URL iconDownload = getClass().getClassLoader().getResource("icon/download.png");
-        ImageIcon icon = new ImageIcon(iconDownload);
-        Image scaledImage = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
-        icon = new ImageIcon(scaledImage);
+        var icon = IconResizeHelper.getInstance().initImageIcon("icon/download.png", 100, 100);
         JLabel label = new JLabel(icon, SwingConstants.CENTER);
         label.setBorder(BorderFactory.createEmptyBorder(100, 0, 0, 0));
         this.add(label);

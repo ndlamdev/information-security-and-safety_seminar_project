@@ -13,8 +13,8 @@ import main.java.security.traditionalCipher.ATraditionalCipherImpl;
 import java.util.HashMap;
 import java.util.Map;
 
-import static main.java.helper.CharSetConfig.decodeArrayCharEncodeToString;
-import static main.java.helper.CharSetConfig.encodeStringToArrayCharEncode;
+import static main.java.config.CharSetConfig.decodeArrayCharEncodeToString;
+import static main.java.config.CharSetConfig.encodeStringToArrayCharEncode;
 
 public class VigenereDecrypt extends ATraditionalCipherImpl {
     private final int[] key;

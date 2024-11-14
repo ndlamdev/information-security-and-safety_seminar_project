@@ -43,5 +43,15 @@ public class MainMenuController implements ActionListener {
             mainMenu.changePageGenerateKeySymmetrical();
             return;
         }
+
+        if (jMenuItem.equals(mainMenu.getKeyAsymmetrical())) {
+            mainMenu.changePageGenerateKeyAsymmetrical();
+            return;
+        }
+
+        if(jMenuItem.equals(mainMenu.getOpenWorkSpace())) {
+            mainMenu.selectWorkSpace();
+            return;
+        }
     }
 }

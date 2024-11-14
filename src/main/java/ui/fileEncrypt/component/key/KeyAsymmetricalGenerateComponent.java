@@ -18,12 +18,13 @@ import java.awt.event.MouseListener;
 import java.util.Observable;
 import java.util.Observer;
 
-public class KeySymmetricalGenerateComponent extends JPanel implements Observer {
+public class KeyAsymmetricalGenerateComponent extends JPanel implements Observer {
     private final int STROKE_WIDTH = 2;
     private final int RADIUS = 10;
-    private LabelBorder labelKey;
+    private LabelBorder labelShowPublicKey, labelShowPrivateKey;
+    private JLabel labelPublicKey, labelPrivateKey;
 
-    public KeySymmetricalGenerateComponent() {
+    public KeyAsymmetricalGenerateComponent() {
         this.setOpaque(false);
         this.init();
     }
@@ -31,12 +32,15 @@ public class KeySymmetricalGenerateComponent extends JPanel implements Observer 
     private void init() {
         this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
 
-        labelKey = new LabelBorder() {{
+        labelPublicKey = new JLabel("Khóa công khai!");
+        this.add(labelPublicKey);
+
+        labelShowPublicKey = new LabelBorder() {{
             addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent mouseEvent) {
-                    if (labelKey.getText().isBlank()) return;
-                    copy(labelKey.getText(), "Copy khóa thành công!");
+                    if (labelShowPublicKey.getText().isBlank()) return;
+                    copy(labelShowPublicKey.getText(), "Copy khóa công khai thành công!");
                 }
 
                 @Override
@@ -60,12 +64,52 @@ public class KeySymmetricalGenerateComponent extends JPanel implements Observer 
                 }
             });
         }};
-        this.add(labelKey);
+        this.add(labelShowPublicKey);
+
+
+        labelPrivateKey = new JLabel("Khóa riêng tư!");
+        this.add(labelPrivateKey);
+
+        labelShowPrivateKey = new LabelBorder(){{
+            addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent mouseEvent) {
+                    if (labelShowPrivateKey.getText().isBlank()) return;
+                    copy(labelShowPrivateKey.getText(), "Copy khóa riêng tư thành công!");
+                }
+
+                @Override
+                public void mousePressed(MouseEvent mouseEvent) {
+
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent mouseEvent) {
+
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent mouseEvent) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent mouseEvent) {
+
+                }
+            });
+        }};
+        this.add(labelShowPrivateKey);
     }
 
-    public void setKey(String key) {
-        this.labelKey.setText(key);
-        this.labelKey.repaint();
+    public void setPrivateKey(String key) {
+        this.labelShowPrivateKey.setText(key);
+        this.labelShowPrivateKey.repaint();
+    }
+
+    public void setPublicKey(String key) {
+        this.labelShowPublicKey.setText(key);
+        this.labelShowPublicKey.repaint();
     }
 
     @Override
@@ -92,8 +136,12 @@ public class KeySymmetricalGenerateComponent extends JPanel implements Observer 
     @Override
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
-        this.setPreferredSize(new Dimension(parentSize - 200, 110));
-        labelKey.setPreferredSize(new Dimension(parentSize - 300, 50));
+        this.setPreferredSize(new Dimension(parentSize - 200, 240));
+        labelShowPublicKey.setPreferredSize(new Dimension(parentSize - 300, 50));
+        labelShowPrivateKey.setPreferredSize(new Dimension(parentSize - 300, 50));
+
+        labelPublicKey.setPreferredSize(new Dimension(parentSize - 300, 30));
+        labelPrivateKey.setPreferredSize(new Dimension(parentSize - 300, 30));
     }
 
     private void copy(String text, String contentNotify) {

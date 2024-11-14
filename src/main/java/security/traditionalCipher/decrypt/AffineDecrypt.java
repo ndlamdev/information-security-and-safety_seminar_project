@@ -15,8 +15,8 @@ import main.java.security.traditionalCipher.ITraditionalCipher;
 import java.util.HashMap;
 import java.util.Map;
 
-import static main.java.helper.CharSetConfig.decodeArrayCharEncodeToString;
-import static main.java.helper.CharSetConfig.encodeStringToArrayCharEncode;
+import static main.java.config.CharSetConfig.decodeArrayCharEncodeToString;
+import static main.java.config.CharSetConfig.encodeStringToArrayCharEncode;
 
 public class AffineDecrypt extends ATraditionalCipherImpl {
     private final AffineCipher.AffineKey key;

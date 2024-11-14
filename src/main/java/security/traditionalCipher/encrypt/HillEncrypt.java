@@ -13,7 +13,7 @@ import main.java.security.traditionalCipher.ATraditionalCipherImpl;
 
 import java.util.*;
 
-import static main.java.helper.CharSetConfig.*;
+import static main.java.config.CharSetConfig.*;
 
 public class HillEncrypt extends ATraditionalCipherImpl {
     private final int[][] key;

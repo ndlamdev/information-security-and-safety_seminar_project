@@ -6,7 +6,7 @@
  * User: lam-nguyen
  **/
 
-package main.java.helper;
+package main.java.config;
 
 import main.java.security.traditionalCipher.ITraditionalCipher;
 

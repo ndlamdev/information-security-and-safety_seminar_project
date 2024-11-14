@@ -74,16 +74,73 @@ public class KeyConfig {
 
     private void initMapAlgorithmAsymmetrical() {
         mapAlgorithmAsymmetrical = new HashMap<>() {{
-            put(IAsymmetrical.Algorithms.RSA.name(), new ArrayList<>() {
+            put(IAsymmetrical.KeyFactory.Algorithms.DiffieHellman.name(), new ArrayList<>() {
                 {
+                    add("1024");
+                    add("2048");
+                    add("3072");
+                }
+            });
+            put(IAsymmetrical.KeyFactory.Algorithms.DSA.name(), new ArrayList<>() {
+                {
+                    add("1024");
                     add("2048");
                 }
             });
-            put(ISymmetrical.Algorithms.AES.name(), new ArrayList<>() {{
-                add("128");
-                add("192");
-                add("256");
-            }});
+            put(IAsymmetrical.KeyFactory.Algorithms.EC.name(), new ArrayList<>() {
+                {
+                    add("256");
+                    add("384");
+                    add("521");
+                }
+            });
+            put(IAsymmetrical.KeyFactory.Algorithms.EdDSA.name(), new ArrayList<>() {
+                {
+//                    add("256");
+                    add("448");
+                }
+            });
+//            put(IAsymmetrical.KeyFactory.Algorithms.Ed25519.name(), new ArrayList<>() {
+//                {
+//                    add("256");
+//                }
+//            });
+            put(IAsymmetrical.KeyFactory.Algorithms.Ed448.name(), new ArrayList<>() {
+                {
+                    add("448");
+                }
+            });
+            put(IAsymmetrical.KeyFactory.Algorithms.RSA.name(), new ArrayList<>() {
+                {
+                    add("1024");
+                    add("2048");
+                    add("3072");
+                    add("4096");
+                }
+            });
+//            put(IAsymmetrical.KeyFactory.Algorithms.RSASSA_PSS.name(), new ArrayList<>() {
+//                {
+//                    add("1024");
+//                    add("2048");
+//                    add("3072");
+//                }
+//            });
+            put(IAsymmetrical.KeyFactory.Algorithms.XDH.name(), new ArrayList<>() {
+                {
+//                    add("256");
+                    add("448");
+                }
+            });
+//            put(IAsymmetrical.KeyFactory.Algorithms.X25519.name(), new ArrayList<>() {
+//                {
+//                    add("256");
+//                }
+//            });
+            put(IAsymmetrical.KeyFactory.Algorithms.X448.name(), new ArrayList<>() {
+                {
+                    add("448");
+                }
+            });
         }};
     }
 }

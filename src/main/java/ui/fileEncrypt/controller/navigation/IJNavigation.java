@@ -12,6 +12,6 @@ public interface IJNavigation {
     void push(NamePage name);
 
     enum NamePage {
-        SymmetricalPage, GenerateKeySymmetricalPage, AboutPage
+        SymmetricalPage, GenerateKeySymmetricalPage, GenerateKeyAsymmetricalPage, AboutPage
     }
 }

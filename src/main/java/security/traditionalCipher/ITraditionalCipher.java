@@ -8,7 +8,7 @@
 
 package main.java.security.traditionalCipher;
 
-import main.java.helper.CharSetConfig;
+import main.java.config.CharSetConfig;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;

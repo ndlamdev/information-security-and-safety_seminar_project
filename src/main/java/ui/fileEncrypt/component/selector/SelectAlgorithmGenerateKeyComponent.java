@@ -20,7 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
 
-public class SelectKeyAlgorithmSymmetricalComponent extends JPanel implements Observer {
+public class SelectAlgorithmGenerateKeyComponent extends JPanel implements Observer {
     private final int RADIUS = 20;
     private final int STROKE_WIDTH = 2;
     private JComboBox<String> jbcAlgorithms, jbcSizeKey;
@@ -32,11 +32,11 @@ public class SelectKeyAlgorithmSymmetricalComponent extends JPanel implements Ob
     private JLabel labelAlgtithm;
     private JPanel panelAlgorithm;
 
-    public SelectKeyAlgorithmSymmetricalComponent(Function<AlgorithmKey, Void> onAlgorithmKeyChanged) {
+    public SelectAlgorithmGenerateKeyComponent(Function<AlgorithmKey, Void> onAlgorithmKeyChanged, Map<String, List<String>> mapAlgorithms) {
         this.onAlgorithmKeyChanged = onAlgorithmKeyChanged;
         this.setOpaque(false);
 
-        mapAlgorithms = KeyConfig.getInstance().getMapAlgorithmSymmetrical();
+        this.mapAlgorithms = mapAlgorithms;
 
         this.init();
     }

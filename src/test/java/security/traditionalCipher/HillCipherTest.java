@@ -8,7 +8,7 @@
 
 package test.java.security.traditionalCipher;
 
-import main.java.helper.CharSetConfig;
+import main.java.config.CharSetConfig;
 import main.java.security.traditionalCipher.ITraditionalCipher;
 import main.java.security.traditionalCipher.TraditionalKey;
 import main.java.security.traditionalCipher.algorithm.HillCipher;

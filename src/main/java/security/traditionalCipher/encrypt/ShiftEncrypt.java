@@ -12,8 +12,8 @@ import main.java.security.traditionalCipher.ATraditionalCipherImpl;
 
 import java.util.*;
 
-import static main.java.helper.CharSetConfig.decodeArrayCharEncodeToString;
-import static main.java.helper.CharSetConfig.encodeStringToArrayCharEncode;
+import static main.java.config.CharSetConfig.decodeArrayCharEncodeToString;
+import static main.java.config.CharSetConfig.encodeStringToArrayCharEncode;
 
 public class ShiftEncrypt extends ATraditionalCipherImpl {
     private final int key;
