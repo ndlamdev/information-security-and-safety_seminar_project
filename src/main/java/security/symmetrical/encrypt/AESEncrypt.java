@@ -14,16 +14,28 @@ import main.java.security.symmetrical.ISymmetrical;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 @NoArgsConstructor
 public class AESEncrypt extends ASymmetricalEncrypt {
     public AESEncrypt(String mode, String padding) {
         super(mode, padding);
+        byte[] iv = new byte[16];
+        SecureRandom secureRandom = new SecureRandom();
+        secureRandom.nextBytes(iv);
+        ivSpec = new IvParameterSpec(iv);
+    }
+
+    public AESEncrypt(String mode, String padding, IvParameterSpec iv) {
+        super(mode, padding, iv);
     }
 
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
         cipher = ISymmetrical.getCipherInstance(Algorithms.AES, mode, padding);
     }
 
@@ -35,6 +47,6 @@ public class AESEncrypt extends ASymmetricalEncrypt {
      */
     @Override
     protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance("AES");
+        return KeyGenerator.getInstance(Algorithms.AES.name());
     }
 }

@@ -51,7 +51,9 @@ public interface ISymmetricalEncrypt extends ISymmetrical {
      * @param source Đường dẫn đến tệp nguồn cần mã hóa.
      * @param dest   Đường dẫn đến tệp đích để ghi dữ liệu đã mã hóa.
      * @param append Có thêm vào tệp đích nếu nó đã tồn tại hay không.
-     * @return True nếu tệp được mã hóa thành công, false nếu không.
+     * @throws IOException               Lỗi đọc file.
+     * @throws IllegalBlockSizeException Lỗi
+     * @throws BadPaddingException       Lỗi
      */
-    boolean encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException;
+    void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException;
 }

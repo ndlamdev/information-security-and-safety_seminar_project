@@ -9,23 +9,18 @@
 package main.java.security.asymmetrical.encrypt;
 
 import main.java.security.asymmetrical.AAsymmetrical;
-import main.java.security.asymmetrical.ASymmetricalKey;
+import main.java.security.asymmetrical.AsymmetricalKey;
 import main.java.security.symmetrical.ISymmetrical;
-import main.java.security.symmetrical.encrypt.ISymmetricalEncrypt;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
 import java.util.Base64;
 
 public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASymmetricalEncrypt {
@@ -46,51 +41,40 @@ public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASy
     }
 
     @Override
-    public final boolean encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws Exception {
-        var cipherEncrypt = ISymmetrical.Factory.createEncrypt(algorithm, sizeKey);
+    public final void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        var cipherEncrypt = ISymmetrical.Factory.createEncrypt(algorithm, null, null, sizeKey);
         var key = cipherEncrypt.getKey();
-        try {
-            DataOutputStream output = new DataOutputStream(new FileOutputStream(dest));
-            String base64Encode = encryptStringToBase64(ISymmetrical.encodeKeyToBase64(key));
-            output.writeUTF(algorithm.name());
-            output.writeUTF(base64Encode);
-            output.writeLong(output.size() + 8L);
-            output.close();
-        } catch (FileNotFoundException e) {
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return encryptFileHelper(cipherEncrypt, source, dest);
-    }
-
-    private boolean encryptFileHelper(ISymmetricalEncrypt encrypt, String source, String dest) throws IllegalBlockSizeException, IOException, BadPaddingException {
-        return encrypt.encryptFile(source, dest, true);
+        DataOutputStream output = new DataOutputStream(new FileOutputStream(dest));
+        String base64Encode = encryptStringToBase64(ISymmetrical.encodeKeyToBase64(key));
+        output.writeUTF(algorithm.name());
+        output.writeUTF(base64Encode);
+        output.writeLong(output.size() + 8L);
+        output.close();
+        cipherEncrypt.encryptFile(source, dest, true);
     }
 
     protected abstract KeyPairGenerator initKeyPairGenerator() throws NoSuchAlgorithmException;
 
     @Override
-    public final ASymmetricalKey generateKey(int size) throws Exception {
+    public final AsymmetricalKey generateKey(int size) throws NoSuchAlgorithmException {
         KeyPairGenerator generator = initKeyPairGenerator();
         generator.initialize(size);
         var keyPair = generator.generateKeyPair();
-        return new ASymmetricalKey(keyPair.getPrivate(), keyPair.getPublic());
+        return new AsymmetricalKey(keyPair.getPrivate(), keyPair.getPublic());
     }
 
     @Override
-    public final byte[] encrypt(String data) throws Exception {
+    public final byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException {
         return cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
-    public final String encryptToBase64(byte[] data) throws Exception {
+    public final String encryptToBase64(byte[] data) throws IllegalBlockSizeException, BadPaddingException {
         return Base64.getEncoder().encodeToString(cipher.doFinal(data));
     }
 
     @Override
-    public final String encryptStringToBase64(String data) throws Exception {
+    public final String encryptStringToBase64(String data) throws IllegalBlockSizeException, BadPaddingException {
         return Base64.getEncoder().encodeToString(encrypt(data));
     }
 }

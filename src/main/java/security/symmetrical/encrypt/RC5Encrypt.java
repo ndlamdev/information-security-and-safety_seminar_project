@@ -14,10 +14,15 @@ import main.java.security.symmetrical.ISymmetrical;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import java.security.NoSuchAlgorithmException;
 
 @NoArgsConstructor
 public class RC5Encrypt extends ASymmetricalEncrypt {
+    public RC5Encrypt(String mode, String padding, IvParameterSpec iv) {
+        super(mode, padding, iv);
+    }
+
     public RC5Encrypt(String mode, String padding) {
         super(mode, padding);
     }

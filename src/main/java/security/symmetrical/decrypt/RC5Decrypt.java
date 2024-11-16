@@ -9,19 +9,19 @@
 package main.java.security.symmetrical.decrypt;
 
 import main.java.security.symmetrical.ISymmetrical;
+import main.java.security.symmetrical.SymmetricalKey;
 
-import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public class RC5Decrypt extends ASymmetricalDecrypt {
-    public RC5Decrypt(SecretKey key, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public RC5Decrypt(SymmetricalKey key, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
         super(key, mode, padding);
     }
 
-    public RC5Decrypt(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public RC5Decrypt(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
         super(key);
     }
 

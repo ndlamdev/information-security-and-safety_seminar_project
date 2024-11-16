@@ -14,12 +14,17 @@ import main.java.security.symmetrical.ISymmetrical;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import java.security.NoSuchAlgorithmException;
 
 @NoArgsConstructor
 public class DESedeWrapEncrypt extends ASymmetricalEncrypt {
     public DESedeWrapEncrypt(String mode, String padding) {
         super(mode, padding);
+    }
+
+    public DESedeWrapEncrypt(String mode, String padding, IvParameterSpec iv) {
+        super(mode, padding, iv);
     }
 
     @Override

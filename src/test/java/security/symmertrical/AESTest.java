@@ -25,7 +25,7 @@ public class AESTest {
         encrypt = new AESEncrypt();
         var key = encrypt.generateKey(128);
         encrypt.loadKey(key);
-        decrypt = new AESDecrypt(key);
+        decrypt = new AESDecrypt(null);
     }
 
     @Test
@@ -33,6 +33,8 @@ public class AESTest {
         String data = "Nguyễn Đình Làm sinh ngày 13/05/2003!";
         String datEncrypt = encrypt.encryptStringBase64(data);
         String dataDecrypt = decrypt.decryptBase64ToString(datEncrypt);
+        System.out.println(data);
+        System.out.println(dataDecrypt);
         Assertions.assertEquals(data, dataDecrypt);
     }
 
@@ -41,7 +43,7 @@ public class AESTest {
         String file = "/home/lam-nguyen/Desktop/hinh.png";
         String fileEncrypt = "/home/lam-nguyen/Desktop/hinh_encrypt.png";
         String fileDecrypt = "/home/lam-nguyen/Desktop/hinh_decrypt.png";
-        Assertions.assertTrue(encrypt.encryptFile(file, fileEncrypt, false));
-        Assertions.assertTrue(decrypt.decryptFile(fileEncrypt, fileDecrypt, 0));
+        encrypt.encryptFile(file, fileEncrypt, false);
+        decrypt.decryptFile(fileEncrypt, fileDecrypt, 0);
     }
 }

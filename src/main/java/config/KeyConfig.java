@@ -60,10 +60,10 @@ public class KeyConfig {
                 for (int i = 40; i <= 2048; i++)
                     add(String.valueOf(i));
             }});
-            put(ISymmetrical.Algorithms.RC5.name(), new ArrayList<>() {{
-                for (int i = 0; i <= 2040; i++)
-                    add(String.valueOf(i));
-            }});
+//            put(ISymmetrical.Algorithms.RC5.name(), new ArrayList<>() {{
+//                for (int i = 0; i <= 2040; i++)
+//                    add(String.valueOf(i));
+//            }});
             put(ISymmetrical.Algorithms.AES.name(), new ArrayList<>() {{
                 add("128");
                 add("192");
@@ -92,6 +92,7 @@ public class KeyConfig {
                     add("256");
                     add("384");
                     add("521");
+                    add("571");
                 }
             });
             put(IAsymmetrical.KeyFactory.Algorithms.EdDSA.name(), new ArrayList<>() {

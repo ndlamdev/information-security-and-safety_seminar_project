@@ -11,8 +11,10 @@ package main.java.security.symmetrical.encrypt;
 import main.java.security.symmetrical.ASymmetrical;
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -21,6 +23,9 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
 
     public ASymmetricalEncrypt(String mode, String padding) {
         super(mode, padding);
+    }
+    public ASymmetricalEncrypt(String mode, String padding, IvParameterSpec iv) {
+        super(mode, padding, iv);
     }
 
     public ASymmetricalEncrypt() {
@@ -36,10 +41,11 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @throws InvalidKeyException      Nếu khóa không hợp lệ.
      */
     @Override
-    public final void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public final void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
         super.loadKey(key);
         initCipher();
-        cipher.init(Cipher.ENCRYPT_MODE, key);
+        if (ivSpec != null) cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+        else cipher.init(Cipher.ENCRYPT_MODE, key);
     }
 
     /**
@@ -74,26 +80,21 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @param source Đường dẫn đến tệp nguồn cần mã hóa.
      * @param dest   Đường dẫn đến tệp đích để ghi dữ liệu đã mã hóa.
      * @param append Có thêm vào tệp đích nếu nó đã tồn tại hay không.
-     * @return True nếu tệp được mã hóa thành công, false nếu không.
      */
     @Override
-    public final boolean encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException {
+    public final void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException {
         BufferedInputStream bufferInput = new BufferedInputStream(new FileInputStream(source));
         CipherInputStream input = new CipherInputStream(bufferInput, cipher);
-        BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(dest, append));
+        DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest, append)));
 
         byte[] buffer = new byte[1024 * 10];
         int i;
-        while ((i = input.read(buffer)) != -1)
-            output.write(buffer, 0, i);
+        while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
         input.close();
 
         byte[] finalBuffer = cipher.doFinal();
-        if (finalBuffer != null)
-            output.write(finalBuffer);
-        output.flush();
-
-        return true;
+        if (finalBuffer != null) output.write(finalBuffer);
+        output.close();
     }
 
     /**

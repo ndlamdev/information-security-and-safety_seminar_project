@@ -9,19 +9,19 @@
 package main.java.security.symmetrical.decrypt;
 
 import main.java.security.symmetrical.ISymmetrical;
+import main.java.security.symmetrical.SymmetricalKey;
 
-import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public class BlowfishDecrypt extends ASymmetricalDecrypt {
-    public BlowfishDecrypt(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
-        super(key, null, null);
+    public BlowfishDecrypt(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+        super(key);
     }
 
-    public BlowfishDecrypt(SecretKey key, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public BlowfishDecrypt(SymmetricalKey key, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
         super(key, mode, padding);
     }
 

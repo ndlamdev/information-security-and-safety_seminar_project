@@ -18,5 +18,15 @@ public interface ISymmetricalDecrypt extends ISymmetrical {
 
     String decryptBase64ToString(String data);
 
-    boolean decryptFile(String source, String dest, long skip) throws IOException, IllegalBlockSizeException, BadPaddingException;
+    /**
+     * Giải mã nội dung của tệp nguồn và ghi dữ liệu đã mã hóa vào tệp đích.
+     *
+     * @param source Đường dẫn đến tệp nguồn cần mã hóa.
+     * @param dest   Đường dẫn đến tệp đích để ghi dữ liệu đã mã hóa.
+     * @param skip   Số byte sẽ skip để đến được phần nội dung.
+     * @throws IOException               Lỗi đọc file.
+     * @throws IllegalBlockSizeException Lỗi
+     * @throws BadPaddingException       Lỗi
+     */
+    void decryptFile(String source, String dest, long skip) throws IOException, IllegalBlockSizeException, BadPaddingException;
 }

@@ -46,7 +46,7 @@ public class RSATest {
         String file = "/home/lam-nguyen/Desktop/hinh.png";
         String fileEncrypt = "/home/lam-nguyen/Desktop/hinh_encrypt.png";
         String fileDecrypt = "/home/lam-nguyen/Desktop/hinh_decrypt.png";
-        Assertions.assertTrue(encrypt.encryptFile(ISymmetrical.Algorithms.DES, 56, file, fileEncrypt));
-        Assertions.assertTrue(decrypt.decryptFile(fileEncrypt, fileDecrypt));
+        encrypt.encryptFile(ISymmetrical.Algorithms.DES, 56, file, fileEncrypt);
+        decrypt.decryptFile(fileEncrypt, fileDecrypt);
     }
 }

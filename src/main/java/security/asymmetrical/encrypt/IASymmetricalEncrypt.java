@@ -8,10 +8,14 @@
 
 package main.java.security.asymmetrical.encrypt;
 
-import main.java.security.asymmetrical.ASymmetricalKey;
+import main.java.security.asymmetrical.AsymmetricalKey;
 import main.java.security.symmetrical.ISymmetrical;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -19,13 +23,13 @@ import java.security.PublicKey;
 public interface IASymmetricalEncrypt {
     void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
 
-    ASymmetricalKey generateKey(int size) throws Exception;
+    AsymmetricalKey generateKey(int size) throws NoSuchAlgorithmException;
 
-    byte[] encrypt(String data) throws Exception;
+    byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException;
 
-    String encryptToBase64(byte[] data) throws Exception;
+    String encryptToBase64(byte[] data) throws IllegalBlockSizeException, BadPaddingException;
 
-    String encryptStringToBase64(String data) throws Exception;
+    String encryptStringToBase64(String data) throws IllegalBlockSizeException, BadPaddingException;
 
-    boolean encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws Exception;
+    void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
 }

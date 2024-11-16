@@ -8,7 +8,7 @@
 
 package main.java;
 
-import main.java.ui.fileEncrypt.Application;
+import main.java.ui.Application;
 
 import javax.swing.*;
 

@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -25,7 +26,7 @@ import java.util.Base64;
 public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASymmetricalDecrypt {
     protected PrivateKey key;
 
-    public AASymmetricalDecrypt(PrivateKey key) throws Exception {
+    public AASymmetricalDecrypt(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         this.loadKey(key);
     }
 
@@ -33,15 +34,14 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
     }
 
     @Override
-    public final boolean decryptFile(String source, String dest) throws Exception {
+    public final void decryptFile(String source, String dest) throws HeaderException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException {
         HeaderFileEncrypt header = loadHeader(source);
-        if (header == null) {
-            return false;
-        }
-        return decryptFileHelper(header, source, dest);
+        if (header == null) throw new HeaderException("Không tồn tại header");
+
+        ISymmetrical.Factory.createDecrypt(header.algorithm, null, null, null).decryptFile(source, dest, header.skip);
     }
 
-    private HeaderFileEncrypt loadHeader(String source) throws Exception {
+    private HeaderFileEncrypt loadHeader(String source) {
         DataInputStream input;
         try {
             input = new DataInputStream(new FileInputStream(source));
@@ -65,18 +65,15 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
                 return null;
             }
             return new HeaderFileEncrypt(key, alg, skip);
-        } catch (IOException e) {
+        } catch (IOException | IllegalBlockSizeException | RuntimeException | BadPaddingException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private boolean decryptFileHelper(HeaderFileEncrypt header, String source, String dest) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException {
-        return ISymmetrical.Factory.createDecrypt(header.algorithm, header.key).decryptFile(source, dest, header.skip);
-    }
 
     @Override
-    public final void loadKey(PrivateKey key) throws Exception {
+    public final void loadKey(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
         this.key = key;
         initCipher();
         cipher.init(Cipher.DECRYPT_MODE, key);
@@ -86,17 +83,17 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
     }
 
     @Override
-    public final byte[] decrypt(byte[] data) throws Exception {
+    public final byte[] decrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException {
         return cipher.doFinal(data);
     }
 
     @Override
-    public final String decryptToString(byte[] data) throws Exception {
+    public final String decryptToString(byte[] data) throws IllegalBlockSizeException, BadPaddingException {
         return new String(decrypt(data), StandardCharsets.UTF_8);
     }
 
     @Override
-    public final String decryptBase64ToString(String base64) throws Exception {
+    public final String decryptBase64ToString(String base64) throws IllegalBlockSizeException, BadPaddingException {
         return decryptToString(Base64.getDecoder().decode(base64));
     }
 }

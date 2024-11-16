@@ -8,10 +8,14 @@
 
 package main.java.security.asymmetrical;
 
+import java.io.*;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public interface IAsymmetrical {
@@ -26,7 +30,7 @@ public interface IAsymmetrical {
     enum Algorithms {
         DSA,
         RSA,
-        EC,
+        ECIES
     }
 
     class KeyFactory {
@@ -44,7 +48,7 @@ public interface IAsymmetrical {
             X448
         }
 
-        public static ASymmetricalKey generateKey(Algorithms alg, int sizeKey) {
+        public static AsymmetricalKey generateKey(Algorithms alg, int sizeKey) {
             KeyPairGenerator generator = null;
             try {
                 generator = KeyPairGenerator.getInstance(alg.name());
@@ -54,7 +58,37 @@ public interface IAsymmetrical {
             }
 
             var keyPair = generator.generateKeyPair();
-            return new ASymmetricalKey(keyPair.getPrivate(), keyPair.getPublic());
+            return new AsymmetricalKey(keyPair.getPrivate(), keyPair.getPublic());
         }
+
+        public static AsymmetricalKey readKey(String file) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+            DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file), 1024 * 10));
+            String algorithm = input.readUTF();
+            String base64PrivateKey = input.readUTF();
+            String base64PublicKey = input.readUTF();
+            input.close();
+            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PublicKey));
+            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(base64PrivateKey));
+            java.security.KeyFactory kf = java.security.KeyFactory.getInstance(algorithm);
+            PrivateKey privateKey = kf.generatePrivate(pkcs8EncodedKeySpec);
+            PublicKey publicKey = kf.generatePublic(x509EncodedKeySpec);
+            return new AsymmetricalKey(privateKey, publicKey);
+        }
+    }
+
+    static void saveKey(IAsymmetrical.KeyFactory.Algorithms algorithm, AsymmetricalKey key, String file) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file), 1024 * 10));
+        outputStream.writeUTF(algorithm.name());
+        outputStream.writeUTF(encodeKeyToBase64(key.privateKey()));
+        outputStream.writeUTF(encodeKeyToBase64(key.publicKey()));
+        outputStream.close();
+    }
+
+    static void saveKey(String algorithm, AsymmetricalKey key, String file) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file), 1024 * 10));
+        outputStream.writeUTF(algorithm);
+        outputStream.writeUTF(encodeKeyToBase64(key.privateKey()));
+        outputStream.writeUTF(encodeKeyToBase64(key.publicKey()));
+        outputStream.close();
     }
 }

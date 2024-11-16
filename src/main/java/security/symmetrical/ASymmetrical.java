@@ -8,9 +8,13 @@
 
 package main.java.security.symmetrical;
 
+import lombok.Getter;
+
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -18,10 +22,18 @@ public abstract class ASymmetrical implements ISymmetrical {
     protected SecretKey key;
     protected Cipher cipher;
     protected String mode, padding;
+    @Getter
+    protected IvParameterSpec ivSpec;
 
     public ASymmetrical(String mode, String padding) {
         this.mode = mode;
         this.padding = padding;
+    }
+
+    public ASymmetrical(String mode, String padding, IvParameterSpec ivSpec) {
+        this.mode = mode;
+        this.padding = padding;
+        this.ivSpec = ivSpec;
     }
 
     /**
@@ -33,7 +45,7 @@ public abstract class ASymmetrical implements ISymmetrical {
      * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán
      */
     @Override
-    public void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
         this.key = key;
     }
 
@@ -53,7 +65,7 @@ public abstract class ASymmetrical implements ISymmetrical {
      * @throws NoSuchPaddingException   Lỗi khi thêm padding vào thuật toán
      * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại
      */
-    protected abstract void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException;
+    protected abstract void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException;
 
 
     protected String getExtension() {
