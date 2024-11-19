@@ -53,7 +53,7 @@ public class HillCipherTest {
 
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
-            traditionalKey = (TraditionalKey<int[][]>) hillCipherEncrypt.generateKey(2);
+            traditionalKey = (TraditionalKey<int[][]>) hillCipherEncrypt.generateKey("2");
             hillCipherEncrypt.loadKey(traditionalKey);
             hillCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             hillCipherDecrypt = new HillCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.VN);
@@ -77,7 +77,7 @@ public class HillCipherTest {
 
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
-            traditionalKey = (TraditionalKey<int[][]>) hillCipherEncrypt.generateKey(3);
+            traditionalKey = (TraditionalKey<int[][]>) hillCipherEncrypt.generateKey("3");
             hillCipherEncrypt.loadKey(traditionalKey);
             hillCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             hillCipherDecrypt = new HillCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.EN);

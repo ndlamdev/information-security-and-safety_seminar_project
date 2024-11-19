@@ -15,6 +15,7 @@ import com.lamnguyen.security.traditionalCipher.TraditionalKey;
 import com.lamnguyen.security.traditionalCipher.decrypt.VigenereDecrypt;
 import com.lamnguyen.security.traditionalCipher.encrypt.VigenereEncrypt;
 
+import java.io.*;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,25 @@ public class VigenereCipher extends ATraditionalCipher {
 
     public VigenereCipher(SecureLanguage language) {
         super(language);
+    }
 
+    @Override
+    public void saveKey(String file) throws IOException {
+        var out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        out.writeUTF(Algorithms.VIGENERE.name());
+        out.writeUTF(language.name());
+        out.writeUTF(CharSetConfig.decodeArrayCharEncodeToString(key, mapChar, new HashMap<>(), key.length));
+        out.close();
+    }
+
+    @Override
+    public TraditionalKey<?> readKey(String file) throws IOException, NumberFormatException {
+        var in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        if (!Algorithms.VIGENERE.name().equals(in.readUTF()) || !language.name().equals(in.readUTF()))
+            throw new IOException("Khóa Không hợp lệ");
+        var key = in.readUTF();
+        in.close();
+        return new TraditionalKey<>(key);
     }
 
     public void init(SecureMode mode) {
@@ -50,13 +69,14 @@ public class VigenereCipher extends ATraditionalCipher {
         return algorithm.doFinal(data);
     }
 
-    public TraditionalKey<String> generateKey(int sizeKey) throws Exception {
-        if (sizeKey <= 0) throw new Exception("Length key must be longer than 1!");
+    public TraditionalKey<String> generateKey(String sizeKey) throws Exception {
+        var size = Integer.parseInt(sizeKey);
+        if (size <= 2) throw new Exception("Length key must be longer than 2!");
         StringBuilder builder = new StringBuilder();
         var random = new SecureRandom();
         var mapChar = CharSetConfig.getMapChar(language).keySet().stream().toList();
         var bound = mapChar.size();
-        for (var index = 0; index < sizeKey; index++)
+        for (var index = 0; index < size; index++)
             builder.append(mapChar.get(random.nextInt(bound)));
 
         return new TraditionalKey<>(builder.toString());

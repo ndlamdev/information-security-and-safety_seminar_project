@@ -27,7 +27,6 @@ public class CipherTextAsymmetricalPage extends JPanel {
     private OutputInputTextComponent inputTextComponent, outputTextComponent;
     private InputKeyComponent inputKeyComponent;
     private SelectCipherAlgorithmComponent selectAlgorithmComponent;
-    private boolean encrypt = true;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private JButton action;
     private AsymmetricalKey key;
@@ -66,25 +65,32 @@ public class CipherTextAsymmetricalPage extends JPanel {
         selectAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmAsymmetrical());
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
-
-        action = new JButton() {{
-            setPreferredSize(new Dimension(500, 50));
-        }};
-        this.add(action);
-
-        encryptMode();
     }
 
     public void encryptMode() {
-        encrypt = true;
-        action.setText("Mã hóa");
-        action.addActionListener(actionEvent -> encrypt());
+        if (action != null)
+            this.remove(action);
+        action = new JButton() {{
+            setText("Mã hóa");
+            setPreferredSize(new Dimension(500, 50));
+            addActionListener(actionEvent -> encrypt());
+        }};
+        this.add(action);
+        this.updateUI();
+        this.repaint();
     }
 
     public void decryptMode() {
-        encrypt = false;
-        action.setText("Giải hóa");
-        action.addActionListener(actionEvent -> decrypt());
+        if (action != null)
+            this.remove(action);
+        action = new JButton() {{
+            setText("Giải hóa");
+            setPreferredSize(new Dimension(500, 50));
+            addActionListener(actionEvent -> decrypt());
+        }};
+        this.add(action);
+        this.updateUI();
+        this.repaint();
     }
 
     private void encrypt() {

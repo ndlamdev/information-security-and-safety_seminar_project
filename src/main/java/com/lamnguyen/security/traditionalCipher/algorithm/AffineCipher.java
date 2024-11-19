@@ -16,6 +16,7 @@ import com.lamnguyen.security.traditionalCipher.TraditionalKey;
 import com.lamnguyen.security.traditionalCipher.decrypt.AffineDecrypt;
 import com.lamnguyen.security.traditionalCipher.encrypt.AffineEncrypt;
 
+import java.io.*;
 import java.security.SecureRandom;
 
 public class AffineCipher extends ATraditionalCipher {
@@ -29,6 +30,28 @@ public class AffineCipher extends ATraditionalCipher {
 
     public AffineCipher(SecureLanguage lang) {
         super(lang);
+    }
+
+    @Override
+    public void saveKey(String file) throws IOException {
+        var out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        out.writeUTF(Algorithms.VIGENERE.name());
+        out.writeUTF(language.name());
+        out.writeUTF(key.toString());
+        out.close();
+    }
+
+    @Override
+    public TraditionalKey<?> readKey(String file) throws IOException, NumberFormatException {
+        var in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        if (!Algorithms.VIGENERE.name().equals(in.readUTF()) || !language.name().equals(in.readUTF()))
+            throw new IOException("Khóa Không hợp lệ");
+        var keyString = in.readUTF();
+        in.close();
+        var arr = keyString.split("_");
+        var a = Integer.parseInt(arr[0]);
+        var b = Integer.parseInt(arr[1]);
+        return new TraditionalKey<>(new AffineKey(a, b));
     }
 
     @Override
@@ -54,12 +77,15 @@ public class AffineCipher extends ATraditionalCipher {
         return algorithm.doFinal(data);
     }
 
-    public TraditionalKey<AffineKey> generateKey(int sizeKey) throws Exception {
-        if (sizeKey <= 0) throw new Exception("Length key must be longer than 1!");
+    public TraditionalKey<AffineKey> generateKey(String sizeKey) throws Exception {
+        var arr = sizeKey.split("_");
+        var a = Integer.parseInt(arr[0]);
+        var b = Integer.parseInt(arr[1]);
+        if (a < 10 || b < 10) throw new Exception("size key must be longer than 10!");
         var random = new SecureRandom();
-        var key = new AffineKey(Math.abs(random.nextInt(1, sizeKey)), Math.abs(random.nextInt(1, sizeKey)));
-        while (ITraditionalCipher.gcd(key.a, language.totalChar) != 1)
-            key = new AffineKey(Math.abs(random.nextInt(1, sizeKey)), Math.abs(random.nextInt(1, sizeKey)));
+        var key = new AffineKey(Math.abs(random.nextInt(2, a)), Math.abs(random.nextInt(2, b)));
+        while (key.a == key.b || ITraditionalCipher.gcd(key.a, language.totalChar) != 1)
+            key = new AffineKey(Math.abs(random.nextInt(2, a)), Math.abs(random.nextInt(2, b)));
         return new TraditionalKey<>(key);
     }
 
@@ -73,6 +99,10 @@ public class AffineCipher extends ATraditionalCipher {
     }
 
     public record AffineKey(int a, int b) {
+        @Override
+        public String toString() {
+            return a + "_" + b;
+        }
     }
 }
 

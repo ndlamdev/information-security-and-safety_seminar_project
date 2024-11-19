@@ -9,6 +9,11 @@
 package com.lamnguyen.security.traditionalCipher;
 
 import com.lamnguyen.config.CharSetConfig;
+import com.lamnguyen.security.traditionalCipher.algorithm.*;
+import com.lamnguyen.security.traditionalCipher.encrypt.ATraditionalEncrypt;
+import com.lamnguyen.security.traditionalCipher.encrypt.HillEncrypt;
+
+import java.io.IOException;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
@@ -18,9 +23,13 @@ public interface ITraditionalCipher extends ITraditionalCipherImpl {
 
     void init(SecureMode mode) throws Exception;
 
-    TraditionalKey<?> generateKey(int size) throws Exception;
+    TraditionalKey<?> generateKey(String size) throws Exception;
 
     void loadKey(TraditionalKey<?> traditionalKey) throws Exception;
+
+    void saveKey(String file) throws IOException;
+
+    TraditionalKey<?> readKey(String file) throws IOException;
 
     enum SecureMode {
         DECRYPT, ENCRYPT
@@ -61,9 +70,26 @@ public interface ITraditionalCipher extends ITraditionalCipherImpl {
         return gcdHelper(a, b, n - 1);
     }
 
+    enum Algorithms {
+        HILL, SHIFT, SUBSTITUTION, VIGENERE, AFFINE
+    }
+
     class KeyFactory {
-        public enum Algorithms {
-            HILL, SHIFT, SUBSTITUTION, VIGENERE, AFFINE
+        public static TraditionalKey<?> generateKey(Algorithms alg, SecureLanguage lang, String size) throws Exception {
+            var cipher = Factory.createEncrypt(alg, lang);
+            return cipher.generateKey(size);
+        }
+    }
+
+    class Factory {
+        public static ITraditionalCipher createEncrypt(Algorithms alg, SecureLanguage lang) {
+            return switch (alg) {
+                case HILL -> new HillCipher(lang);
+                case SHIFT -> new ShiftCipher(lang);
+                case SUBSTITUTION -> new SubstitutionCipher(lang);
+                case VIGENERE -> new VigenereCipher(lang);
+                case AFFINE -> new AffineCipher(lang);
+            };
         }
     }
 }

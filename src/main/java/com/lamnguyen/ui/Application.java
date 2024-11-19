@@ -44,6 +44,7 @@ public class Application extends JFrame {
     private SignFilePage signFilePage;
     private VerifySignatureFilePage verifySignatureFilePage;
     private GenerateTraditionalKeyPage generateTraditionalKeyPage;
+    private CipherTextTraditionalPage traditionalTextPage;
 
     public Application() {
         toolkit = Toolkit.getDefaultToolkit();
@@ -75,6 +76,9 @@ public class Application extends JFrame {
 
         asymmetricalTextPage = new CipherTextAsymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.CipherTextAsymmetricalPage.name(), asymmetricalTextPage);
+
+        traditionalTextPage = new CipherTextTraditionalPage(this);
+        panelRight.add(IJNavigation.NamePage.CipherTextTraditionalPage.name(), traditionalTextPage);
 
         hashFile = new HashFilePage(this);
         panelRight.add(IJNavigation.NamePage.HashFilePage.name(), hashFile);
@@ -206,5 +210,13 @@ public class Application extends JFrame {
     }
 
     public void signFile() {
+    }
+
+    public void encryptTextTraditional() {
+        traditionalTextPage.encryptMode();
+    }
+
+    public void decryptTextTraditional() {
+        traditionalTextPage.decryptMode();
     }
 }

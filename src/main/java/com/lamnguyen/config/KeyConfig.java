@@ -149,14 +149,14 @@ public class KeyConfig {
 
     private void initAlgorithmTraditional() {
         mapAlgorithmTraditional = new HashMap<>() {{
-            put(ITraditionalCipher.KeyFactory.Algorithms.HILL.name(), new ArrayList<>() {{
+            put(ITraditionalCipher.Algorithms.HILL.name(), new ArrayList<>() {{
                 add("2");
                 add("3");
             }});
-            put(ITraditionalCipher.KeyFactory.Algorithms.SHIFT.name(), new ArrayList<>());
-            put(ITraditionalCipher.KeyFactory.Algorithms.SUBSTITUTION.name(), new ArrayList<>());
-            put(ITraditionalCipher.KeyFactory.Algorithms.VIGENERE.name(), new ArrayList<>());
-            put(ITraditionalCipher.KeyFactory.Algorithms.AFFINE.name(), new ArrayList<>());
+            put(ITraditionalCipher.Algorithms.SHIFT.name(), new ArrayList<>());
+            put(ITraditionalCipher.Algorithms.SUBSTITUTION.name(), new ArrayList<>());
+            put(ITraditionalCipher.Algorithms.VIGENERE.name(), new ArrayList<>());
+            put(ITraditionalCipher.Algorithms.AFFINE.name(), new ArrayList<>());
         }};
     }
 }

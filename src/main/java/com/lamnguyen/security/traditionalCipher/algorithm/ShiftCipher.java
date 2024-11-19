@@ -15,6 +15,7 @@ import com.lamnguyen.security.traditionalCipher.TraditionalKey;
 import com.lamnguyen.security.traditionalCipher.decrypt.ShiftDecrypt;
 import com.lamnguyen.security.traditionalCipher.encrypt.ShiftEncrypt;
 
+import java.io.*;
 import java.security.SecureRandom;
 
 
@@ -29,6 +30,25 @@ public class ShiftCipher extends ATraditionalCipher {
 
     public ShiftCipher(SecureLanguage language) {
         super(language);
+    }
+
+    @Override
+    public void saveKey(String file) throws IOException {
+        var out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        out.writeUTF(Algorithms.SHIFT.name());
+        out.writeUTF(language.name());
+        out.writeInt(key);
+        out.close();
+    }
+
+    @Override
+    public TraditionalKey<?> readKey(String file) throws IOException, NumberFormatException {
+        var in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        if (!Algorithms.SHIFT.name().equals(in.readUTF()) || !language.name().equals(in.readUTF()))
+            throw new IOException("Khóa Không hợp lệ");
+        var key = in.readInt();
+        in.close();
+        return new TraditionalKey<>(key);
     }
 
     public void init(SecureMode mode) {
@@ -46,9 +66,10 @@ public class ShiftCipher extends ATraditionalCipher {
         return algorithm.doFinal(data);
     }
 
-    public TraditionalKey<Integer> generateKey(int sizeKey) throws Exception {
-        if (sizeKey <= 0) throw new Exception("Length key must be longer than 1!");
-        return new TraditionalKey<>(Math.abs(new SecureRandom().nextInt(sizeKey)));
+    public TraditionalKey<Integer> generateKey(String sizeKey) throws Exception {
+        var size = Integer.parseInt(sizeKey);
+        if (size <= 2) throw new Exception("Length key must be longer than 2!");
+        return new TraditionalKey<>(Math.abs(new SecureRandom().nextInt(2, size)));
     }
 
     @Override

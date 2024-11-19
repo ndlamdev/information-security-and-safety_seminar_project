@@ -32,10 +32,10 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
     private final Map<String, List<String>> mapAlgorithms;
     private final Function<AlgorithmKey, Void> onAlgorithmKeyChanged;
     private Dimension dimensionPanel, dimensionComboBox, dimensionLabel;
-    private JLabel labelSizeKey, labelAlgorithm, inputSizeKeySubstitution;
+    private JLabel labelSizeKey, labelAlgorithm;
     private JPanel panelSizeKey, panelAlgorithm, panelTypeInputSizeKey, panelInputSizeAffine;
     private CardLayout cardLayout;
-    private JTextField inputSizeKeyShift, inputSizeKeyAAffine, inputSizeKeyBAffine, inputSizeKeyVigenere;
+    private JTextField inputSizeKeyShift, inputSizeKeyAAffine, inputSizeKeyBAffine, inputSizeKeyVigenere, inputSizeKeySubstitution;
     private AlgorithmKey key;
     private NumericFilter numericFilter;
 
@@ -78,13 +78,13 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
             setOpaque(false);
         }};
 
-        jbcSizeKeyHill = new JComboBox<>(new DefaultComboBoxModel<>(mapAlgorithms.get(ITraditionalCipher.KeyFactory.Algorithms.HILL.name()).toArray(String[]::new))) {{
+        jbcSizeKeyHill = new JComboBox<>(new DefaultComboBoxModel<>(mapAlgorithms.get(ITraditionalCipher.Algorithms.HILL.name()).toArray(String[]::new))) {{
             addActionListener(actionEvent -> {
                 key = new AlgorithmKey((String) jbcAlgorithms.getSelectedItem(), (String) jbcSizeKeyHill.getSelectedItem());
                 onAlgorithmKeyChanged.apply(getAlgorithmKey());
             });
         }};
-        panelTypeInputSizeKey.add(jbcSizeKeyHill, ITraditionalCipher.KeyFactory.Algorithms.HILL.name());
+        panelTypeInputSizeKey.add(jbcSizeKeyHill, ITraditionalCipher.Algorithms.HILL.name());
 
         inputSizeKeyShift = new JTextField() {{
             ((AbstractDocument) getDocument()).setDocumentFilter(numericFilter);
@@ -98,7 +98,7 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
                 }
             });
         }};
-        panelTypeInputSizeKey.add(inputSizeKeyShift, ITraditionalCipher.KeyFactory.Algorithms.SHIFT.name());
+        panelTypeInputSizeKey.add(inputSizeKeyShift, ITraditionalCipher.Algorithms.SHIFT.name());
 
         inputSizeKeyVigenere = new JTextField() {{
             ((AbstractDocument) getDocument()).setDocumentFilter(numericFilter);
@@ -112,10 +112,21 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
                 }
             });
         }};
-        panelTypeInputSizeKey.add(inputSizeKeyVigenere, ITraditionalCipher.KeyFactory.Algorithms.VIGENERE.name());
+        panelTypeInputSizeKey.add(inputSizeKeyVigenere, ITraditionalCipher.Algorithms.VIGENERE.name());
 
-        inputSizeKeySubstitution = new JLabel();
-        panelTypeInputSizeKey.add(inputSizeKeySubstitution, ITraditionalCipher.KeyFactory.Algorithms.SUBSTITUTION.name());
+        inputSizeKeySubstitution = new JTextField() {{
+            ((AbstractDocument) getDocument()).setDocumentFilter(numericFilter);
+            addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyReleased(KeyEvent e) {
+                    var size = inputSizeKeySubstitution.getText();
+                    if (size.isBlank()) key = null;
+                    else key = new AlgorithmKey((String) jbcAlgorithms.getSelectedItem(), size);
+                    onAlgorithmKeyChanged.apply(key);
+                }
+            });
+        }};
+        panelTypeInputSizeKey.add(inputSizeKeySubstitution, ITraditionalCipher.Algorithms.SUBSTITUTION.name());
 
         inputSizeKeyAAffine = new JTextField() {{
             ((AbstractDocument) getDocument()).setDocumentFilter(numericFilter);
@@ -151,7 +162,7 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
             }});
             add(inputSizeKeyBAffine);
         }};
-        panelTypeInputSizeKey.add(panelInputSizeAffine, ITraditionalCipher.KeyFactory.Algorithms.AFFINE.name());
+        panelTypeInputSizeKey.add(panelInputSizeAffine, ITraditionalCipher.Algorithms.AFFINE.name());
 
         labelSizeKey = new JLabel("Kích thước khóa!");
         panelSizeKey = new JPanel() {{
@@ -161,29 +172,32 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
         }};
         this.add(panelSizeKey);
 
-        key = new AlgorithmKey(ITraditionalCipher.KeyFactory.Algorithms.HILL.name(), (String) jbcSizeKeyHill.getSelectedItem());
+        key = new AlgorithmKey(ITraditionalCipher.Algorithms.HILL.name(), (String) jbcSizeKeyHill.getSelectedItem());
     }
 
     private void notifyChangeAlgorithm(String algorithm) {
-        key = switch (ITraditionalCipher.KeyFactory.Algorithms.valueOf(algorithm)) {
+        key = switch (ITraditionalCipher.Algorithms.valueOf(algorithm)) {
             case HILL -> {
                 jbcSizeKeyHill.setSelectedIndex(0);
                 yield new AlgorithmKey(algorithm, (String) jbcSizeKeyHill.getSelectedItem());
             }
             case AFFINE -> {
+                inputSizeKeyAAffine.setText("10");
+                inputSizeKeyBAffine.setText("10");
                 var a = inputSizeKeyAAffine.getText();
                 var b = inputSizeKeyBAffine.getText();
-                inputSizeKeyAAffine.setText("3");
-                inputSizeKeyBAffine.setText("7");
                 yield new AlgorithmKey((String) jbcAlgorithms.getSelectedItem(), a + "_" + b);
             }
             case SHIFT -> {
-                inputSizeKeyShift.setText("2");
+                inputSizeKeyShift.setText("10");
                 yield new AlgorithmKey(algorithm, inputSizeKeyShift.getText());
             }
-            case SUBSTITUTION -> new AlgorithmKey(algorithm, "");
+            case SUBSTITUTION -> {
+                inputSizeKeySubstitution.setText("2");
+                yield new AlgorithmKey(algorithm, inputSizeKeySubstitution.getText());
+            }
             case VIGENERE -> {
-                inputSizeKeyVigenere.setText("2");
+                inputSizeKeyVigenere.setText("10");
                 yield new AlgorithmKey(algorithm, inputSizeKeyVigenere.getText());
             }
         };

@@ -14,6 +14,7 @@ import com.lamnguyen.security.symmetrical.ISymmetrical;
 import com.lamnguyen.security.symmetrical.encrypt.ISymmetricalEncrypt;
 import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
 import com.lamnguyen.security.traditionalCipher.TraditionalKey;
+import com.lamnguyen.security.traditionalCipher.algorithm.AffineCipher;
 import com.lamnguyen.security.traditionalCipher.encrypt.ATraditionalEncrypt;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
@@ -26,19 +27,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
 
 public class GenerateTraditionalKeyPage extends JPanel implements Observer {
+    private ITraditionalCipher cipher;
     private OutputInputTextComponent outputKey;
     private SelectAlgorithmGenerateTraditionalKeyComponent selectAlgorithmComponent;
     private OutputComponent outputComponent;
     private SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private JButton buttonCreate;
-    private JPanel panelSpace;
     private Application application;
-    private ATraditionalEncrypt encrypt;
+    private JComboBox<ITraditionalCipher.SecureLanguage> jcbLanguage;
 
     public GenerateTraditionalKeyPage(Application application) {
         this.application = application;
@@ -53,8 +56,8 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
             if (algorithmKey == null)
                 outputComponent.setFileName("");
             else
-                outputComponent.setFileName(algorithmKey.getName() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
-            encrypt = null;
+                outputComponent.setFileName(algorithmKey.getName() + "_" + jcbLanguage.getSelectedItem() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
+            cipher = null;
             return null;
         };
 
@@ -68,6 +71,18 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
+        jcbLanguage = new JComboBox<>(ITraditionalCipher.SecureLanguage.values()) {{
+            addActionListener(actionEvent -> {
+                cipher = null;
+                var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
+                if (algorithmKey == null)
+                    outputComponent.setFileName("");
+                else
+                    outputComponent.setFileName(algorithmKey.getName() + "_" + jcbLanguage.getSelectedItem() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
+            });
+        }};
+        this.add(jcbLanguage);
+
         buttonCreate = new JButton("Tạo khóa!") {{
             addActionListener(actionEvent -> {
                 var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
@@ -75,21 +90,21 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
                     JOptionPane.showMessageDialog(null, "Vui lòng nhập size key!", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                var name = ITraditionalCipher.KeyFactory.Algorithms.valueOf(algorithmKey.getName());
+                var name = ITraditionalCipher.Algorithms.valueOf(algorithmKey.getName());
+                var lang = (ITraditionalCipher.SecureLanguage) jcbLanguage.getSelectedItem();
+                var size = algorithmKey.getSize();
+                cipher = ITraditionalCipher.Factory.createEncrypt(name, lang);
+                generateKey(size);
             });
         }};
         this.add(buttonCreate);
 
-        panelSpace = new JPanel() {{
-            setOpaque(false);
-        }};
-        this.add(panelSpace);
 
         var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
         outputComponent = new OutputComponent() {{
             setPathFolder(SettingHelper.getInstance().getWorkSpace() + "/key");
             setTextButtonAction("Xuất file");
-            setFileName(algorithmKey.getName() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
+            setFileName(algorithmKey.getName() + "_" + jcbLanguage.getSelectedItem() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
             setExtensionFile(".keys");
             setActionButtonAction(actionEvent -> saveKey());
         }};
@@ -97,15 +112,50 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
         sizeController.addObserver(outputComponent);
     }
 
+    private void generateKey(String size) {
+        TraditionalKey<?> key;
+        try {
+            key = cipher.generateKey(size);
+            cipher.loadKey(key);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        var contentKey = key.contentKey();
+        switch (contentKey) {
+            case Integer intKey -> {
+                outputKey.setTextJTextArea(String.valueOf(intKey));
+            }
+            case HashMap mapKey -> {
+                var hash = (HashMap<Character, Character>) mapKey;
+                var arrKey = hash.entrySet().stream().map(entry -> entry.getKey() + " -> " + entry.getValue()).toArray(String[]::new);
+                outputKey.setTextJTextArea(String.join("\n", arrKey));
+            }
+            case AffineCipher.AffineKey affineKey -> {
+                outputKey.setTextJTextArea("A: " + affineKey.a() + "\nB: " + affineKey.b());
+            }
+            case String string -> {
+                outputKey.setTextJTextArea(string);
+            }
+            default -> {
+                var k = (int[][]) contentKey;
+                var stringKey = new StringBuilder();
+                for (var row : k)
+                    stringKey.append("|\t").append(String.join("\t|\t", Arrays.stream(row).mapToObj(String::valueOf).toArray(String[]::new))).append("\t|\n");
+                outputKey.setTextJTextArea(stringKey.toString());
+            }
+        }
+    }
+
     private void saveKey() {
-        if (encrypt == null) {
+        if (cipher == null) {
             JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             new File(outputComponent.getFolderDest()).mkdirs();
-            encrypt.saveKey(outputComponent.getFullPath());
+            cipher.saveKey(outputComponent.getFullPath());
             if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                 application.reloadWorkSpace();
             JOptionPane.showMessageDialog(null, "Thành công!");
@@ -118,6 +168,6 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
-        panelSpace.setPreferredSize(new Dimension(parentSize - 200, 50));
+        jcbLanguage.setPreferredSize(new Dimension(parentSize - 200, 50));
     }
 }

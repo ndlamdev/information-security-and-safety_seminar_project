@@ -8,40 +8,34 @@
 
 package com.lamnguyen.ui.view;
 
-import com.lamnguyen.config.CipherAlgorithmConfig;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
-import com.lamnguyen.security.symmetrical.SymmetricalKey;
-import com.lamnguyen.security.symmetrical.decrypt.ISymmetricalDecrypt;
-import com.lamnguyen.security.symmetrical.encrypt.ISymmetricalEncrypt;
+import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
+import com.lamnguyen.security.traditionalCipher.TraditionalKey;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
-import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
+import com.lamnguyen.ui.component.selector.SelectCipherTraditionalAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 import lombok.Getter;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.File;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.util.function.Function;
 
-public class CipherTextSymmetricalPage extends JPanel {
+public class CipherTextTraditionalPage extends JPanel {
     private final Application application;
     private OutputInputTextComponent inputTextComponent, outputTextComponent;
     private InputKeyComponent inputKeyComponent;
-    private SelectCipherAlgorithmComponent selectAlgorithmComponent;
+    private SelectCipherTraditionalAlgorithmComponent selectAlgorithmComponent;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private JButton action;
     @Getter
-    private SymmetricalKey key;
+    private TraditionalKey<?> key;
+    private Function<SelectCipherTraditionalAlgorithmComponent.Algorithm, Void> onAlgChange;
 
 
-    public CipherTextSymmetricalPage(Application application) {
+    public CipherTextTraditionalPage(Application application) {
         this.application = application;
         this.init();
     }
@@ -71,23 +65,22 @@ public class CipherTextSymmetricalPage extends JPanel {
         this.add(inputKeyComponent);
         sizeController.addObserver(inputKeyComponent);
 
-        selectAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmSymmetrical());
+        onAlgChange = algorithm -> {
+            key = null;
+            return null;
+        };
+        selectAlgorithmComponent = new SelectCipherTraditionalAlgorithmComponent(onAlgChange);
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
-
-        action = new JButton() {{
-            setPreferredSize(new Dimension(500, 50));
-        }};
-        this.add(action);
     }
 
     public void encryptMode() {
         if (action != null)
             this.remove(action);
         action = new JButton() {{
-            setText("Mã hóa");
             setPreferredSize(new Dimension(500, 50));
-            addActionListener(actionEvent -> encrypt());
+            setText("Mã hóa");
+            addActionListener(actionEvent -> doFinal(ITraditionalCipher.SecureMode.ENCRYPT));
         }};
         this.add(action);
         this.updateUI();
@@ -98,63 +91,45 @@ public class CipherTextSymmetricalPage extends JPanel {
         if (action != null)
             this.remove(action);
         action = new JButton() {{
-            setText("Giải hóa");
             setPreferredSize(new Dimension(500, 50));
-            addActionListener(actionEvent -> decrypt());
+            setText("Giải hóa");
+            addActionListener(actionEvent -> doFinal(ITraditionalCipher.SecureMode.DECRYPT));
         }};
         this.add(action);
         this.updateUI();
         this.repaint();
     }
 
-    private void encrypt() {
+
+    private void doFinal(ITraditionalCipher.SecureMode mode) {
         var text = inputTextComponent.getText();
         var alg = selectAlgorithmComponent.getAlgorithm();
         if (!validate(text, key)) return;
-        ISymmetricalEncrypt cipher = null;
+        var cipher = ITraditionalCipher.Factory.createEncrypt(alg.algorithm(), alg.language());
         try {
-            cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-                 InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
+            cipher.loadKey(key);
+            cipher.init(mode);
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+            JOptionPane.showMessageDialog(null, "Khóa không hợp lệ", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
         try {
-            outputTextComponent.setTextJTextArea(cipher.encryptStringBase64(text));
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Thành công!");
+            outputTextComponent.setTextJTextArea(cipher.doFinal(text));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void decrypt() {
-        var text = inputTextComponent.getText();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        if (!validate(text, key)) return;
-        ISymmetricalDecrypt cipher = null;
-        try {
-            cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-                 InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        }
-
-        var data = cipher.decryptBase64ToString(text);
-        if (data == null) {
-            JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            outputTextComponent.setTextJTextArea(data);
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        }
-    }
-
-    private boolean validate(String file, SymmetricalKey key) {
-        if (file == null) {
+    private boolean validate(String text, TraditionalKey<?> key) {
+        if (text == null) {
             JOptionPane.showMessageDialog(null, "Vui lòng nhập văn bảng mã hóa!", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
         if (key == null) {
-            JOptionPane.showMessageDialog(null, "Chưa nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Vui lòng load file key!", "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
 
@@ -163,11 +138,13 @@ public class CipherTextSymmetricalPage extends JPanel {
 
     public Void loadFileKey(File file) {
         if (file == null) return null;
+        var alg = selectAlgorithmComponent.getAlgorithm();
         try {
-            key = ISymmetrical.KeyFactory.readKey(file.getAbsolutePath());
+            key = ITraditionalCipher.Factory.createEncrypt(alg.algorithm(), alg.language()).readKey(file.getAbsolutePath());
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {
+            e.printStackTrace(System.out);
             JOptionPane.showMessageDialog(null, "File key không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 

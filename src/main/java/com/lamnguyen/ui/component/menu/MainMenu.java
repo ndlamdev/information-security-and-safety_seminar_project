@@ -31,6 +31,8 @@ public class MainMenu extends JMenuBar {
             decryptTextSymmetricalMenuItem,
             encryptTextAsymmetricalMenuItem,
             decryptTextAsymmetricalMenuItem,
+            encryptTextTraditionalMenuItem,
+            decryptTextTraditionalMenuItem,
             exitMenuItem,
             symmetricalKeyMenuItem,
             asymmetricalKeyMenuItem,
@@ -44,6 +46,7 @@ public class MainMenu extends JMenuBar {
             asymmetricalFileMenu,
             symmetricalTextMenu,
             asymmetricalTextMenu,
+            traditionalTextMenu,
             homeMenu,
             generateKeyMenu,
             fileMenu,
@@ -148,6 +151,19 @@ public class MainMenu extends JMenuBar {
             addActionListener(mainMenuController);
         }};
         asymmetricalTextMenu.add(decryptTextAsymmetricalMenuItem);
+
+        traditionalTextMenu = new JMenu("Tự nhiên");
+        textMenu.add(traditionalTextMenu);
+
+        encryptTextTraditionalMenuItem = new JMenuItem("Mã hóa") {{
+            addActionListener(mainMenuController);
+        }};
+        traditionalTextMenu.add(encryptTextTraditionalMenuItem);
+
+        decryptTextTraditionalMenuItem = new JMenuItem("Giải mã") {{
+            addActionListener(mainMenuController);
+        }};
+        traditionalTextMenu.add(decryptTextTraditionalMenuItem);
     }
 
     private void initMenuItemHome() {
@@ -254,5 +270,15 @@ public class MainMenu extends JMenuBar {
 
     public void changePageGenerateTraditionalKey() {
         navigation.push(IJNavigation.NamePage.GenerateTraditionalKeyPage);
+    }
+
+    public void changePageEncryptTraditionalText() {
+        application.encryptTextTraditional();
+        navigation.push(IJNavigation.NamePage.CipherTextTraditionalPage);
+    }
+
+    public void changePageDecryptTraditionalText() {
+        application.decryptTextTraditional();
+        navigation.push(IJNavigation.NamePage.CipherTextTraditionalPage);
     }
 }

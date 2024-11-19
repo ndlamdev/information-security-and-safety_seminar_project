@@ -17,7 +17,9 @@ import com.lamnguyen.security.traditionalCipher.TraditionalKey;
 import com.lamnguyen.security.traditionalCipher.decrypt.HillDecrypt;
 import com.lamnguyen.security.traditionalCipher.encrypt.HillEncrypt;
 
+import java.io.*;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 public class HillCipher extends ATraditionalCipher {
     private int[][] key;
@@ -31,6 +33,35 @@ public class HillCipher extends ATraditionalCipher {
     public HillCipher(SecureLanguage lang) {
         super(lang);
         this.key = null;
+    }
+
+    @Override
+    public void saveKey(String file) throws IOException {
+        var out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+        out.writeUTF(Algorithms.HILL.name());
+        out.writeUTF(language.name());
+        out.writeInt(key.length);
+        for (var row : key) {
+            out.writeUTF(String.join("_", Arrays.stream(row).mapToObj(String::valueOf).toArray(String[]::new)));
+        }
+        out.close();
+    }
+
+    @Override
+    public TraditionalKey<?> readKey(String file) throws IOException, NumberFormatException {
+        var in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        if (!Algorithms.HILL.name().equals(in.readUTF()) || !language.name().equals(in.readUTF()))
+            throw new IOException("Khóa Không hợp lệ");
+        var size = in.readInt();
+        var key = new int[size][size];
+        for (var row = 0; row < size; row++) {
+            var rowString = in.readUTF();
+            var rowSplit = rowString.split("_");
+            for (var cell = 0; cell < size; cell++)
+                key[row][cell] = Integer.parseInt(rowSplit[cell]);
+        }
+        in.close();
+        return new TraditionalKey<>(key);
     }
 
     @Override
@@ -59,14 +90,15 @@ public class HillCipher extends ATraditionalCipher {
         return det != 0 && ITraditionalCipher.gcd(det, language.totalChar) == 1;
     }
 
-    public TraditionalKey<int[][]> generateKey(int sizeKey) throws Exception {
-        if (sizeKey <= 0) throw new Exception("Length key must be longer than 1!");
+    public TraditionalKey<int[][]> generateKey(String sizeKey) throws Exception {
+        var size = Integer.parseInt(sizeKey);
+        if (size <= 0) throw new Exception("Length key must be longer than 1!");
         var random = new SecureRandom();
-        var key = new int[sizeKey][sizeKey];
-        generateKeyHelper(key, sizeKey, random);
+        var key = new int[size][size];
+        generateKeyHelper(key, size, random);
         var validate = validateKey(key);
         while (!validate) {
-            generateKeyHelper(key, sizeKey, random);
+            generateKeyHelper(key, size, random);
             validate = validateKey(key);
         }
 

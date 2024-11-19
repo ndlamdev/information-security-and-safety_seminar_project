@@ -10,11 +10,8 @@ package com.lamnguyen;
 
 import com.lamnguyen.ui.Application;
 
-import javax.swing.*;
-import java.io.IOException;
-
 public class Program {
-    public static void main(String[] args) throws UnsupportedLookAndFeelException, ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
+    public static void main(String[] args)  {
         Application.setup();
         new Application();
     }
