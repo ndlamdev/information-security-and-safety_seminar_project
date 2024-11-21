@@ -30,9 +30,14 @@ public class TreeFileComponent extends JScrollPane {
         setPath(path);
     }
 
+    public TreeFileComponent() {
+        this.init();
+    }
+
     private void init() {
         tree = new JTree() {{
             setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            setVisible(path != null);
         }};
         tree.setCellRenderer(new CustomTreeCellRenderer());
         tree.setDragEnabled(true);
@@ -45,6 +50,7 @@ public class TreeFileComponent extends JScrollPane {
         var file = new File(path);
         if (!file.exists()) return;
         tree.setModel(new DefaultTreeModel(setPathHelper(file)));
+        tree.setVisible(true);
     }
 
     private DefaultMutableTreeNode setPathHelper(File file) {

@@ -18,6 +18,7 @@ import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -98,8 +99,8 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
     }
 
     public void encryptMode() {
-        outputComponent.setTextButtonAction("Mã hóa!");
         encrypt = true;
+        outputComponent.setTextButtonAction("Mã hóa!");
         outputComponent.setActionButtonAction(actionEvent -> encryptFile());
     }
 
@@ -110,52 +111,63 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
     }
 
     private void encryptFile() {
-        var file = dropAndDragComponent.getPathFile();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        if (!validate(file, key)) return;
+        DialogProgressHelper.runProcess(process -> {
+            var file = dropAndDragComponent.getPathFile();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!validate(file, key)) return;
 
-        try {
-            var cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-            cipher.encryptFile(file, outputComponent.getFullPath(), false);
-            if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                application.reloadWorkSpace();
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        } catch (IllegalBlockSizeException | IOException | BadPaddingException | NoSuchPaddingException |
-                 InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (NoSuchAlgorithmException e) {
-            if (alg.padding() == null)
-                JOptionPane.showMessageDialog(null, "Vui lòng chọn padding nếu đã chọn mode!", "Error", JOptionPane.ERROR_MESSAGE);
-            else if (alg.mode() == null)
-                JOptionPane.showMessageDialog(null, "Vui lòng chọn mode nếu đã chọn padding!", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        }
+            try {
+                var cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
+                cipher.encryptFile(file, outputComponent.getFullPath(), false);
+                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                    application.reloadWorkSpace();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IllegalBlockSizeException | IOException | BadPaddingException | NoSuchPaddingException |
+                     InvalidAlgorithmParameterException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NoSuchAlgorithmException e) {
+                if (alg.padding() == null)
+                    JOptionPane.showMessageDialog(null, "Vui lòng chọn padding nếu đã chọn mode!", "Error", JOptionPane.ERROR_MESSAGE);
+                else if (alg.mode() == null)
+                    JOptionPane.showMessageDialog(null, "Vui lòng chọn mode nếu đã chọn padding!", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            }
+        });
+
     }
 
     private void decryptFile() {
-        var file = dropAndDragComponent.getPathFile();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        if (!validate(file, key)) return;
+        DialogProgressHelper.runProcess(process -> {
+            var file = dropAndDragComponent.getPathFile();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!validate(file, key)) return;
 
-        try {
-            var cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-            cipher.decryptFile(file, outputComponent.getFullPath(), 0);
-            if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                application.reloadWorkSpace();
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        } catch (IllegalBlockSizeException | IOException | BadPaddingException | NoSuchPaddingException |
-                 InvalidKeyException e) {
-            JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (NoSuchAlgorithmException e) {
-            if (alg.padding() == null)
-                JOptionPane.showMessageDialog(null, "Vui lòng chọn padding nếu đã chọn mode!", "Error", JOptionPane.ERROR_MESSAGE);
-            else if (alg.mode() == null)
-                JOptionPane.showMessageDialog(null, "Vui lòng chọn mode nếu đã chọn padding!", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new RuntimeException(e);
-        }
+            try {
+                var cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
+                cipher.decryptFile(file, outputComponent.getFullPath(), 0);
+                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                    application.reloadWorkSpace();
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IllegalBlockSizeException | IOException | BadPaddingException | NoSuchPaddingException |
+                     InvalidKeyException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NoSuchAlgorithmException e) {
+                if (alg.padding() == null) {
+                    process.dispose();
+                    JOptionPane.showMessageDialog(null, "Vui lòng chọn padding nếu đã chọn mode!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else if (alg.mode() == null) {
+                    process.dispose();
+                    JOptionPane.showMessageDialog(null, "Vui lòng chọn mode nếu đã chọn padding!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (InvalidAlgorithmParameterException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
     }
 
     private boolean validate(String file, SymmetricalKey key) {

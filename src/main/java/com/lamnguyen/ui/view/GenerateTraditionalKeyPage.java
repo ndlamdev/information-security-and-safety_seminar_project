@@ -8,20 +8,16 @@
 
 package com.lamnguyen.ui.view;
 
-import com.lamnguyen.config.KeyConfig;
 import com.lamnguyen.helper.SettingHelper;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
-import com.lamnguyen.security.symmetrical.encrypt.ISymmetricalEncrypt;
 import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
 import com.lamnguyen.security.traditionalCipher.TraditionalKey;
 import com.lamnguyen.security.traditionalCipher.algorithm.AffineCipher;
-import com.lamnguyen.security.traditionalCipher.encrypt.ATraditionalEncrypt;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
-import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateTraditionalKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -114,55 +110,64 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
     }
 
     private void generateKey(String size) {
-        TraditionalKey<?> key;
-        try {
-            key = cipher.generateKey(size);
-            cipher.loadKey(key);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        DialogProgressHelper.runProcess(process -> {
+            TraditionalKey<?> key;
+            try {
+                key = cipher.generateKey(size);
+                cipher.loadKey(key);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-        var contentKey = key.contentKey();
-        switch (contentKey) {
-            case Integer intKey -> {
-                outputKey.setTextJTextArea(String.valueOf(intKey));
+            var contentKey = key.contentKey();
+            switch (contentKey) {
+                case Integer intKey -> {
+                    outputKey.setTextJTextArea(String.valueOf(intKey));
+                }
+                case HashMap mapKey -> {
+                    var hash = (HashMap<Character, Character>) mapKey;
+                    var arrKey = hash.entrySet().stream().map(entry -> entry.getKey() + " -> " + entry.getValue()).toArray(String[]::new);
+                    outputKey.setTextJTextArea(String.join("\n", arrKey));
+                }
+                case AffineCipher.AffineKey affineKey -> {
+                    outputKey.setTextJTextArea("A: " + affineKey.a() + "\nB: " + affineKey.b());
+                }
+                case String string -> {
+                    outputKey.setTextJTextArea(string);
+                }
+                default -> {
+                    var k = (int[][]) contentKey;
+                    var stringKey = new StringBuilder();
+                    for (var row : k)
+                        stringKey.append("|\t").append(String.join("\t|\t", Arrays.stream(row).mapToObj(String::valueOf).toArray(String[]::new))).append("\t|\n");
+                    outputKey.setTextJTextArea(stringKey.toString());
+                }
             }
-            case HashMap mapKey -> {
-                var hash = (HashMap<Character, Character>) mapKey;
-                var arrKey = hash.entrySet().stream().map(entry -> entry.getKey() + " -> " + entry.getValue()).toArray(String[]::new);
-                outputKey.setTextJTextArea(String.join("\n", arrKey));
-            }
-            case AffineCipher.AffineKey affineKey -> {
-                outputKey.setTextJTextArea("A: " + affineKey.a() + "\nB: " + affineKey.b());
-            }
-            case String string -> {
-                outputKey.setTextJTextArea(string);
-            }
-            default -> {
-                var k = (int[][]) contentKey;
-                var stringKey = new StringBuilder();
-                for (var row : k)
-                    stringKey.append("|\t").append(String.join("\t|\t", Arrays.stream(row).mapToObj(String::valueOf).toArray(String[]::new))).append("\t|\n");
-                outputKey.setTextJTextArea(stringKey.toString());
-            }
-        }
+
+            process.dispose();
+        });
     }
 
     private void saveKey() {
-        if (cipher == null) {
-            JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        DialogProgressHelper.runProcess(process -> {
+            if (cipher == null) {
+                JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        try {
-            new File(outputComponent.getFolderDest()).mkdirs();
-            cipher.saveKey(outputComponent.getFullPath());
-            if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                application.reloadWorkSpace();
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+            try {
+                new File(outputComponent.getFolderDest()).mkdirs();
+                cipher.saveKey(outputComponent.getFullPath());
+                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                    application.reloadWorkSpace();
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IOException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
     }
 
     @Override

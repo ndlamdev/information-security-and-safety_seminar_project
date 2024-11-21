@@ -30,9 +30,7 @@ public class JPanelNoneFile extends JPanel implements Observer {
     }
 
     private void init() {
-        var icon = IconResizeHelper.getInstance().initImageIcon("download.png", 100, 100);
-        label = new JLabel(icon, SwingConstants.CENTER);
-        label.setBorder(BorderFactory.createEmptyBorder(100, 0, 0, 0));
+        label = new JLabel("", SwingConstants.CENTER);
         this.add(label);
 
         text = new JLabel("Drop file into here!", SwingConstants.CENTER) {{
@@ -60,7 +58,9 @@ public class JPanelNoneFile extends JPanel implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        label.setBorder(BorderFactory.createEmptyBorder((getParent().getHeight() - 170) / 2, 0, 0, 0));
+        var icon = IconResizeHelper.getInstance().initImageIcon("download.png", getParent().getHeight() / 3, getParent().getHeight() / 3);
+        label.setIcon(icon);
+        label.setBorder(BorderFactory.createEmptyBorder((getParent().getHeight() - getParent().getHeight() / 3 - 80) / 2, 0, 0, 0));
         text.setPreferredSize(new Dimension(getParent().getWidth(), 50));
     }
 }

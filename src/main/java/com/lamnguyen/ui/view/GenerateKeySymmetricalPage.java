@@ -17,6 +17,7 @@ import com.lamnguyen.ui.component.key.KeySymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,16 +63,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
         sizeController.addObserver(selectAlgorithmComponent);
 
         buttonCreate = new JButton("Tạo khóa!") {{
-            addActionListener(actionEvent -> {
-                var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
-                var name = ISymmetrical.Algorithms.valueOf(algorithmKey.getName());
-                try {
-                    encrypt = ISymmetrical.Factory.createEncrypt(name, null, null, algorithmKey.getSize());
-                    keyGenerateComponent.setKey(ISymmetrical.encodeKeyToBase64(encrypt.getKey()));
-                } catch (Exception ignored) {
-                    ignored.printStackTrace();
-                }
-            });
+            addActionListener(actionEvent -> generateKey());
         }}; //50
         this.add(buttonCreate);
 
@@ -92,21 +84,40 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
         sizeController.addObserver(outputComponent);
     }
 
-    private void saveKey() {
-        if (encrypt == null) {
-            JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+    private void generateKey() {
+        DialogProgressHelper.runProcess(process -> {
+            var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
+            var name = ISymmetrical.Algorithms.valueOf(algorithmKey.getName());
+            try {
+                encrypt = ISymmetrical.Factory.createEncrypt(name, null, null, algorithmKey.getSize());
+                keyGenerateComponent.setKey(ISymmetrical.encodeKeyToBase64(encrypt.getKey()));
+            } catch (Exception ignored) {
+            }
+            process.dispose();
+        });
 
-        try {
-            new File(outputComponent.getFolderDest()).mkdirs();
-            encrypt.saveKey(outputComponent.getFullPath());
-            if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                application.reloadWorkSpace();
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+    }
+
+    private void saveKey() {
+        DialogProgressHelper.runProcess(process -> {
+            if (encrypt == null) {
+                JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                new File(outputComponent.getFolderDest()).mkdirs();
+                encrypt.saveKey(outputComponent.getFullPath());
+                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                    application.reloadWorkSpace();
+
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IOException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     @Override

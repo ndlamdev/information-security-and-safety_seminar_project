@@ -18,6 +18,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 import lombok.Getter;
 
 import javax.crypto.BadPaddingException;
@@ -127,24 +128,28 @@ public class CipherTextSymmetricalPage extends JPanel {
     }
 
     private void decrypt() {
-        var text = inputTextComponent.getText();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        if (!validate(text, key)) return;
-        ISymmetricalDecrypt cipher = null;
-        try {
-            cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-                 InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        }
+        DialogProgressHelper.runProcess(process -> {
+            var text = inputTextComponent.getText();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!validate(text, key)) return;
+            ISymmetricalDecrypt cipher = null;
+            try {
+                cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                     InvalidAlgorithmParameterException e) {
+                e.printStackTrace();
+            }
 
-        var data = cipher.decryptBase64ToString(text);
-        if (data == null) {
-            JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            outputTextComponent.setTextJTextArea(data);
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        }
+            var data = cipher.decryptBase64ToString(text);
+            process.dispose();
+            if (data == null) {
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                outputTextComponent.setTextJTextArea(data);
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            }
+        });
+
     }
 
     private boolean validate(String file, SymmetricalKey key) {

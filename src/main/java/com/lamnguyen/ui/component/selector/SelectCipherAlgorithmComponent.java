@@ -149,7 +149,7 @@ public class SelectCipherAlgorithmComponent extends JPanel implements Observer {
         panelMode.setPreferredSize(sizePanel);
         panelPadding.setPreferredSize(sizePanel);
 
-        sizeLabel.width = sizePanel.width - 100;
+        sizeLabel.width = sizePanel.width - 10;
         labelAlgorithm.setPreferredSize(sizeLabel);
         labelMode.setPreferredSize(sizeLabel);
         labelPadding.setPreferredSize(sizeLabel);

@@ -17,6 +17,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -94,10 +95,11 @@ public class CipherTextAsymmetricalPage extends JPanel {
     }
 
     private void encrypt() {
-
+        DialogProgressHelper.runProcess(process -> process.dispose());
     }
 
     private void decrypt() {
+        DialogProgressHelper.runProcess(process -> process.dispose());
     }
 
     private boolean validate(String file, SymmetricalKey key) {

@@ -17,6 +17,7 @@ import com.lamnguyen.ui.component.tree.TreeFileComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 import com.lamnguyen.ui.controller.navigation.IJNavigation;
 import com.lamnguyen.ui.controller.navigation.impl.JNavigation;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 import com.lamnguyen.ui.view.*;
 
 import javax.swing.*;
@@ -53,6 +54,9 @@ public class Application extends JFrame {
         height = toolkit.getScreenSize().height - 100;
         pathWorkSpace = SettingHelper.getInstance().getWorkSpace();
         this.init();
+        this.setVisible(true);
+        sizeController.onChange();
+        reloadWorkSpace();
     }
 
     private void init() {
@@ -62,7 +66,6 @@ public class Application extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setBounds(100, 50, width, height);
         this.setResizable(false);
-
 
         CardLayout layout = new CardLayout();
         panelRight = new JPanel(layout) {{
@@ -105,51 +108,18 @@ public class Application extends JFrame {
         verifySignatureFilePage = new VerifySignatureFilePage(this);
         panelRight.add(IJNavigation.NamePage.VerifySignatureFilePage.name(), verifySignatureFilePage);
 
-        panelLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {{
-            var min = height/7*4;
-            var max = height/7*5;
-            setDividerLocation(max);
-            addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+        panelLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        addPropertyChangeListenerHelper(panelLeft, height / 7 * 5, height / 7 * 4);
 
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    int currentLocation = panelLeft.getDividerLocation();
-                    if (currentLocation > max)
-                        panelLeft.setDividerLocation(max);
-                    if (currentLocation <= min)
-                        panelLeft.setDividerLocation(min);
-
-                    sizeController.onChange();
-                }
-            });
-        }};
-
-        tree = new TreeFileComponent(pathWorkSpace);
+        tree = new TreeFileComponent();
         panelLeft.add(tree);
 
-        listKey = new ListKeyComponent(pathWorkSpace);
+        listKey = new ListKeyComponent();
         sizeController.addObserver(listKey);
         panelLeft.add(listKey);
 
-
-        mainContainer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelLeft, panelRight) {{
-            var min = width/5;
-            var max = width/4;
-            setDividerLocation(max);
-            addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    int currentLocation = mainContainer.getDividerLocation();
-                    if (currentLocation > max)
-                        mainContainer.setDividerLocation(max);
-                    if (currentLocation <= min)
-                        mainContainer.setDividerLocation(min);
-
-                    sizeController.onChange();
-                }
-            });
-        }};
+        mainContainer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelLeft, panelRight);
+        addPropertyChangeListenerHelper(mainContainer, width / 4, width / 5);
 
         this.setContentPane(mainContainer);
         this.setVisible(true);
@@ -170,7 +140,6 @@ public class Application extends JFrame {
 
     public void decryptTextSymmetrical() {
         symmetricalTextPage.decryptMode();
-
     }
 
     public void encryptTextAsymmetrical() {
@@ -190,8 +159,11 @@ public class Application extends JFrame {
     }
 
     public void reloadWorkSpace() {
-        tree.setPath(pathWorkSpace);
-        listKey.setPath(pathWorkSpace);
+        DialogProgressHelper.runProcess(process -> {
+            tree.setPath(pathWorkSpace);
+            listKey.setPath(pathWorkSpace);
+            process.dispose();
+        });
     }
 
     public static void setup() {
@@ -226,5 +198,22 @@ public class Application extends JFrame {
 
     public void decryptTextTraditional() {
         traditionalTextPage.decryptMode();
+    }
+
+    private void addPropertyChangeListenerHelper(JSplitPane panel, int max, int min) {
+        panel.setDividerLocation(max);
+        panel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                int currentLocation = panelLeft.getDividerLocation();
+                if (currentLocation > max)
+                    panelLeft.setDividerLocation(max);
+                if (currentLocation <= min)
+                    panelLeft.setDividerLocation(min);
+
+                sizeController.onChange();
+            }
+        });
     }
 }

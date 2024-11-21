@@ -15,11 +15,11 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherTraditionalAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.function.Function;
 
@@ -102,24 +102,28 @@ public class CipherTextTraditionalPage extends JPanel {
 
 
     private void doFinal(ITraditionalCipher.SecureMode mode) {
-        var text = inputTextComponent.getText();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        if (!validate(text, key)) return;
-        var cipher = ITraditionalCipher.Factory.createEncrypt(alg.algorithm(), alg.language());
-        try {
-            cipher.loadKey(key);
-            cipher.init(mode);
-        } catch (Exception e) {
-            e.printStackTrace(System.out);
-            JOptionPane.showMessageDialog(null, "Khóa không hợp lệ", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        DialogProgressHelper.runProcess(process -> {
+            var text = inputTextComponent.getText();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!validate(text, key)) return;
+            var cipher = ITraditionalCipher.Factory.createEncrypt(alg.algorithm(), alg.language());
+            try {
+                cipher.loadKey(key);
+                cipher.init(mode);
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        try {
-            outputTextComponent.setTextJTextArea(cipher.doFinal(text));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            process.dispose();
+            try {
+                outputTextComponent.setTextJTextArea(cipher.doFinal(text));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private boolean validate(String text, TraditionalKey<?> key) {

@@ -17,6 +17,7 @@ import com.lamnguyen.ui.component.key.KeyAsymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -88,20 +89,24 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     }
 
     private void saveKey() {
-        if (privateKeyBase64 == null || publicKeyBase64 == null) {
-            JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        DialogProgressHelper.runProcess(process -> {
+            if (privateKeyBase64 == null || publicKeyBase64 == null) {
+                JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-        try {
-            new File(outputComponent.getFolderDest()).mkdirs();
-            IAsymmetrical.saveKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key, outputComponent.getFullPath());
-            if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                application.reloadWorkSpace();
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+            try {
+                new File(outputComponent.getFolderDest()).mkdirs();
+                IAsymmetrical.saveKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key, outputComponent.getFullPath());
+                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                    application.reloadWorkSpace();
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IOException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     @Override
@@ -113,13 +118,16 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     }
 
     private void generateKey() {
-        var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
-        var name = IAsymmetrical.KeyFactory.Algorithms.valueOf(algorithmKey.getName());
-        key = IAsymmetrical.KeyFactory.generateKey(name, algorithmKey.getSize());
-        if (key == null) return;
-        privateKeyBase64 = IAsymmetrical.encodeKeyToBase64(key.privateKey());
-        publicKeyBase64 = IAsymmetrical.encodeKeyToBase64(key.publicKey());
-        keyGenerateComponent.setPrivateKey(privateKeyBase64);
-        keyGenerateComponent.setPublicKey(publicKeyBase64);
+        DialogProgressHelper.runProcess(process -> {
+            var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
+            var name = IAsymmetrical.KeyFactory.Algorithms.valueOf(algorithmKey.getName());
+            key = IAsymmetrical.KeyFactory.generateKey(name, algorithmKey.getSize());
+            if (key == null) return;
+            privateKeyBase64 = IAsymmetrical.encodeKeyToBase64(key.privateKey());
+            publicKeyBase64 = IAsymmetrical.encodeKeyToBase64(key.publicKey());
+            keyGenerateComponent.setPrivateKey(privateKeyBase64);
+            keyGenerateComponent.setPublicKey(publicKeyBase64);
+            process.dispose();
+        });
     }
 }
