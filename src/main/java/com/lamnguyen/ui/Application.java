@@ -45,9 +45,12 @@ public class Application extends JFrame {
     private VerifySignatureFilePage verifySignatureFilePage;
     private GenerateTraditionalKeyPage generateTraditionalKeyPage;
     private CipherTextTraditionalPage traditionalTextPage;
+    private int width, height;
 
     public Application() {
         toolkit = Toolkit.getDefaultToolkit();
+        width = toolkit.getScreenSize().width - 200;
+        height = toolkit.getScreenSize().height - 100;
         pathWorkSpace = SettingHelper.getInstance().getWorkSpace();
         this.init();
     }
@@ -57,7 +60,7 @@ public class Application extends JFrame {
 
         this.setTitle("Phần mềm mã hóa/giải mã file Lam Nguyên");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setBounds(100, 50, 1800, 1000);
+        this.setBounds(100, 50, width, height);
         this.setResizable(false);
 
 
@@ -70,6 +73,7 @@ public class Application extends JFrame {
 
         symmetricalFilePage = new CipherFileSymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.CipherFileSymmetricalPage.name(), symmetricalFilePage);
+        sizeController.addObserver(symmetricalFilePage);
 
         symmetricalTextPage = new CipherTextSymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.CipherTextSymmetricalPage.name(), symmetricalTextPage);
@@ -102,16 +106,18 @@ public class Application extends JFrame {
         panelRight.add(IJNavigation.NamePage.VerifySignatureFilePage.name(), verifySignatureFilePage);
 
         panelLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT) {{
-            setDividerLocation(700);
+            var min = height/7*4;
+            var max = height/7*5;
+            setDividerLocation(max);
             addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     int currentLocation = panelLeft.getDividerLocation();
-                    if (currentLocation > 700)
-                        panelLeft.setDividerLocation(700);
-                    if (currentLocation <= 500)
-                        panelLeft.setDividerLocation(500);
+                    if (currentLocation > max)
+                        panelLeft.setDividerLocation(max);
+                    if (currentLocation <= min)
+                        panelLeft.setDividerLocation(min);
 
                     sizeController.onChange();
                 }
@@ -127,16 +133,18 @@ public class Application extends JFrame {
 
 
         mainContainer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panelLeft, panelRight) {{
-            setDividerLocation(500);
+            var min = width/5;
+            var max = width/4;
+            setDividerLocation(max);
             addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     int currentLocation = mainContainer.getDividerLocation();
-                    if (currentLocation > 500)
-                        mainContainer.setDividerLocation(500);
-                    if (currentLocation <= 300)
-                        mainContainer.setDividerLocation(300);
+                    if (currentLocation > max)
+                        mainContainer.setDividerLocation(max);
+                    if (currentLocation <= min)
+                        mainContainer.setDividerLocation(min);
 
                     sizeController.onChange();
                 }

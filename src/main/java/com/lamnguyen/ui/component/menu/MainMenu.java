@@ -152,7 +152,7 @@ public class MainMenu extends JMenuBar {
         }};
         asymmetricalTextMenu.add(decryptTextAsymmetricalMenuItem);
 
-        traditionalTextMenu = new JMenu("Tự nhiên");
+        traditionalTextMenu = new JMenu("Cổ điển");
         textMenu.add(traditionalTextMenu);
 
         encryptTextTraditionalMenuItem = new JMenuItem("Mã hóa") {{
@@ -204,7 +204,7 @@ public class MainMenu extends JMenuBar {
         }};
         generateKeyMenu.add(asymmetricalKeyMenuItem);
 
-        traditionalKey = new JMenuItem("Khóa mã hóa tự nhiên") {{
+        traditionalKey = new JMenuItem("Khóa mã hóa cổ điển") {{
             addActionListener(mainMenuController);
         }};
         generateKeyMenu.add(traditionalKey);

@@ -45,7 +45,7 @@ public class ShiftCipherTest {
 
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
-            traditionalKey = (TraditionalKey<Integer>) shiftCipherEncrypt.generateKey(3);
+            traditionalKey = (TraditionalKey<Integer>) shiftCipherEncrypt.generateKey("3");
             shiftCipherEncrypt.loadKey(traditionalKey);
             shiftCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             shiftCipherDecrypt = new ShiftCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.VN);

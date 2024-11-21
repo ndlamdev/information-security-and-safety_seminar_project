@@ -29,9 +29,11 @@ import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.function.Function;
 
-public class CipherFileSymmetricalPage extends JPanel {
+public class CipherFileSymmetricalPage extends JPanel implements Observer {
     private final Application application;
     private OutputComponent outputComponent;
     private DropAndDragComponent dropAndDragComponent;
@@ -41,8 +43,6 @@ public class CipherFileSymmetricalPage extends JPanel {
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private SymmetricalKey key;
 
-
-    //1300
     public CipherFileSymmetricalPage(Application application) {
         this.application = application;
         this.init();
@@ -66,21 +66,20 @@ public class CipherFileSymmetricalPage extends JPanel {
 
         this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 30));
 
-        dropAndDragComponent = new DropAndDragComponent(onFileChanged);
-        sizeController.addObserver(dropAndDragComponent);
+        dropAndDragComponent = new DropAndDragComponent(onFileChanged); //200
         this.add(dropAndDragComponent);
 
-        inputKeyComponent = new InputKeyComponent(this::loadFileKey);
+        inputKeyComponent = new InputKeyComponent(this::loadFileKey); // 110
         this.add(inputKeyComponent);
         sizeController.addObserver(inputKeyComponent);
 
-        selectAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmSymmetrical(), onAlgorithmChanged);
+        selectAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmSymmetrical(), onAlgorithmChanged); // 160
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
-        outputComponent = new OutputComponent();
-        this.add(outputComponent);
+        outputComponent = new OutputComponent(); //110
         sizeController.addObserver(outputComponent);
+        this.add(outputComponent);
 
         encryptMode();
     }
@@ -182,7 +181,8 @@ public class CipherFileSymmetricalPage extends JPanel {
             return;
         }
 
-        String pathFolder = pathFile.substring(0, pathFile.lastIndexOf("/"));
+        var indexOf = pathFile.lastIndexOf(File.separator);
+        String pathFolder = indexOf == -1 ? "" : pathFile.substring(0, indexOf);
         String fullFileName = pathFile.substring(pathFolder.length() + 1);
         String nameFile = fullFileName.substring(0, fullFileName.lastIndexOf("."));
         String extensionFile = fullFileName.substring(nameFile.length());
@@ -191,5 +191,12 @@ public class CipherFileSymmetricalPage extends JPanel {
         var nameAlg = algorithm.algorithm().name() + (algorithm.mode() == null ? "" : "-" + algorithm.mode()) + (algorithm.padding() == null ? "" : "-" + algorithm.padding());
         outputComponent.setFileName(nameFile + (encrypt ? "_encrypt" : "_decrypt") + "_by_" + nameAlg);
         outputComponent.setExtensionFile(extensionFile);
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        var sizeParent = this.getParent().getSize();
+        dropAndDragComponent.setPreferredSize(new Dimension(sizeParent.width - 400, sizeParent.height - 160 - 110 - 100 - 50 * 3));
+        dropAndDragComponent.setSize(dropAndDragComponent.getPreferredSize());
     }
 }

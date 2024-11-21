@@ -45,7 +45,7 @@ public class AffineCipherTest {
 
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
-            traditionalKey = (TraditionalKey<AffineCipher.AffineKey>) affineCipherEncrypt.generateKey(100);
+            traditionalKey = (TraditionalKey<AffineCipher.AffineKey>) affineCipherEncrypt.generateKey("100");
             System.out.println(traditionalKey.contentKey());
             affineCipherEncrypt.loadKey(traditionalKey);
             System.out.println(traditionalKey.contentKey());

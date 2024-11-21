@@ -36,6 +36,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     private JButton buttonCreate;
     private JPanel panelSpace;
     private Application application;
+    private final int vGap = 20;
 
     public GenerateKeyAsymmetricalPage(Application application) {
         this.application = application;
@@ -44,7 +45,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
 
     private void init() {
         this.setOpaque(false);
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, vGap));
 
         Function<SelectAlgorithmGenerateKeyComponent.AlgorithmKey, Void> onAlgorithmKeyChanged = algorithmKey -> {
             outputComponent.setFileName(algorithmKey.getName() + "_" + algorithmKey.getSize());
@@ -56,17 +57,17 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
             return null;
         };
 
-        keyGenerateComponent = new KeyAsymmetricalGenerateComponent();
+        keyGenerateComponent = new KeyAsymmetricalGenerateComponent(); //240
         this.add(keyGenerateComponent);
         sizeController.addObserver(keyGenerateComponent);
 
-        selectAlgorithmComponent = new SelectAlgorithmGenerateKeyComponent(onAlgorithmKeyChanged, KeyConfig.getInstance().getMapAlgorithmAsymmetrical());
+        selectAlgorithmComponent = new SelectAlgorithmGenerateKeyComponent(onAlgorithmKeyChanged, KeyConfig.getInstance().getMapAlgorithmAsymmetrical()); //150
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
         buttonCreate = new JButton("Tạo khóa!") {{
             addActionListener(actionEvent -> generateKey());
-        }};
+        }}; //50
         this.add(buttonCreate);
 
         panelSpace = new JPanel() {{
@@ -74,7 +75,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
         }};
         this.add(panelSpace);
 
-        var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
+        var algorithmKey = selectAlgorithmComponent.getAlgorithmKey(); //110
         outputComponent = new OutputComponent() {{
             setPathFolder(SettingHelper.getInstance().getWorkSpace() + "/key");
             setTextButtonAction("Xuất file");
@@ -107,7 +108,8 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
-        panelSpace.setPreferredSize(new Dimension(parentSize - 200, 110));
+        var sizeSpace = this.getHeight() - vGap * 5 - 110 - 50 - 150 - 260;
+        panelSpace.setPreferredSize(new Dimension(parentSize - 200, sizeSpace));
     }
 
     private void generateKey() {

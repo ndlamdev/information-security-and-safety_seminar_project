@@ -13,6 +13,7 @@ import com.lamnguyen.ui.component.input.SelectFolderDest;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -23,6 +24,7 @@ public class OutputComponent extends JPanel implements Observer {
     private JLabel jlbFolderDest, jlbExtensionFile;
     private JButton jbtAction;
     private ActionListener actionButtonAction;
+    private JLabel label;
 
     public OutputComponent() {
         this.setOpaque(false);
@@ -35,11 +37,13 @@ public class OutputComponent extends JPanel implements Observer {
         jlbFolderDest = new SelectFolderDest();
         this.add(jlbFolderDest);
 
-        this.add(new JLabel("/") {{
+        label = new JLabel( File.separator) {{
             setPreferredSize(new Dimension(20, 50));
+            setSize(getPreferredSize());
             setFont(new Font("", Font.PLAIN, 40));
             setHorizontalAlignment(SwingConstants.CENTER);
-        }});
+        }};
+        this.add(label);
 
         jtfFileDest = new JTextField();
         this.add(jtfFileDest);
@@ -47,6 +51,7 @@ public class OutputComponent extends JPanel implements Observer {
         jlbExtensionFile = new JLabel("") {{
             setForeground(Color.GRAY);
             setPreferredSize(new Dimension(100, 50));
+            setSize(getPreferredSize());
             setFont(new Font("", Font.PLAIN, 30));
         }};
         this.add(jlbExtensionFile);
@@ -54,6 +59,7 @@ public class OutputComponent extends JPanel implements Observer {
 
         jbtAction = new JButton("Mã hóa!") {{
             setPreferredSize(new Dimension(150, 50));
+            setSize(getPreferredSize());
         }};
         this.add(jbtAction);
     }
@@ -106,7 +112,7 @@ public class OutputComponent extends JPanel implements Observer {
 
     public String getFolderDest() {
         var path = jlbFolderDest.getText();
-        return path.isBlank() ? "" : (path + "/");
+        return path.isBlank() ? "" : (path + File.separator);
     }
 
     public String getExtensionFile() {
@@ -125,7 +131,9 @@ public class OutputComponent extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var sizeParent = getParent().getWidth();
         this.setPreferredSize(new Dimension(sizeParent - 200, 110));
-        jlbFolderDest.setPreferredSize(new Dimension(sizeParent - 800, 50));
-        jtfFileDest.setPreferredSize(new Dimension(sizeParent - 1100, 50));
+        this.setSize(this.getPreferredSize());
+        var temp = this.getSize().width - (this.jbtAction.getSize().width + jlbExtensionFile.getSize().width + label.getSize().width + 40 + 10 * 4);
+        jlbFolderDest.setPreferredSize(new Dimension(temp / 5 * 3, 50));
+        jtfFileDest.setPreferredSize(new Dimension(temp / 5 * 2, 50));
     }
 }

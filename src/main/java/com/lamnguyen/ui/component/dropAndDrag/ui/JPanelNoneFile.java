@@ -60,7 +60,7 @@ public class JPanelNoneFile extends JPanel implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        label.setBorder(BorderFactory.createEmptyBorder((getParent().getHeight() - 150) / 2, 0, 0, 0));
+        label.setBorder(BorderFactory.createEmptyBorder((getParent().getHeight() - 170) / 2, 0, 0, 0));
         text.setPreferredSize(new Dimension(getParent().getWidth(), 50));
     }
 }

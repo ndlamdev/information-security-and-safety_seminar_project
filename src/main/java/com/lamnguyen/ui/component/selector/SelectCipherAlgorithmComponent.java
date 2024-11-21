@@ -142,6 +142,7 @@ public class SelectCipherAlgorithmComponent extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var sizeParent = getParent().getWidth();
         this.setPreferredSize(new Dimension(sizeParent - 200, 160));
+        this.setSize(this.getPreferredSize());
 
         sizePanel.width = (sizeParent - 270) / 3;
         panelAlgorithm.setPreferredSize(sizePanel);

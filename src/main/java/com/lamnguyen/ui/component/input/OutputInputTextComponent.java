@@ -48,7 +48,7 @@ public class OutputInputTextComponent extends JPanel implements Observer {
             setLineWrap(true);
             setWrapStyleWord(true);
         }};
-        scrollPane = new JScrollPane(jTextArea){{
+        scrollPane = new JScrollPane(jTextArea) {{
             if (customSize != null) {
                 setPreferredSize(new Dimension(customSize.width - 200 - 40, customSize.height - 40));
                 setSize(getPreferredSize());
@@ -120,5 +120,16 @@ public class OutputInputTextComponent extends JPanel implements Observer {
 
         this.setSize(this.getPreferredSize());
         this.scrollPane.setSize(this.scrollPane.getPreferredSize());
+    }
+
+    public void setCustomSize(Dimension dimension) {
+        this.customSize = dimension;
+        var parentSize = getParent().getWidth();
+        this.setPreferredSize(new Dimension(parentSize - 200, customSize.height));
+        this.scrollPane.setPreferredSize(new Dimension(parentSize - 200 - 40, customSize.height - 40));
+        this.setSize(this.getPreferredSize());
+        this.scrollPane.setSize(this.scrollPane.getPreferredSize());
+        this.updateUI();
+        this.repaint();
     }
 }

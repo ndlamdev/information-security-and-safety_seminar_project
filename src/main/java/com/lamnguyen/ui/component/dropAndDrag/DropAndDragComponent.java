@@ -21,7 +21,7 @@ import java.util.Observer;
 import java.util.function.Function;
 
 public class DropAndDragComponent extends JPanel implements Observer {
-    private final int RADIUS = 150;
+    private final int RADIUS = 100;
     private final int STROKE_WIDTH = 2;
     private CardLayout cardLayout;
     private JPanelDisplayFile panelDisplayFile;
@@ -101,7 +101,7 @@ public class DropAndDragComponent extends JPanel implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        this.setPreferredSize(Objects.requireNonNullElseGet(customSize, () -> new Dimension(getParent().getWidth() - 500, 400)));
+        this.setPreferredSize(Objects.requireNonNullElseGet(customSize, () -> new Dimension(getParent().getWidth() - 300, 200)));
 
         this.setSize(this.getPreferredSize());
     }

@@ -83,6 +83,7 @@ public class InputKeyComponent extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var parentWidth = getParent().getWidth();
         this.setPreferredSize(new Dimension(parentWidth - 200, 110));
+        this.setSize(this.getPreferredSize());
         jtfInputKey.setPreferredSize(new Dimension(parentWidth - 510, 50));
     }
 

@@ -42,6 +42,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
     private JButton buttonCreate;
     private Application application;
     private JComboBox<ITraditionalCipher.SecureLanguage> jcbLanguage;
+    private final int vGap = 20;
 
     public GenerateTraditionalKeyPage(Application application) {
         this.application = application;
@@ -50,7 +51,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
 
     private void init() {
         this.setOpaque(false);
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, vGap));
 
         Function<SelectAlgorithmGenerateTraditionalKeyComponent.AlgorithmKey, Void> onAlgorithmKeyChanged = algorithmKey -> {
             if (algorithmKey == null)
@@ -61,13 +62,13 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
             return null;
         };
 
-        outputKey = new OutputInputTextComponent("khóa khởi tạo", new Dimension(1300, 300)) {{
+        outputKey = new OutputInputTextComponent("khóa khởi tạo") {{
             setEditable(false);
             clickToCopy(true);
-        }};
+        }}; // ?
         this.add(outputKey);
 
-        selectAlgorithmComponent = new SelectAlgorithmGenerateTraditionalKeyComponent(onAlgorithmKeyChanged);
+        selectAlgorithmComponent = new SelectAlgorithmGenerateTraditionalKeyComponent(onAlgorithmKeyChanged); //150
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
@@ -80,7 +81,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
                 else
                     outputComponent.setFileName(algorithmKey.getName() + "_" + jcbLanguage.getSelectedItem() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
             });
-        }};
+        }}; // 50
         this.add(jcbLanguage);
 
         buttonCreate = new JButton("Tạo khóa!") {{
@@ -96,7 +97,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
                 cipher = ITraditionalCipher.Factory.createEncrypt(name, lang);
                 generateKey(size);
             });
-        }};
+        }}; //50
         this.add(buttonCreate);
 
 
@@ -107,7 +108,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
             setFileName(algorithmKey.getName() + "_" + jcbLanguage.getSelectedItem() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
             setExtensionFile(".keys");
             setActionButtonAction(actionEvent -> saveKey());
-        }};
+        }}; // 110
         this.add(outputComponent);
         sizeController.addObserver(outputComponent);
     }
@@ -169,5 +170,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
         jcbLanguage.setPreferredSize(new Dimension(parentSize - 200, 50));
+        var size = getParent().getHeight() - vGap * 6 - 110 - 50 * 2 - 150;
+        outputKey.setCustomSize(new Dimension(parentSize - 500, size));
     }
 }

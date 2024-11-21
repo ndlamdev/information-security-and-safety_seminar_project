@@ -35,6 +35,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
     private JPanel panelSpace;
     private Application application;
     private ISymmetricalEncrypt encrypt;
+    private final int vGap = 20;
 
     public GenerateKeySymmetricalPage(Application application) {
         this.application = application;
@@ -43,7 +44,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
 
     private void init() {
         this.setOpaque(false);
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 50));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, vGap));
 
         Function<SelectAlgorithmGenerateKeyComponent.AlgorithmKey, Void> onAlgorithmKeyChanged = algorithmKey -> {
             outputComponent.setFileName(algorithmKey.getName() + "_" + algorithmKey.getSize());
@@ -52,11 +53,11 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
             return null;
         };
 
-        keyGenerateComponent = new KeySymmetricalGenerateComponent();
+        keyGenerateComponent = new KeySymmetricalGenerateComponent(); // 110
         this.add(keyGenerateComponent);
         sizeController.addObserver(keyGenerateComponent);
 
-        selectAlgorithmComponent = new SelectAlgorithmGenerateKeyComponent(onAlgorithmKeyChanged, KeyConfig.getInstance().getMapAlgorithmSymmetrical());
+        selectAlgorithmComponent = new SelectAlgorithmGenerateKeyComponent(onAlgorithmKeyChanged, KeyConfig.getInstance().getMapAlgorithmSymmetrical()); // 150
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
@@ -71,7 +72,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
                     ignored.printStackTrace();
                 }
             });
-        }};
+        }}; //50
         this.add(buttonCreate);
 
         panelSpace = new JPanel() {{
@@ -86,8 +87,8 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
             setFileName(algorithmKey.getName() + "_" + algorithmKey.getSize());
             setExtensionFile(".keys");
             setActionButtonAction(actionEvent -> saveKey());
-        }};
-        this.add(outputComponent);
+        }}; // 110
+        this.add(outputComponent, BorderLayout.SOUTH);
         sizeController.addObserver(outputComponent);
     }
 
@@ -111,7 +112,8 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
-        buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
-        panelSpace.setPreferredSize(new Dimension(parentSize - 200, 200));
+        buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50)); //50
+        var sizeSpace = this.getHeight() - vGap * 6 - 110 * 2 - 50 - 150;
+        panelSpace.setPreferredSize(new Dimension(parentSize - 200, sizeSpace));
     }
 }
