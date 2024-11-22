@@ -10,10 +10,10 @@ package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
 import com.lamnguyen.helper.ValidationHelper;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
-import com.lamnguyen.security.symmetrical.SymmetricalKey;
-import com.lamnguyen.security.symmetrical.decrypt.ISymmetricalDecrypt;
-import com.lamnguyen.security.symmetrical.encrypt.ISymmetricalEncrypt;
+import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.model.symmetrical.SymmetricalKey;
+import com.lamnguyen.model.symmetrical.decrypt.ISymmetricalDecrypt;
+import com.lamnguyen.model.symmetrical.encrypt.ISymmetricalEncrypt;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;

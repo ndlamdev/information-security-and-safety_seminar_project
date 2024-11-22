@@ -9,7 +9,6 @@
 package com.lamnguyen.ui.component.selector;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
 
 import javax.swing.*;
 import java.awt.*;

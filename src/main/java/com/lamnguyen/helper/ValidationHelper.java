@@ -8,9 +8,9 @@
 
 package com.lamnguyen.helper;
 
-import com.lamnguyen.security.asymmetrical.AsymmetricalKey;
-import com.lamnguyen.security.symmetrical.SymmetricalKey;
-import com.lamnguyen.security.traditionalCipher.TraditionalKey;
+import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
+import com.lamnguyen.model.symmetrical.SymmetricalKey;
+import com.lamnguyen.model.traditionalCipher.TraditionalKey;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 
 import javax.swing.*;

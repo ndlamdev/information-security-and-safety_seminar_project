@@ -10,8 +10,8 @@ package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.KeyConfig;
 import com.lamnguyen.helper.SettingHelper;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
-import com.lamnguyen.security.symmetrical.encrypt.ISymmetricalEncrypt;
+import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.model.symmetrical.encrypt.ISymmetricalEncrypt;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.output.KeySymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;

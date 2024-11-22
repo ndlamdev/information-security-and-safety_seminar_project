@@ -9,8 +9,8 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.helper.ValidationHelper;
-import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
-import com.lamnguyen.security.traditionalCipher.TraditionalKey;
+import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
+import com.lamnguyen.model.traditionalCipher.TraditionalKey;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;

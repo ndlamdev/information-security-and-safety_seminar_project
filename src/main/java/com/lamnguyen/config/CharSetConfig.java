@@ -8,7 +8,7 @@
 
 package com.lamnguyen.config;
 
-import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
+import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
 
 import java.util.*;
 

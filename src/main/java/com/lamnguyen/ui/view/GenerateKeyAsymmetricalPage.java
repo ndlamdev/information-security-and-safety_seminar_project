@@ -10,8 +10,8 @@ package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.KeyConfig;
 import com.lamnguyen.helper.SettingHelper;
-import com.lamnguyen.security.asymmetrical.AsymmetricalKey;
-import com.lamnguyen.security.asymmetrical.IAsymmetrical;
+import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
+import com.lamnguyen.model.asymmetrical.IAsymmetrical;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.output.KeyAsymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;

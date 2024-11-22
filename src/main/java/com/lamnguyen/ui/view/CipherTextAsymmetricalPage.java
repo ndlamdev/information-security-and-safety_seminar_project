@@ -9,9 +9,8 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
-import com.lamnguyen.security.asymmetrical.AsymmetricalKey;
-import com.lamnguyen.security.asymmetrical.IAsymmetrical;
-import com.lamnguyen.security.symmetrical.SymmetricalKey;
+import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
+import com.lamnguyen.model.asymmetrical.IAsymmetrical;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;

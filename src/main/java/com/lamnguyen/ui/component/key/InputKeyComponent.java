@@ -9,8 +9,6 @@
 package com.lamnguyen.ui.component.key;
 
 import lombok.Getter;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
-import com.lamnguyen.security.symmetrical.SymmetricalKey;
 import com.lamnguyen.ui.controller.DropFileAdapter;
 import com.lamnguyen.ui.controller.KeyComponentController;
 

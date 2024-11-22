@@ -11,7 +11,7 @@ package com.lamnguyen.ui.component.selector;
 import lombok.Getter;
 import lombok.Setter;
 import com.lamnguyen.config.KeyConfig;
-import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
+import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;

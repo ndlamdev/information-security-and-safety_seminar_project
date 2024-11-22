@@ -9,10 +9,9 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
-import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.helper.ValidationHelper;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
-import com.lamnguyen.security.symmetrical.SymmetricalKey;
+import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.model.symmetrical.SymmetricalKey;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
@@ -21,16 +20,9 @@ import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 import com.lamnguyen.helper.DialogProgressHelper;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;

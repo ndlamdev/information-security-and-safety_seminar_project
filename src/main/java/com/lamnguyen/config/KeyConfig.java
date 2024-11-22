@@ -9,9 +9,9 @@
 package com.lamnguyen.config;
 
 import lombok.Getter;
-import com.lamnguyen.security.asymmetrical.IAsymmetrical;
-import com.lamnguyen.security.symmetrical.ISymmetrical;
-import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
+import com.lamnguyen.model.asymmetrical.IAsymmetrical;
+import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
 
 import java.util.ArrayList;
 import java.util.HashMap;

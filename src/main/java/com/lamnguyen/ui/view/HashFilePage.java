@@ -8,7 +8,7 @@
 
 package com.lamnguyen.ui.view;
 
-import com.lamnguyen.security.hash.impl.HashFileImpl;
+import com.lamnguyen.model.hash.impl.HashFileImpl;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;

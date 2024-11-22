@@ -10,10 +10,10 @@ package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.SignatureAlgorithmConfig;
 import com.lamnguyen.helper.ValidationHelper;
-import com.lamnguyen.security.asymmetrical.AsymmetricalKey;
-import com.lamnguyen.security.asymmetrical.IAsymmetrical;
-import com.lamnguyen.security.signature.ISignFile;
-import com.lamnguyen.security.signature.impl.SignFileImpl;
+import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
+import com.lamnguyen.model.asymmetrical.IAsymmetrical;
+import com.lamnguyen.model.signature.ISignFile;
+import com.lamnguyen.model.signature.impl.SignFileImpl;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;

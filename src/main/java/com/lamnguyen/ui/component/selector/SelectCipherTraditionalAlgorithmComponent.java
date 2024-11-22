@@ -8,7 +8,7 @@
 
 package com.lamnguyen.ui.component.selector;
 
-import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
+import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
 
 import javax.swing.*;
 import java.awt.*;
