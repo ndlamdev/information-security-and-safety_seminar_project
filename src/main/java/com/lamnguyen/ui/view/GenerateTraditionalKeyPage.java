@@ -17,7 +17,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateTraditionalKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.ui.helper.DialogProgressHelper;
+import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,7 +38,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
     private JButton buttonCreate;
     private Application application;
     private JComboBox<ITraditionalCipher.SecureLanguage> jcbLanguage;
-    private final int vGap = 20;
+    private final int V_GAP = 20;
 
     public GenerateTraditionalKeyPage(Application application) {
         this.application = application;
@@ -47,7 +47,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
 
     private void init() {
         this.setOpaque(false);
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, vGap));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
         Function<SelectAlgorithmGenerateTraditionalKeyComponent.AlgorithmKey, Void> onAlgorithmKeyChanged = algorithmKey -> {
             if (algorithmKey == null)
@@ -175,7 +175,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
         jcbLanguage.setPreferredSize(new Dimension(parentSize - 200, 50));
-        var size = getParent().getHeight() - vGap * 6 - 110 - 50 * 2 - 150;
+        var size = getParent().getHeight() - V_GAP * 6 - 110 - 50 * 2 - 150;
         outputKey.setCustomSize(new Dimension(parentSize - 500, size));
     }
 }

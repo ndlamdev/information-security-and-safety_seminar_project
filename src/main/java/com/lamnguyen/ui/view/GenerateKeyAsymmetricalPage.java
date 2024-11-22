@@ -17,7 +17,7 @@ import com.lamnguyen.ui.component.key.KeyAsymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.ui.helper.DialogProgressHelper;
+import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,12 +32,11 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     private KeyAsymmetricalGenerateComponent keyGenerateComponent;
     private SelectAlgorithmGenerateKeyComponent selectAlgorithmComponent;
     private OutputComponent outputComponent;
-    private String privateKeyBase64, publicKeyBase64;
     private SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private JButton buttonCreate;
     private JPanel panelSpace;
     private Application application;
-    private final int vGap = 20;
+    private final int V_GAP = 20;
 
     public GenerateKeyAsymmetricalPage(Application application) {
         this.application = application;
@@ -46,13 +45,11 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
 
     private void init() {
         this.setOpaque(false);
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, vGap));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
         Function<SelectAlgorithmGenerateKeyComponent.AlgorithmKey, Void> onAlgorithmKeyChanged = algorithmKey -> {
             outputComponent.setFileName(algorithmKey.getName() + "_" + algorithmKey.getSize());
             key = null;
-            privateKeyBase64 = null;
-            publicKeyBase64 = null;
             keyGenerateComponent.setPrivateKey("");
             keyGenerateComponent.setPublicKey("");
             return null;
@@ -90,7 +87,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
 
     private void saveKey() {
         DialogProgressHelper.runProcess(process -> {
-            if (privateKeyBase64 == null || publicKeyBase64 == null) {
+            if (key == null) {
                 JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -113,7 +110,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
-        var sizeSpace = this.getHeight() - vGap * 5 - 110 - 50 - 150 - 260;
+        var sizeSpace = this.getHeight() - V_GAP * 5 - 110 - 50 - 150 - 260;
         panelSpace.setPreferredSize(new Dimension(parentSize - 200, sizeSpace));
     }
 
@@ -123,10 +120,8 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
             var name = IAsymmetrical.KeyFactory.Algorithms.valueOf(algorithmKey.getName());
             key = IAsymmetrical.KeyFactory.generateKey(name, algorithmKey.getSize());
             if (key == null) return;
-            privateKeyBase64 = IAsymmetrical.encodeKeyToBase64(key.privateKey());
-            publicKeyBase64 = IAsymmetrical.encodeKeyToBase64(key.publicKey());
-            keyGenerateComponent.setPrivateKey(privateKeyBase64);
-            keyGenerateComponent.setPublicKey(publicKeyBase64);
+            keyGenerateComponent.setPrivateKey(IAsymmetrical.encodeKeyToBase64(key.privateKey()));
+            keyGenerateComponent.setPublicKey(IAsymmetrical.encodeKeyToBase64(key.publicKey()));
             process.dispose();
         });
     }

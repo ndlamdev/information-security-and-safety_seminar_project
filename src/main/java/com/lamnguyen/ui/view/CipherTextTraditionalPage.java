@@ -8,6 +8,7 @@
 
 package com.lamnguyen.ui.view;
 
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.security.traditionalCipher.ITraditionalCipher;
 import com.lamnguyen.security.traditionalCipher.TraditionalKey;
 import com.lamnguyen.ui.Application;
@@ -15,7 +16,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherTraditionalAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.ui.helper.DialogProgressHelper;
+import com.lamnguyen.helper.DialogProgressHelper;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -105,7 +106,8 @@ public class CipherTextTraditionalPage extends JPanel {
         DialogProgressHelper.runProcess(process -> {
             var text = inputTextComponent.getText();
             var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!validate(text, key)) return;
+            if (!ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+                return;
             var cipher = ITraditionalCipher.Factory.createEncrypt(alg.algorithm(), alg.language());
             try {
                 cipher.loadKey(key);
@@ -120,24 +122,13 @@ public class CipherTextTraditionalPage extends JPanel {
             process.dispose();
             try {
                 outputTextComponent.setTextJTextArea(cipher.doFinal(text));
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thành công");
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                process.dispose();
+                JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-    }
-
-    private boolean validate(String text, TraditionalKey<?> key) {
-        if (text == null) {
-            JOptionPane.showMessageDialog(null, "Vui lòng nhập văn bảng mã hóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (key == null) {
-            JOptionPane.showMessageDialog(null, "Vui lòng load file key!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
     }
 
     public Void loadFileKey(File file) {

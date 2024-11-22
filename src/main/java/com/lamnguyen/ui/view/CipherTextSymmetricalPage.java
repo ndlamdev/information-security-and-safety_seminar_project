@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.security.symmetrical.ISymmetrical;
 import com.lamnguyen.security.symmetrical.SymmetricalKey;
 import com.lamnguyen.security.symmetrical.decrypt.ISymmetricalDecrypt;
@@ -18,7 +19,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.ui.helper.DialogProgressHelper;
+import com.lamnguyen.helper.DialogProgressHelper;
 import lombok.Getter;
 
 import javax.crypto.BadPaddingException;
@@ -109,29 +110,38 @@ public class CipherTextSymmetricalPage extends JPanel {
     }
 
     private void encrypt() {
-        var text = inputTextComponent.getText();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        if (!validate(text, key)) return;
-        ISymmetricalEncrypt cipher = null;
-        try {
-            cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-                 InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
-        }
-        try {
-            outputTextComponent.setTextJTextArea(cipher.encryptStringBase64(text));
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        }
+        DialogProgressHelper.runProcess(process -> {
+            var text = inputTextComponent.getText();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+                return;
+            ISymmetricalEncrypt cipher = null;
+            try {
+                cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                     InvalidAlgorithmParameterException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                outputTextComponent.setTextJTextArea(cipher.encryptStringBase64(text));
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            process.dispose();
+        });
     }
 
     private void decrypt() {
         DialogProgressHelper.runProcess(process -> {
             var text = inputTextComponent.getText();
             var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!validate(text, key)) return;
+            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+                return;
             ISymmetricalDecrypt cipher = null;
             try {
                 cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
@@ -150,20 +160,6 @@ public class CipherTextSymmetricalPage extends JPanel {
             }
         });
 
-    }
-
-    private boolean validate(String file, SymmetricalKey key) {
-        if (file == null) {
-            JOptionPane.showMessageDialog(null, "Vui lòng nhập văn bảng mã hóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (key == null) {
-            JOptionPane.showMessageDialog(null, "Chưa nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
     }
 
     public Void loadFileKey(File file) {

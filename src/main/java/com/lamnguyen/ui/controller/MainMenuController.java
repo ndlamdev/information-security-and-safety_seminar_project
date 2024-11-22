@@ -39,6 +39,16 @@ public class MainMenuController implements ActionListener {
             return;
         }
 
+        if (jMenuItem.equals(mainMenu.getEncryptFileAsymmetricalMenuItem())) {
+            mainMenu.changePageEncryptAsymmetricalFile();
+            return;
+        }
+
+        if (jMenuItem.equals(mainMenu.getDecryptFileAsymmetricalMenuItem())) {
+            mainMenu.changePageDecryptAsymmetricalFile();
+            return;
+        }
+
         if (jMenuItem.equals(mainMenu.getEncryptTextSymmetricalMenuItem())) {
             mainMenu.changePageEncryptSymmetricalText();
             return;

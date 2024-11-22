@@ -17,7 +17,7 @@ import com.lamnguyen.ui.component.tree.TreeFileComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 import com.lamnguyen.ui.controller.navigation.IJNavigation;
 import com.lamnguyen.ui.controller.navigation.impl.JNavigation;
-import com.lamnguyen.ui.helper.DialogProgressHelper;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.ui.view.*;
 
 import javax.swing.*;
@@ -47,6 +47,7 @@ public class Application extends JFrame {
     private GenerateTraditionalKeyPage generateTraditionalKeyPage;
     private CipherTextTraditionalPage traditionalTextPage;
     private int width, height;
+    private CipherFileAsymmetricalPage asymmetricalFilePage;
 
     public Application() {
         toolkit = Toolkit.getDefaultToolkit();
@@ -78,6 +79,10 @@ public class Application extends JFrame {
         panelRight.add(IJNavigation.NamePage.CipherFileSymmetricalPage.name(), symmetricalFilePage);
         sizeController.addObserver(symmetricalFilePage);
 
+        asymmetricalFilePage = new CipherFileAsymmetricalPage(this);
+        panelRight.add(IJNavigation.NamePage.CipherFileAsymmetricalPage.name(), asymmetricalFilePage);
+        sizeController.addObserver(asymmetricalFilePage);
+
         symmetricalTextPage = new CipherTextSymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.CipherTextSymmetricalPage.name(), symmetricalTextPage);
 
@@ -104,9 +109,11 @@ public class Application extends JFrame {
 
         signFilePage = new SignFilePage(this);
         panelRight.add(IJNavigation.NamePage.SignFilePage.name(), signFilePage);
+        sizeController.addObserver(signFilePage);
 
         verifySignatureFilePage = new VerifySignatureFilePage(this);
         panelRight.add(IJNavigation.NamePage.VerifySignatureFilePage.name(), verifySignatureFilePage);
+        sizeController.addObserver(verifySignatureFilePage);
 
         panelLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         addPropertyChangeListenerHelper(panelLeft, height / 7 * 5, height / 7 * 4);
@@ -132,6 +139,14 @@ public class Application extends JFrame {
 
     public void decryptFileSymmetrical() {
         symmetricalFilePage.decryptMode();
+    }
+
+    public void encryptFileAsymmetrical() {
+        asymmetricalFilePage.encryptMode();
+    }
+
+    public void decryptFileAsymmetrical() {
+        asymmetricalFilePage.decryptMode();
     }
 
     public void encryptTextSymmetrical() {

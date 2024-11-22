@@ -43,9 +43,8 @@ public class DropAndDragComponent extends JPanel implements Observer {
 
     public DropAndDragComponent(Dimension size) {
         this.customSize = size;
-        this.setPreferredSize(customSize);
-        this.setSize(customSize);
         this.init();
+        setCustomSize(size);
         setOpaque(false);
     }
 
@@ -104,6 +103,18 @@ public class DropAndDragComponent extends JPanel implements Observer {
         this.setPreferredSize(Objects.requireNonNullElseGet(customSize, () -> new Dimension(getParent().getWidth() - 300, 200)));
 
         this.setSize(this.getPreferredSize());
+    }
+
+    public void setCustomSize(Dimension dimension) {
+        this.customSize = dimension;
+        this.setPreferredSize(Objects.requireNonNullElseGet(customSize, () -> new Dimension(getParent().getWidth() - 300, 200)));
+        this.setSize(this.getPreferredSize());
+
+        this.updateUI();
+        this.repaint();
+
+        this.panelNoneFile.reload();
+        this.panelDisplayFile.reload();
     }
 }
 

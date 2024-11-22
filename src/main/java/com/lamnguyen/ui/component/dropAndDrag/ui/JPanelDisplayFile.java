@@ -49,6 +49,10 @@ public class JPanelDisplayFile extends JPanel implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
+        reload();
+    }
+
+    public void reload() {
         var icon = IconResizeHelper.getInstance().initImageIcon("file.png", getParent().getHeight() / 3, getParent().getHeight() / 3);
         label.setIcon(icon);
         label.setBorder(BorderFactory.createEmptyBorder((getParent().getHeight() - getParent().getHeight() / 3 - 80) / 2, 0, 0, 0));

@@ -14,10 +14,10 @@ import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.security.symmetrical.ISymmetrical;
 import com.lamnguyen.security.symmetrical.SymmetricalKey;
 import com.lamnguyen.ui.Application;
-import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
+import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 import com.lamnguyen.helper.DialogProgressHelper;
 
@@ -35,18 +35,19 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
 
-public class CipherFileSymmetricalPage extends JPanel implements Observer {
+public class CipherFileAsymmetricalPage extends JPanel implements Observer {
     private final Application application;
     private OutputComponent outputComponent;
     private DropAndDragComponent dropAndDragComponent;
     private InputKeyComponent inputKeyComponent;
-    private SelectCipherAlgorithmComponent selectAlgorithmComponent;
+    private SelectCipherAlgorithmComponent selectCipherFileAlgorithmComponent, selectCipherKeyAlgorithmComponent;
     private boolean encrypt = true;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private SymmetricalKey key;
     private final int V_GAP = 20;
+    private int heightDrop;
 
-    public CipherFileSymmetricalPage(Application application) {
+    public CipherFileAsymmetricalPage(Application application) {
         this.application = application;
         this.init();
     }
@@ -55,7 +56,7 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
         this.setOpaque(false);
 
         Function<String, Void> onFileChanged = pathFile -> {
-            setFileNameOut(pathFile, selectAlgorithmComponent.getAlgorithm());
+            setFileNameOut(pathFile, selectCipherFileAlgorithmComponent.getAlgorithm());
             return null;
         };
 
@@ -76,9 +77,18 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
         this.add(inputKeyComponent);
         sizeController.addObserver(inputKeyComponent);
 
-        selectAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmSymmetrical(), onAlgorithmChanged); // 160
-        this.add(selectAlgorithmComponent);
-        sizeController.addObserver(selectAlgorithmComponent);
+        selectCipherFileAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmSymmetrical(), onAlgorithmChanged) {{
+            setTitle("Lựa chọn thuật toán " + (encrypt ? "mã hóa" : "giải mã") + " file!");
+        }};
+        this.add(selectCipherFileAlgorithmComponent);
+        selectCipherFileAlgorithmComponent.setHeightItemComponent(new SelectCipherAlgorithmComponent.HeightItemComponent(20, 30, 15));
+        sizeController.addObserver(selectCipherFileAlgorithmComponent);
+
+        selectCipherKeyAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmAsymmetrical(), onAlgorithmChanged) {{
+            setTitle("Lựa chọn thuật toán " + (encrypt ? "mã hóa" : "giải mã") + " khóa!!");
+        }};
+        this.add(selectCipherKeyAlgorithmComponent);
+        sizeController.addObserver(selectCipherKeyAlgorithmComponent);
 
         outputComponent = new OutputComponent(); //110
         sizeController.addObserver(outputComponent);
@@ -102,36 +112,45 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
         encrypt = true;
         outputComponent.setTextButtonAction("Mã hóa!");
         outputComponent.setActionButtonAction(actionEvent -> encryptFile());
+        selectCipherFileAlgorithmComponent.setVisible(true);
+        selectCipherKeyAlgorithmComponent.setHeightItemComponent(new SelectCipherAlgorithmComponent.HeightItemComponent(20, 30, 15));
+        var width = dropAndDragComponent.getSize().width;
+        dropAndDragComponent.setCustomSize(new Dimension(width, heightDrop - selectCipherKeyAlgorithmComponent.getHeight() - selectCipherKeyAlgorithmComponent.getHeight() - V_GAP * 6));
     }
 
     public void decryptMode() {
         encrypt = false;
         outputComponent.setTextButtonAction("Giải mã!");
         outputComponent.setActionButtonAction(actionEvent -> decryptFile());
+        selectCipherFileAlgorithmComponent.setVisible(false);
+        selectCipherKeyAlgorithmComponent.setHeightItemComponent(new SelectCipherAlgorithmComponent.HeightItemComponent(20, 50, 20));
+        var width = dropAndDragComponent.getSize().width;
+        dropAndDragComponent.setCustomSize(new Dimension(width, heightDrop - selectCipherKeyAlgorithmComponent.getHeight() - V_GAP * 5));
     }
 
     private void encryptFile() {
         DialogProgressHelper.runProcess(process -> {
             var file = dropAndDragComponent.getPathFile();
-            var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateFile(file, process))
+            var algEncryptFile = selectCipherFileAlgorithmComponent.getAlgorithm();
+            var algEncryptKey = selectCipherKeyAlgorithmComponent.getAlgorithm();
+            if (!ValidationHelper.validateAlgorithm(algEncryptKey, process) || !ValidationHelper.validateAlgorithm(algEncryptFile, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateFile(file, process))
                 return;
 
-            try {
-                var cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-                cipher.encryptFile(file, outputComponent.getFullPath(), false);
-                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                    application.reloadWorkSpace();
-                process.dispose();
-                JOptionPane.showMessageDialog(null, "Thành công!");
-            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
-                     NoSuchPaddingException | InvalidAlgorithmParameterException e) {
-                process.dispose();
-                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (InvalidKeyException e) {
-                e.printStackTrace(System.out);
-                process.dispose();
-            }
+//            try {
+//                var cipher = ISymmetrical.Factory.createEncrypt(algEncryptKey.algorithm(), algEncryptKey.mode(), algEncryptKey.padding(), key);
+//                cipher.encryptFile(file, outputComponent.getFullPath(), false);
+//                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+//                    application.reloadWorkSpace();
+//                process.dispose();
+//                JOptionPane.showMessageDialog(null, "Thành công!");
+//            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
+//                     NoSuchPaddingException | InvalidAlgorithmParameterException e) {
+//                process.dispose();
+//                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+//            } catch (InvalidKeyException e) {
+//                e.printStackTrace(System.out);
+//                process.dispose();
+//            }
         });
 
     }
@@ -139,25 +158,24 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
     private void decryptFile() {
         DialogProgressHelper.runProcess(process -> {
             var file = dropAndDragComponent.getPathFile();
-            var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateFile(file, process))
+            var algDecryptFile = selectCipherKeyAlgorithmComponent.getAlgorithm();
+            if (!ValidationHelper.validateAlgorithm(algDecryptFile, process) || !ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(key, process))
                 return;
 
-
-            try {
-                var cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-                cipher.decryptFile(file, outputComponent.getFullPath(), 0);
-                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                    application.reloadWorkSpace();
-                process.dispose();
-                JOptionPane.showMessageDialog(null, "Thành công!");
-            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
-                     NoSuchPaddingException | InvalidKeyException e) {
-                process.dispose();
-                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (InvalidAlgorithmParameterException e) {
-                process.dispose();
-            }
+//            try {
+//                var cipher = ISymmetrical.Factory.createDecrypt(algDecryptFile.algorithm(), algDecryptFile.mode(), algDecryptFile.padding(), key);
+//                cipher.decryptFile(file, outputComponent.getFullPath(), 0);
+//                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+//                    application.reloadWorkSpace();
+//                process.dispose();
+//                JOptionPane.showMessageDialog(null, "Thành công!");
+//            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
+//                     NoSuchPaddingException | InvalidKeyException e) {
+//                process.dispose();
+//                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+//            } catch (InvalidAlgorithmParameterException e) {
+//                process.dispose();
+//            }
         });
 
     }
@@ -186,7 +204,8 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         var sizeParent = this.getParent().getSize();
-        dropAndDragComponent.setPreferredSize(new Dimension(sizeParent.width - 400, sizeParent.height - selectAlgorithmComponent.getHeight() - 110 - 110 - V_GAP * 5));
+        heightDrop = sizeParent.height - 110 - 110;
+        dropAndDragComponent.setPreferredSize(new Dimension(sizeParent.width - 400, heightDrop - selectCipherKeyAlgorithmComponent.getHeight() - selectCipherFileAlgorithmComponent.getHeight() - V_GAP * 6));
         dropAndDragComponent.setSize(dropAndDragComponent.getPreferredSize());
     }
 }

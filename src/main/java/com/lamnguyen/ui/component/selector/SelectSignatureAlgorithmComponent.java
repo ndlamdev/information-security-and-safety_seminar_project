@@ -50,7 +50,7 @@ public class SelectSignatureAlgorithmComponent extends JPanel implements Observe
         sizeLabel = new Dimension(0, 30);
         sizeCombobox = new Dimension(0, 50);
 
-        this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
+        this.setBorder(BorderFactory.createEmptyBorder(25, 20, 20, 20));
 
         var algorithms = algorithmList.stream().map(SignatureAlgorithmConfig.Algorithm::alg).toArray(String[]::new);
         jcbAlgorithm = new JComboBox<>(algorithms) {{
@@ -143,14 +143,14 @@ public class SelectSignatureAlgorithmComponent extends JPanel implements Observe
     @Override
     public void update(Observable observable, Object o) {
         var sizeParent = getParent().getWidth();
-        this.setPreferredSize(new Dimension(sizeParent - 200, 160));
+        this.setPreferredSize(new Dimension(sizeParent - 200, 150));
 
         sizePanel.width = (sizeParent - 270) / 3;
         panelAlgorithm.setPreferredSize(sizePanel);
         panelMode.setPreferredSize(sizePanel);
         panelHashAlgorithm.setPreferredSize(sizePanel);
 
-        sizeLabel.width = sizePanel.width - 100;
+        sizeLabel.width = sizePanel.width - 10;
         labelAlgorithm.setPreferredSize(sizeLabel);
         labelIn.setPreferredSize(sizeLabel);
         labelHashAlgorithm.setPreferredSize(sizeLabel);

@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.SignatureAlgorithmConfig;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.security.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.security.asymmetrical.IAsymmetrical;
 import com.lamnguyen.security.signature.ISignFile;
@@ -19,6 +20,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectSignatureAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,15 +30,18 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.util.Observable;
+import java.util.Observer;
 
-public class SignFilePage extends JPanel {
+public class SignFilePage extends JPanel implements Observer {
     private final Application application;
     private DropAndDragComponent dropAndDragComponent;
     private InputKeyComponent inputKeyComponent;
     private SelectSignatureAlgorithmComponent selectAlgorithmComponent;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private AsymmetricalKey key;
-    private OutputInputTextComponent outputComponent;
+    private OutputInputTextComponent resultComponent;
+    private final int V_GAP = 20;
 
 
     public SignFilePage(Application application) {
@@ -47,66 +52,56 @@ public class SignFilePage extends JPanel {
     private void init() {
         this.setOpaque(false);
 
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 30));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
-        dropAndDragComponent = new DropAndDragComponent(new Dimension(800, 250));
-        sizeController.addObserver(dropAndDragComponent);
+        dropAndDragComponent = new DropAndDragComponent();
         this.add(dropAndDragComponent);
 
-        inputKeyComponent = new InputKeyComponent(this::loadFileKey);
+        inputKeyComponent = new InputKeyComponent(this::loadFileKey);//100
         this.add(inputKeyComponent);
         sizeController.addObserver(inputKeyComponent);
 
-        selectAlgorithmComponent = new SelectSignatureAlgorithmComponent(SignatureAlgorithmConfig.getInstance().getAlgorithmSignature());
+        selectAlgorithmComponent = new SelectSignatureAlgorithmComponent(SignatureAlgorithmConfig.getInstance().getAlgorithmSignature()); //150
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
         this.add(new JButton("Ký") {{
             setPreferredSize(new Dimension(500, 50));
             addActionListener(action -> signFile());
-        }});
+        }}); // 50
 
-        outputComponent = new OutputInputTextComponent("Chữ kí file!") {{
+        resultComponent = new OutputInputTextComponent("Chữ kí file!") {{
             setEditable(false);
             clickToCopy(true);
         }};
-        this.add(outputComponent);
-        sizeController.addObserver(outputComponent);
+        this.add(resultComponent);
     }
 
 
     private void signFile() {
-        var file = dropAndDragComponent.getPathFile();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        if (!validate(file, key)) return;
+        DialogProgressHelper.runProcess(process -> {
+            var file = dropAndDragComponent.getPathFile();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!ValidationHelper.validateFile(file, process))
+                return;
 
-        ISignFile signer = null;
-        try {
-            signer = SignFileImpl.getInstance(alg, key.privateKey());
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        try {
-            outputComponent.setTextJTextArea(signer.sign(file));
-            JOptionPane.showMessageDialog(null, "Thành công!");
-        } catch (IOException | SignatureException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private boolean validate(String file, AsymmetricalKey key) {
-        if (file == null) {
-            JOptionPane.showMessageDialog(null, "Chưa chọn file ký!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (key == null) {
-            JOptionPane.showMessageDialog(null, "Chưa nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
+            ISignFile signer = null;
+            try {
+                signer = SignFileImpl.getInstance(alg, key.privateKey());
+            } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                resultComponent.setTextJTextArea(signer.sign(file));
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IOException | SignatureException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     public Void loadFileKey(File file) {
@@ -120,5 +115,12 @@ public class SignFilePage extends JPanel {
         }
 
         return null;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        var sizeParent = this.getParent().getSize();
+        resultComponent.setCustomSize(new Dimension(sizeParent.width - 200, 70));
+        dropAndDragComponent.setCustomSize(new Dimension(sizeParent.width - 400, sizeParent.height - V_GAP * 6 - 50 - 110 - 150 - 70));
     }
 }

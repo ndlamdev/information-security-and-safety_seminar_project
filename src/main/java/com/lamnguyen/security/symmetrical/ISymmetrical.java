@@ -212,6 +212,44 @@ public interface ISymmetrical {
         }
 
         /**
+         * Hổ trợ tạo một interface mã hóa đối xứng với mode và padding.
+         *
+         * @param algorithm Thuật toán mã hóa đối xứng muốn tạo.
+         * @param keySize   Chiều dài của khóa tương ứng với từng thuật toán.
+         * @param mode      Mode của thuật toán
+         * @param padding   Padding ủa thuật toán
+         * @return ISymmetricalEncrypt: Một interface mã hóa đối xứng.
+         * @throws NoSuchPaddingException   Lỗi khi thêm padding vào thuật toán  mã hóa.
+         * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
+         * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
+         */
+        public static ISymmetricalEncrypt createEncrypt(String algorithm, String mode, String padding, int keySize) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+            var instance = getInstanceSymmetricalEncrypt(ISymmetrical.Algorithms.valueOf(algorithm), mode, padding);
+
+            instance.loadKey(instance.generateKey(keySize));
+            return instance;
+        }
+
+        /**
+         * Hổ trợ tạo một interface mã hóa đối xứng với với mode và padding.
+         *
+         * @param algorithm Thuật toán mã hóa đối xứng muốn tạo.
+         * @param key       Khóa của thuật toán.
+         * @param mode      Mode của thuật toán
+         * @param padding   Padding ủa thuật toán
+         * @return ISymmetricalEncrypt: Một interface mã hóa đối xứng.
+         * @throws NoSuchPaddingException   Lỗi khi thêm padding vào thuật toán  mã hóa.
+         * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
+         * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
+         */
+        public static ISymmetricalEncrypt createEncrypt(String algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+            var instance = getInstanceSymmetricalEncrypt(ISymmetrical.Algorithms.valueOf(algorithm), mode, padding, key.iv());
+
+            instance.loadKey(key.key());
+            return instance;
+        }
+
+        /**
          * Hổ trợ tạo một interface giải mã đối xứng với mode và padding.
          *
          * @param algorithm Thuật toán giải mã đối xứng muốn tạo.
@@ -239,6 +277,22 @@ public interface ISymmetrical {
                 case RC4 -> new RC4Decrypt(key, mode, padding);
                 case RC5 -> new RC5Decrypt(key, mode, padding);
             };
+        }
+
+        /**
+         * Hổ trợ tạo một interface giải mã đối xứng với mode và padding.
+         *
+         * @param algorithm Thuật toán giải mã đối xứng muốn tạo.
+         * @param key       Key để tạo cipher giải mã.
+         * @param mode      Mode của thuật toán
+         * @param padding   Padding ủa thuật toán
+         * @return ISymmetricalDecrypt Một interface giải mã đối xứng.
+         * @throws NoSuchPaddingException   Lỗi khi thêm padding vào thuật toán  mã hóa.
+         * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
+         * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
+         */
+        public static ISymmetricalDecrypt createDecrypt(String algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+            return createDecrypt(ISymmetrical.Algorithms.valueOf(algorithm), mode, padding, key);
         }
     }
 

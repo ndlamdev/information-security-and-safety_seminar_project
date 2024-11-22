@@ -85,6 +85,8 @@ public class InputKeyComponent extends JPanel implements Observer {
         this.setPreferredSize(new Dimension(parentWidth - 200, 110));
         this.setSize(this.getPreferredSize());
         jtfInputKey.setPreferredSize(new Dimension(parentWidth - 510, 50));
+        this.updateUI();
+        this.repaint();
     }
 
     public void setPathFileKey(String absolutePath) {

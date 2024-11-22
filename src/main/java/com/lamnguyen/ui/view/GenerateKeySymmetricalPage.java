@@ -17,7 +17,7 @@ import com.lamnguyen.ui.component.key.KeySymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.ui.helper.DialogProgressHelper;
+import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +36,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
     private JPanel panelSpace;
     private Application application;
     private ISymmetricalEncrypt encrypt;
-    private final int vGap = 20;
+    private final int V_GAP = 20;
 
     public GenerateKeySymmetricalPage(Application application) {
         this.application = application;
@@ -45,7 +45,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
 
     private void init() {
         this.setOpaque(false);
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, vGap));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
         Function<SelectAlgorithmGenerateKeyComponent.AlgorithmKey, Void> onAlgorithmKeyChanged = algorithmKey -> {
             outputComponent.setFileName(algorithmKey.getName() + "_" + algorithmKey.getSize());
@@ -124,7 +124,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50)); //50
-        var sizeSpace = this.getHeight() - vGap * 6 - 110 * 2 - 50 - 150;
+        var sizeSpace = this.getHeight() - V_GAP * 6 - 110 * 2 - 50 - 150;
         panelSpace.setPreferredSize(new Dimension(parentSize - 200, sizeSpace));
     }
 }

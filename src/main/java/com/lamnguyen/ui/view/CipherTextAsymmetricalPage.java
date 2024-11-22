@@ -17,7 +17,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.ui.helper.DialogProgressHelper;
+import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -102,19 +102,6 @@ public class CipherTextAsymmetricalPage extends JPanel {
         DialogProgressHelper.runProcess(process -> process.dispose());
     }
 
-    private boolean validate(String file, SymmetricalKey key) {
-        if (file == null) {
-            JOptionPane.showMessageDialog(null, "Chưa chọn file mã hóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (key == null) {
-            JOptionPane.showMessageDialog(null, "Chưa nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
-    }
 
     public Void loadFileKey(File file) {
         if (file == null) return null;

@@ -220,6 +220,16 @@ public class MainMenu extends JMenuBar {
         navigation.push(IJNavigation.NamePage.CipherFileSymmetricalPage);
     }
 
+    public void changePageEncryptAsymmetricalFile() {
+        application.encryptFileAsymmetrical();
+        navigation.push(IJNavigation.NamePage.CipherFileAsymmetricalPage);
+    }
+
+    public void changePageDecryptAsymmetricalFile() {
+        application.decryptFileAsymmetrical();
+        navigation.push(IJNavigation.NamePage.CipherFileAsymmetricalPage);
+    }
+
     public void changePageEncryptSymmetricalText() {
         application.encryptTextSymmetrical();
         navigation.push(IJNavigation.NamePage.CipherTextSymmetricalPage);

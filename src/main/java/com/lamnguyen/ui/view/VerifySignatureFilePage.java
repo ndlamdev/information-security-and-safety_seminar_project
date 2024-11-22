@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.SignatureAlgorithmConfig;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.security.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.security.asymmetrical.IAsymmetrical;
 import com.lamnguyen.security.signature.IVerifySignatureFile;
@@ -19,6 +20,7 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectSignatureAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,15 +30,18 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.util.Observable;
+import java.util.Observer;
 
-public class VerifySignatureFilePage extends JPanel {
+public class VerifySignatureFilePage extends JPanel implements Observer {
     private final Application application;
     private DropAndDragComponent dropAndDragComponent;
     private InputKeyComponent inputKeyComponent;
     private SelectSignatureAlgorithmComponent selectAlgorithmComponent;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private AsymmetricalKey key;
-    private OutputInputTextComponent inputComponent;
+    private OutputInputTextComponent inputSignComponent;
+    private final int V_GAP = 20;
 
 
     public VerifySignatureFilePage(Application application) {
@@ -47,15 +52,13 @@ public class VerifySignatureFilePage extends JPanel {
     private void init() {
         this.setOpaque(false);
 
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 30));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
         dropAndDragComponent = new DropAndDragComponent(new Dimension(800, 250));
-        sizeController.addObserver(dropAndDragComponent);
         this.add(dropAndDragComponent);
 
-        inputComponent = new OutputInputTextComponent("Chữ kí file!");
-        this.add(inputComponent);
-        sizeController.addObserver(inputComponent);
+        inputSignComponent = new OutputInputTextComponent("Chữ kí file!");
+        this.add(inputSignComponent);
 
         inputKeyComponent = new InputKeyComponent(this::loadFileKey);
         this.add(inputKeyComponent);
@@ -73,43 +76,31 @@ public class VerifySignatureFilePage extends JPanel {
 
 
     private void verifySignatureFile() {
-        var file = dropAndDragComponent.getPathFile();
-        var alg = selectAlgorithmComponent.getAlgorithm();
-        var signature = inputComponent.getText();
-        if (!validate(file, key, signature)) return;
+        DialogProgressHelper.runProcess(process -> {
+            var file = dropAndDragComponent.getPathFile();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            var signature = inputSignComponent.getText();
+            if (!ValidationHelper.validateFile(file, process) || ValidationHelper.validateKey(key, process) || !ValidationHelper.validateSignature(signature, process))
+                return;
 
-        IVerifySignatureFile verifier = null;
-        try {
-            verifier = VerifySignatureFileImpl.getInstance(alg, key.publicKey());
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
-            e.printStackTrace();
-        }
-        try {
-            if (verifier.verify(file, signature))
-                JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thành công!");
-            else throw new SignatureException("Lỗi");
-        } catch (IOException | SignatureException e) {
-            JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private boolean validate(String file, AsymmetricalKey key, String signature) {
-        if (file == null) {
-            JOptionPane.showMessageDialog(null, "Chưa chọn file ký!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (key == null) {
-            JOptionPane.showMessageDialog(null, "Chưa nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        if (signature == null) {
-            JOptionPane.showMessageDialog(null, "Chưa nhập chữ ký!", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
-        return true;
+            IVerifySignatureFile verifier = null;
+            try {
+                verifier = VerifySignatureFileImpl.getInstance(alg, key.publicKey());
+                process.dispose();
+            } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
+                process.dispose();
+                return;
+            }
+            try {
+                if (verifier.verify(file, signature)) {
+                    process.dispose();
+                    JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thành công!");
+                } else throw new SignatureException("Lỗi");
+            } catch (IOException | SignatureException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     public Void loadFileKey(File file) {
@@ -123,5 +114,12 @@ public class VerifySignatureFilePage extends JPanel {
         }
 
         return null;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        var sizeParent = getParent().getSize();
+        inputSignComponent.setCustomSize(new Dimension(sizeParent.width - 200, 70));
+        dropAndDragComponent.setCustomSize(new Dimension(sizeParent.width - 400, sizeParent.height - V_GAP * 6 - 50 - 110 - 150 - 70));
     }
 }

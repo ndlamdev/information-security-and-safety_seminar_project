@@ -6,7 +6,7 @@
  * User: kimin
  **/
 
-package com.lamnguyen.ui.helper;
+package com.lamnguyen.helper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +36,7 @@ public class DialogProgressHelper {
                     dialog.setVisible(true);
                 });
             }).start();
-            process.run(dialog);
+            process.run(new DialogProcess(dialog));
         }).start();
 
     }
@@ -46,6 +46,18 @@ public class DialogProgressHelper {
     }
 
     public interface Process {
-        void run(JDialog dialog);
+        void run(DialogProcess dialog);
+    }
+
+    public static class DialogProcess {
+        private final JDialog dialog;
+
+        public DialogProcess(JDialog dialog) {
+            this.dialog = dialog;
+        }
+
+        public void dispose() {
+            dialog.dispose();
+        }
     }
 }

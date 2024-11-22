@@ -25,7 +25,6 @@ public class TreeFileComponent extends JScrollPane {
     private JTree tree;
 
     public TreeFileComponent(String path) {
-        this.path = path;
         this.init();
         setPath(path);
     }
@@ -41,7 +40,6 @@ public class TreeFileComponent extends JScrollPane {
         }};
         tree.setCellRenderer(new CustomTreeCellRenderer());
         tree.setDragEnabled(true);
-        tree.setTransferHandler(new FileTransferHandler(tree, path));
         this.setViewportView(tree);
     }
 
@@ -50,6 +48,7 @@ public class TreeFileComponent extends JScrollPane {
         var file = new File(path);
         if (!file.exists()) return;
         tree.setModel(new DefaultTreeModel(setPathHelper(file)));
+        tree.setTransferHandler(new FileTransferHandler(tree, path));
         tree.setVisible(true);
     }
 
@@ -85,8 +84,8 @@ public class TreeFileComponent extends JScrollPane {
             if (treePath == null) return null;
 
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) treePath.getLastPathComponent();
-            String fileName = String.join("/", Arrays.stream(selectedNode.getPath()).map(it -> it.toString()).toList());
-            var indexOf = fileName.indexOf("/");
+            String fileName = String.join(File.separator, Arrays.stream(selectedNode.getPath()).map(it -> it.toString()).toList());
+            var indexOf = fileName.indexOf(File.separator);
             if (indexOf != -1)
                 fileName = fileName.substring(indexOf, fileName.length());
             fileName = path + fileName;

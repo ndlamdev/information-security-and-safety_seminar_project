@@ -33,12 +33,10 @@ public class OutputInputTextComponent extends JPanel implements Observer {
     }
 
     public OutputInputTextComponent(String textLabel, Dimension size) {
-        this.customSize = size;
-        this.setPreferredSize(new Dimension(customSize.width - 200, customSize.height));
-        this.setSize(this.getPreferredSize());
         this.textLabel = textLabel;
         this.setOpaque(false);
         this.init();
+        this.setCustomSize(size);
     }
 
     private void init() {
@@ -100,7 +98,7 @@ public class OutputInputTextComponent extends JPanel implements Observer {
         g2.drawRoundRect(0, heightTitle, getWidth() - STROKE_WIDTH, getHeight() - STROKE_WIDTH - heightTitle, RADIUS, RADIUS);
 
         g2.setColor(Color.white);
-        g2.fillRect(20, 0, textLabel.length() * 10 + 15, 28);
+        g2.fillRect(20, 0, (int)(textLabel.length() * 5.7) + 20, 28);
         g2.setColor(Color.BLACK);
         g2.drawString(textLabel, 30, 18);
 
@@ -124,9 +122,8 @@ public class OutputInputTextComponent extends JPanel implements Observer {
 
     public void setCustomSize(Dimension dimension) {
         this.customSize = dimension;
-        var parentSize = getParent().getWidth();
-        this.setPreferredSize(new Dimension(parentSize - 200, customSize.height));
-        this.scrollPane.setPreferredSize(new Dimension(parentSize - 200 - 40, customSize.height - 40));
+        this.setPreferredSize(dimension);
+        this.scrollPane.setPreferredSize(new Dimension(dimension.width - 40, customSize.height - 40));
         this.setSize(this.getPreferredSize());
         this.scrollPane.setSize(this.scrollPane.getPreferredSize());
         this.updateUI();
