@@ -8,7 +8,6 @@
 
 package com.lamnguyen.ui.view;
 
-import com.lamnguyen.security.hash.IHashFile;
 import com.lamnguyen.security.hash.impl.HashFileImpl;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
@@ -18,16 +17,17 @@ import com.lamnguyen.ui.controller.SubjectSizeController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
+import java.util.Observable;
+import java.util.Observer;
 
-public class HashFilePage extends JPanel {
+public class HashFilePage extends JPanel implements Observer {
     private final Application application;
     private DropAndDragComponent dropAndDragComponent;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private SelectHashAlgorithmComponent selectHashAlgorithmComponent;
     private OutputInputTextComponent output;
     private JButton action;
+    private final int V_GAP = 20;
 
 
     //1300
@@ -39,7 +39,7 @@ public class HashFilePage extends JPanel {
     private void init() {
         this.setOpaque(false);
 
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 30));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
         dropAndDragComponent = new DropAndDragComponent();
         sizeController.addObserver(dropAndDragComponent);
@@ -59,7 +59,6 @@ public class HashFilePage extends JPanel {
         output = new OutputInputTextComponent("Mã hash") {{
             setEditable(false);
             clickToCopy(true);
-            setSize(new Dimension(1100, 220));
         }};
         this.add(output);
     }
@@ -77,5 +76,12 @@ public class HashFilePage extends JPanel {
             output.setTextJTextArea(HashFileImpl.getInstance(alg).hash(file.getAbsolutePath()));
         } catch (Exception ignored) {
         }
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        var sizeParent = this.getParent().getSize();
+        output.setCustomSize(new Dimension(sizeParent.width - 200, 150));
+        dropAndDragComponent.setCustomSize(new Dimension(sizeParent.width - 400, sizeParent.height - V_GAP * 5 - 50 - 100 - output.getHeight()));
     }
 }

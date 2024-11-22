@@ -11,8 +11,8 @@ public class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
     private final Icon childIcon;
 
     public CustomTreeCellRenderer() {
-        parentIcon = IconResizeHelper.getInstance().initImageIcon("folder.png", 20, 20);
-        childIcon = IconResizeHelper.getInstance().initImageIcon("file2.png", 20, 20);
+        parentIcon = IconResizeHelper.initImageIcon("folder.png", 20, 20);
+        childIcon = IconResizeHelper.initImageIcon("file2.png", 20, 20);
     }
 
     @Override

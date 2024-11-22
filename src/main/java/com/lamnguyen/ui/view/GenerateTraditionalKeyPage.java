@@ -173,9 +173,9 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
-        buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
+        buttonCreate.setPreferredSize(new Dimension(parentSize - 400, 50));
         jcbLanguage.setPreferredSize(new Dimension(parentSize - 200, 50));
-        var size = getParent().getHeight() - V_GAP * 6 - 110 - 50 * 2 - 150;
+        var size = getParent().getHeight() - V_GAP * 6 - 110 - 50 * 2 - 130;
         outputKey.setCustomSize(new Dimension(parentSize - 500, size));
     }
 }

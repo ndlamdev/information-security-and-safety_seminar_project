@@ -14,18 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 
 public class IconResizeHelper {
-    private static IconResizeHelper instance;
-
-    private IconResizeHelper() {
-
-    }
-
-    public static IconResizeHelper getInstance() {
-        if (instance == null) instance = new IconResizeHelper();
-        return instance;
-    }
-
-    public ImageIcon initImageIcon(String path, int width, int height) {
+    public static ImageIcon initImageIcon(String path, int width, int height) {
         ImageIcon icon = null;
         try {
             icon = new ImageIcon(IconResizeHelper.class.getClassLoader().getResourceAsStream(path).readAllBytes());

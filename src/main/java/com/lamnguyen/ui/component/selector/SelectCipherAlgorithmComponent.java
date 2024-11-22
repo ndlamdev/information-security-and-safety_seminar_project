@@ -34,7 +34,7 @@ public class SelectCipherAlgorithmComponent extends JPanel implements Observer {
     }
 
     public SelectCipherAlgorithmComponent(List<CipherAlgorithmConfig.Algorithm> algorithmList, Function<Algorithm, Void> onAlgorithmChanged) {
-        this.heightItemComponent = new HeightItemComponent(30, 50, 20);
+        this.heightItemComponent = new HeightItemComponent(20, 50, 20);
         this.algorithmList = algorithmList;
         this.onAlgorithmChanged = onAlgorithmChanged;
         this.setOpaque(false);
@@ -44,7 +44,7 @@ public class SelectCipherAlgorithmComponent extends JPanel implements Observer {
 
     public SelectCipherAlgorithmComponent(List<CipherAlgorithmConfig.Algorithm> algorithmList) {
         this.algorithmList = algorithmList;
-        this.heightItemComponent = new HeightItemComponent(30, 50, 20);
+        this.heightItemComponent = new HeightItemComponent(20, 50, 20);
         this.setOpaque(false);
         this.init();
         this.event();
@@ -159,7 +159,7 @@ public class SelectCipherAlgorithmComponent extends JPanel implements Observer {
         g2.fillRect(20, 0, (int) (title.length() * 5.7) + 20, 28);
 
         g2.setColor(Color.BLACK);
-        g2.drawString(title, 30, 18);
+        g2.drawString(title, 30, 15);
     }
 
     public int getHeight() {

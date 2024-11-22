@@ -47,7 +47,7 @@ public class SelectSignatureAlgorithmComponent extends JPanel implements Observe
 
     private void init() {
         sizePanel = new Dimension(0, 90);
-        sizeLabel = new Dimension(0, 30);
+        sizeLabel = new Dimension(0, 20);
         sizeCombobox = new Dimension(0, 50);
 
         this.setBorder(BorderFactory.createEmptyBorder(25, 20, 20, 20));
@@ -137,7 +137,7 @@ public class SelectSignatureAlgorithmComponent extends JPanel implements Observe
         g2.fillRect(20, 0, 190, 28);
 
         g2.setColor(Color.BLACK);
-        g2.drawString("Lựa chọn thuật toán!", 30, 18);
+        g2.drawString("Lựa chọn thuật toán!", 30, 15);
     }
 
     @Override

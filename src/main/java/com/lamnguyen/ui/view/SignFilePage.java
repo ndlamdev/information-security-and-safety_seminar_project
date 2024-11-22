@@ -121,6 +121,6 @@ public class SignFilePage extends JPanel implements Observer {
     public void update(Observable o, Object arg) {
         var sizeParent = this.getParent().getSize();
         resultComponent.setCustomSize(new Dimension(sizeParent.width - 200, 70));
-        dropAndDragComponent.setCustomSize(new Dimension(sizeParent.width - 400, sizeParent.height - V_GAP * 6 - 50 - 110 - 150 - 70));
+        dropAndDragComponent.setCustomSize(new Dimension(sizeParent.width - 400, sizeParent.height - V_GAP * 6 - 50 - 110 - 150 - resultComponent.getHeight()));
     }
 }

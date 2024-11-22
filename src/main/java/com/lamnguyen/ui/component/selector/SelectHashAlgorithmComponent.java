@@ -30,7 +30,7 @@ public class SelectHashAlgorithmComponent extends JPanel implements Observer {
     }
 
     private void init() {
-        this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
+        this.setBorder(BorderFactory.createEmptyBorder(25, 20, 20, 20));
 
         jcbAlgorithm = new JComboBox<>(HashAlgorithmConfig.getInstance().getHashs().toArray(String[]::new)) {{
             addActionListener(actionEvent -> {
@@ -62,13 +62,13 @@ public class SelectHashAlgorithmComponent extends JPanel implements Observer {
         g2.fillRect(20, 0, 190, 28);
 
         g2.setColor(Color.BLACK);
-        g2.drawString("Lựa chọn thuật toán!", 30, 18);
+        g2.drawString("Lựa chọn thuật toán!", 30, 15);
     }
 
     @Override
     public void update(Observable observable, Object o) {
         var sizeParent = getParent().getWidth();
-        this.setPreferredSize(new Dimension(sizeParent - 200, 110));
+        this.setPreferredSize(new Dimension(sizeParent - 200, 100));
         jcbAlgorithm.setPreferredSize(new Dimension(sizeParent - 300, 50));
     }
 }

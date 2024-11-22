@@ -100,7 +100,7 @@ public class OutputInputTextComponent extends JPanel implements Observer {
         g2.setColor(Color.white);
         g2.fillRect(20, 0, (int)(textLabel.length() * 5.7) + 20, 28);
         g2.setColor(Color.BLACK);
-        g2.drawString(textLabel, 30, 18);
+        g2.drawString(textLabel, 30, 15);
 
         super.paintComponent(g);
     }

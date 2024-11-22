@@ -31,8 +31,10 @@ import java.io.File;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Observable;
+import java.util.Observer;
 
-public class CipherTextSymmetricalPage extends JPanel {
+public class CipherTextSymmetricalPage extends JPanel implements Observer {
     private final Application application;
     private OutputInputTextComponent inputTextComponent, outputTextComponent;
     private InputKeyComponent inputKeyComponent;
@@ -41,6 +43,7 @@ public class CipherTextSymmetricalPage extends JPanel {
     private JButton action;
     @Getter
     private SymmetricalKey key;
+    private final int V_GAP = 20;
 
 
     public CipherTextSymmetricalPage(Application application) {
@@ -51,7 +54,7 @@ public class CipherTextSymmetricalPage extends JPanel {
     private void init() {
         this.setOpaque(false);
 
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 30));
+        this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
         inputTextComponent = new OutputInputTextComponent("Nhập văn bảng");
         sizeController.addObserver(inputTextComponent);
@@ -63,11 +66,6 @@ public class CipherTextSymmetricalPage extends JPanel {
         }};
         sizeController.addObserver(outputTextComponent);
         this.add(outputTextComponent);
-
-        this.add(new JPanel() {{
-            setPreferredSize(new Dimension(500, 50));
-            setOpaque(false);
-        }});
 
         inputKeyComponent = new InputKeyComponent(this::loadFileKey);
         this.add(inputKeyComponent);
@@ -173,5 +171,13 @@ public class CipherTextSymmetricalPage extends JPanel {
         }
 
         return null;
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        var parentSize = getParent().getWidth();
+        var sizeSpace = this.getHeight() - V_GAP * 6 - 110 - selectAlgorithmComponent.getHeight() - 50;
+        inputTextComponent.setCustomSize(new Dimension(parentSize - 200, sizeSpace / 2));
+        outputTextComponent.setCustomSize(new Dimension(parentSize - 200, sizeSpace / 2));
     }
 }

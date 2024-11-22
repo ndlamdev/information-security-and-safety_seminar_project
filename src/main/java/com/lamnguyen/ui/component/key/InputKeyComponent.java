@@ -76,7 +76,7 @@ public class InputKeyComponent extends JPanel implements Observer {
         g2.fillRect(20, 0, 140, 28);
 
         g2.setColor(Color.BLACK);
-        g2.drawString("Nhập File Key!", 30, 18);
+        g2.drawString("Nhập File Key!", 30, 15);
     }
 
     @Override

@@ -6,7 +6,7 @@
  * User: lam-nguyen
  **/
 
-package com.lamnguyen.ui.component.key;
+package com.lamnguyen.ui.component.output;
 
 import com.lamnguyen.helper.ClipboardHelper;
 import com.lamnguyen.ui.component.label.LabelBorder;
@@ -30,7 +30,7 @@ public class KeyAsymmetricalGenerateComponent extends JPanel implements Observer
     }
 
     private void init() {
-        this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
+        this.setBorder(BorderFactory.createEmptyBorder(24, 20, 20, 20));
 
         labelPublicKey = new JLabel("Khóa công khai!");
         this.add(labelPublicKey);
@@ -88,7 +88,7 @@ public class KeyAsymmetricalGenerateComponent extends JPanel implements Observer
         g2.setColor(Color.white);
         g2.fillRect(20, 0, 130, 28);
         g2.setColor(Color.BLACK);
-        g2.drawString("Key generate!", 30, 18);
+        g2.drawString("Key generate!", 30, 15);
 
         super.paintComponent(g);
     }
@@ -96,7 +96,7 @@ public class KeyAsymmetricalGenerateComponent extends JPanel implements Observer
     @Override
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
-        this.setPreferredSize(new Dimension(parentSize - 200, 240));
+        this.setPreferredSize(new Dimension(parentSize - 200, 230));
         labelShowPublicKey.setPreferredSize(new Dimension(parentSize - 300, 50));
         labelShowPrivateKey.setPreferredSize(new Dimension(parentSize - 300, 50));
 

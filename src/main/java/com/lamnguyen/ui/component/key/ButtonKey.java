@@ -33,7 +33,7 @@ public class ButtonKey extends JButton {
     }
 
     private void init() {
-        ImageIcon icon = IconResizeHelper.getInstance().initImageIcon("key.png", 20, 20);
+        ImageIcon icon = IconResizeHelper.initImageIcon("key.png", 20, 20);
         this.setIcon(icon);
         this.setName(pathKey);
         this.setPreferredSize(new Dimension(300, 50));

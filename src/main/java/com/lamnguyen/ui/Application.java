@@ -10,6 +10,7 @@ package com.lamnguyen.ui;
 
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.lamnguyen.helper.FileChooseHelper;
+import com.lamnguyen.helper.IconResizeHelper;
 import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.ui.component.list.ListKeyComponent;
 import com.lamnguyen.ui.component.menu.MainMenu;
@@ -63,7 +64,9 @@ public class Application extends JFrame {
     private void init() {
         sizeController = SubjectSizeController.getInstance();
 
-        this.setTitle("Phần mềm mã hóa/giải mã file Lam Nguyên");
+        this.setTitle("Phần mềm mã hóa/giải mã file Lam Nguyễn");
+        this.setIconImage(IconResizeHelper.initImageIcon("logo.png", 200, 200).getImage());
+
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setBounds(100, 50, width, height);
         this.setResizable(false);
@@ -85,15 +88,19 @@ public class Application extends JFrame {
 
         symmetricalTextPage = new CipherTextSymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.CipherTextSymmetricalPage.name(), symmetricalTextPage);
+        sizeController.addObserver(symmetricalTextPage);
 
         asymmetricalTextPage = new CipherTextAsymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.CipherTextAsymmetricalPage.name(), asymmetricalTextPage);
+        sizeController.addObserver(asymmetricalTextPage);
 
         traditionalTextPage = new CipherTextTraditionalPage(this);
         panelRight.add(IJNavigation.NamePage.CipherTextTraditionalPage.name(), traditionalTextPage);
+        sizeController.addObserver(traditionalTextPage);
 
         hashFile = new HashFilePage(this);
         panelRight.add(IJNavigation.NamePage.HashFilePage.name(), hashFile);
+        sizeController.addObserver(hashFile);
 
         generateKeySymmetricalPage = new GenerateKeySymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.GenerateKeySymmetricalPage.name(), generateKeySymmetricalPage);

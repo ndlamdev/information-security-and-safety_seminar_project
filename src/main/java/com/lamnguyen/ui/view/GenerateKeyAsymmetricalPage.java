@@ -13,7 +13,7 @@ import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.security.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.security.asymmetrical.IAsymmetrical;
 import com.lamnguyen.ui.Application;
-import com.lamnguyen.ui.component.key.KeyAsymmetricalGenerateComponent;
+import com.lamnguyen.ui.component.output.KeyAsymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
@@ -110,7 +110,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50));
-        var sizeSpace = this.getHeight() - V_GAP * 5 - 110 - 50 - 150 - 260;
+        var sizeSpace = this.getHeight() - V_GAP * 6 - 110 - 130 - 50 - 230;
         panelSpace.setPreferredSize(new Dimension(parentSize - 200, sizeSpace));
     }
 

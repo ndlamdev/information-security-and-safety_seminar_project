@@ -13,7 +13,7 @@ import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.security.symmetrical.ISymmetrical;
 import com.lamnguyen.security.symmetrical.encrypt.ISymmetricalEncrypt;
 import com.lamnguyen.ui.Application;
-import com.lamnguyen.ui.component.key.KeySymmetricalGenerateComponent;
+import com.lamnguyen.ui.component.output.KeySymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
@@ -124,7 +124,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50)); //50
-        var sizeSpace = this.getHeight() - V_GAP * 6 - 110 * 2 - 50 - 150;
+        var sizeSpace = this.getHeight() - V_GAP * 6 - 110 * 2 - 50 - 130;
         panelSpace.setPreferredSize(new Dimension(parentSize - 200, sizeSpace));
     }
 }

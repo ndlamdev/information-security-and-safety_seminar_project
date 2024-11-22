@@ -62,7 +62,7 @@ public class JPanelNoneFile extends JPanel implements Observer {
     }
 
     public void reload() {
-        var icon = IconResizeHelper.getInstance().initImageIcon("download.png", getParent().getHeight() / 3, getParent().getHeight() / 3);
+        var icon = IconResizeHelper.initImageIcon("download.png", getParent().getHeight() / 3, getParent().getHeight() / 3);
         label.setIcon(icon);
         label.setBorder(BorderFactory.createEmptyBorder((getParent().getHeight() - getParent().getHeight() / 3 - 80) / 2, 0, 0, 0));
         text.setPreferredSize(new Dimension(getParent().getWidth(), 50));

@@ -49,12 +49,12 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
     }
 
     private void init() {
-        this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
+        this.setBorder(BorderFactory.createEmptyBorder(25, 20, 20, 20));
         numericFilter = new NumericFilter();
 
         dimensionPanel = new Dimension(0, 90);
         dimensionComboBox = new Dimension(0, 50);
-        dimensionLabel = new Dimension(0, 30);
+        dimensionLabel = new Dimension(0, 20);
 
         jbcAlgorithms = new JComboBox<>(mapAlgorithms.keySet().toArray(String[]::new)) {{
             addActionListener(itemEvent -> {
@@ -231,7 +231,7 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
         g2.fillRect(20, 0, 190, 28);
 
         g2.setColor(Color.BLACK);
-        g2.drawString("Lựa chọn thuật toán!", 30, 18);
+        g2.drawString("Lựa chọn thuật toán!", 30, 15);
     }
 
     public AlgorithmKey getAlgorithmKey() {
@@ -241,7 +241,7 @@ public class SelectAlgorithmGenerateTraditionalKeyComponent extends JPanel imple
     @Override
     public void update(Observable observable, Object o) {
         var parentSize = getParent().getWidth();
-        this.setPreferredSize(new Dimension(parentSize - 200, 150));
+        this.setPreferredSize(new Dimension(parentSize - 200, 130));
 
         var size = (parentSize - 260) / 3;
         dimensionPanel.width = size;

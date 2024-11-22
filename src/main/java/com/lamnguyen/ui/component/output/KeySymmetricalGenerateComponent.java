@@ -6,7 +6,7 @@
  * User: lam-nguyen
  **/
 
-package com.lamnguyen.ui.component.key;
+package com.lamnguyen.ui.component.output;
 
 import com.lamnguyen.helper.ClipboardHelper;
 import com.lamnguyen.ui.component.label.LabelBorder;
@@ -64,7 +64,7 @@ public class KeySymmetricalGenerateComponent extends JPanel implements Observer 
         g2.setColor(Color.white);
         g2.fillRect(20, 0, 130, 28);
         g2.setColor(Color.BLACK);
-        g2.drawString("Key generate!", 30, 18);
+        g2.drawString("Key generate!", 30, 15);
 
         super.paintComponent(g);
     }

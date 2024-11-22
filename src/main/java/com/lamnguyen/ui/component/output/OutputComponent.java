@@ -81,7 +81,7 @@ public class OutputComponent extends JPanel implements Observer {
         g2.fillRect(20, 0, 130, 28);
 
         g2.setColor(Color.BLACK);
-        g2.drawString("Xuất kết quả!", 30, 18);
+        g2.drawString("Xuất kết quả!", 30, 15);
 
         super.paintComponent(g);
     }

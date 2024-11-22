@@ -41,10 +41,10 @@ public class SelectCipherTraditionalAlgorithmComponent extends JPanel implements
 
     private void init() {
         sizePanel = new Dimension(0, 90);
-        sizeLabel = new Dimension(0, 30);
+        sizeLabel = new Dimension(0, 20);
         sizeCombobox = new Dimension(0, 50);
 
-        this.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20));
+        this.setBorder(BorderFactory.createEmptyBorder(25, 20, 20, 20));
 
         jcbAlgorithm = new JComboBox<>(ITraditionalCipher.Algorithms.values()) {{
             addActionListener(actionEvent -> {
@@ -101,13 +101,13 @@ public class SelectCipherTraditionalAlgorithmComponent extends JPanel implements
         g2.fillRect(20, 0, 190, 28);
 
         g2.setColor(Color.BLACK);
-        g2.drawString("Lựa chọn thuật toán!", 30, 18);
+        g2.drawString("Lựa chọn thuật toán!", 30, 15);
     }
 
     @Override
     public void update(Observable observable, Object o) {
         var sizeParent = getParent().getWidth();
-        this.setPreferredSize(new Dimension(sizeParent - 200, 160));
+        this.setPreferredSize(new Dimension(sizeParent - 200, 150));
 
         sizePanel.width = (sizeParent - 270) / 2;
         panelAlgorithm.setPreferredSize(sizePanel);
