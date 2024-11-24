@@ -9,17 +9,17 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 import com.lamnguyen.model.symmetrical.SymmetricalKey;
 import com.lamnguyen.ui.Application;
-import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
+import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -83,6 +83,8 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
         outputComponent = new OutputComponent(); //110
         sizeController.addObserver(outputComponent);
         this.add(outputComponent);
+
+        encryptMode();
     }
 
     public Void loadFileKey(File file) {
@@ -122,18 +124,13 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
                 cipher.encryptFile(file, outputComponent.getFullPath(), false);
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpace();
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thành công!");
-            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
-                     NoSuchPaddingException | InvalidAlgorithmParameterException e) {
-                process.dispose();
+            } catch (InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | IOException |
+                     BadPaddingException | NoSuchPaddingException | InvalidAlgorithmParameterException e) {
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (InvalidKeyException e) {
-                e.printStackTrace(System.out);
-                process.dispose();
             }
+            process.dispose();
         });
-
     }
 
     private void decryptFile() {
@@ -143,21 +140,18 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
             if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateFile(file, process))
                 return;
 
-
             try {
                 var cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
                 cipher.decryptFile(file, outputComponent.getFullPath(), 0);
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpace();
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thành công!");
-            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
-                     NoSuchPaddingException | InvalidKeyException e) {
-                process.dispose();
+            } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | IllegalBlockSizeException |
+                     IOException | BadPaddingException | NoSuchPaddingException | InvalidKeyException e) {
+                e.printStackTrace(System.out);
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (InvalidAlgorithmParameterException e) {
-                process.dispose();
             }
+            process.dispose();
         });
 
     }

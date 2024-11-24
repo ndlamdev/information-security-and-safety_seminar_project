@@ -65,7 +65,7 @@ public class Application extends JFrame {
         sizeController = SubjectSizeController.getInstance();
 
         this.setTitle("Phần mềm mã hóa/giải mã file Lam Nguyễn");
-        this.setIconImage(IconResizeHelper.initImageIcon("logo.png", 200, 200).getImage());
+        this.setIconImage(IconResizeHelper.initImageIcon("logo.png", 50, 50).getImage());
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setBounds(100, 50, width, height);
@@ -123,7 +123,7 @@ public class Application extends JFrame {
         sizeController.addObserver(verifySignatureFilePage);
 
         panelLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        addPropertyChangeListenerHelper(panelLeft, height / 7 * 5, height / 7 * 4);
+        addPropertyChangeListenerHelper(panelLeft, height / 7 * 4, height / 7 * 4);
 
         tree = new TreeFileComponent();
         panelLeft.add(tree);

@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 import com.lamnguyen.model.symmetrical.SymmetricalKey;
@@ -18,7 +19,6 @@ import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,22 +127,7 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
             var algEncryptKey = selectCipherKeyAlgorithmComponent.getAlgorithm();
             if (!ValidationHelper.validateAlgorithm(algEncryptKey, process) || !ValidationHelper.validateAlgorithm(algEncryptFile, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateFile(file, process))
                 return;
-
-//            try {
-//                var cipher = ISymmetrical.Factory.createEncrypt(algEncryptKey.algorithm(), algEncryptKey.mode(), algEncryptKey.padding(), key);
-//                cipher.encryptFile(file, outputComponent.getFullPath(), false);
-//                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-//                    application.reloadWorkSpace();
-//                process.dispose();
-//                JOptionPane.showMessageDialog(null, "Thành công!");
-//            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
-//                     NoSuchPaddingException | InvalidAlgorithmParameterException e) {
-//                process.dispose();
-//                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-//            } catch (InvalidKeyException e) {
-//                e.printStackTrace(System.out);
-//                process.dispose();
-//            }
+            // TODO
         });
 
     }
@@ -153,23 +138,8 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
             var algDecryptFile = selectCipherKeyAlgorithmComponent.getAlgorithm();
             if (!ValidationHelper.validateAlgorithm(algDecryptFile, process) || !ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(key, process))
                 return;
-
-//            try {
-//                var cipher = ISymmetrical.Factory.createDecrypt(algDecryptFile.algorithm(), algDecryptFile.mode(), algDecryptFile.padding(), key);
-//                cipher.decryptFile(file, outputComponent.getFullPath(), 0);
-//                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-//                    application.reloadWorkSpace();
-//                process.dispose();
-//                JOptionPane.showMessageDialog(null, "Thành công!");
-//            } catch (NoSuchAlgorithmException | IllegalBlockSizeException | IOException | BadPaddingException |
-//                     NoSuchPaddingException | InvalidKeyException e) {
-//                process.dispose();
-//                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-//            } catch (InvalidAlgorithmParameterException e) {
-//                process.dispose();
-//            }
+            // TODO
         });
-
     }
 
     private void setFileNameOut(String pathFile, SelectCipherAlgorithmComponent.Algorithm algorithm) {

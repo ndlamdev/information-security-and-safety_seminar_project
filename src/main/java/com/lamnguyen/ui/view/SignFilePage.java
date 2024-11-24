@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.SignatureAlgorithmConfig;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.model.asymmetrical.IAsymmetrical;
@@ -20,7 +21,6 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectSignatureAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,22 +85,16 @@ public class SignFilePage extends JPanel implements Observer {
             if (!ValidationHelper.validateFile(file, process))
                 return;
 
-            ISignFile signer = null;
             try {
-                signer = SignFileImpl.getInstance(alg, key.privateKey());
+                ISignFile signer = SignFileImpl.getInstance(alg, key.privateKey());
+                resultComponent.setTextJTextArea(signer.sign(file));
             } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
                 process.dispose();
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            try {
-                resultComponent.setTextJTextArea(signer.sign(file));
-                process.dispose();
-                JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (IOException | SignatureException e) {
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
             }
+            process.dispose();
         });
     }
 

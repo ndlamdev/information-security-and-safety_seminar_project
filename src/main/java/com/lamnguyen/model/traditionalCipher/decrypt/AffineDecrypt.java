@@ -9,6 +9,7 @@
 package com.lamnguyen.model.traditionalCipher.decrypt;
 
 import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
+import com.lamnguyen.model.traditionalCipher.TraditionalKey;
 import com.lamnguyen.model.traditionalCipher.algorithm.AffineCipher;
 
 import java.util.HashMap;
@@ -18,13 +19,13 @@ import static com.lamnguyen.config.CharSetConfig.decodeArrayCharEncodeToString;
 import static com.lamnguyen.config.CharSetConfig.encodeStringToArrayCharEncode;
 
 public class AffineDecrypt extends ATraditionalDecrypt {
-    private final AffineCipher.AffineKey key;
+    private final AffineCipher.AffineKey affineKey;
     private int inverseA;
 
     public AffineDecrypt(AffineCipher.AffineKey key, Map<Character, Integer> mapChar) {
-        super(mapChar);
-        this.key = key;
-        this.inverseA = ITraditionalCipher.inverse(key.a(), mapChar.size());
+        super(new TraditionalKey<>(key), mapChar);
+        this.affineKey = key;
+        this.inverseA = ITraditionalCipher.inverse(affineKey.a(), mapChar.size());
     }
 
     @Override
@@ -38,7 +39,7 @@ public class AffineDecrypt extends ATraditionalDecrypt {
         var result = new int[data.length()];
         int[] arrayCharEncode = encodeStringToArrayCharEncode(data, mapChar, mapCharNotEncrypt);
         for (int i = 0; i < arrayCharEncode.length; i++) {
-            result[i] = Math.floorMod(inverseA * (arrayCharEncode[i] - key.b()), mapChar.size());
+            result[i] = Math.floorMod(inverseA * (arrayCharEncode[i] - affineKey.b()), mapChar.size());
         }
         return decodeArrayCharEncodeToString(result, mapChar, mapCharNotEncrypt, data.length());
     }

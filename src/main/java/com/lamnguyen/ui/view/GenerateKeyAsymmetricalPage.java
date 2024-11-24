@@ -9,7 +9,9 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.KeyConfig;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.model.asymmetrical.IAsymmetrical;
 import com.lamnguyen.ui.Application;
@@ -17,7 +19,6 @@ import com.lamnguyen.ui.component.output.KeyAsymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,22 +88,19 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
 
     private void saveKey() {
         DialogProgressHelper.runProcess(process -> {
-            if (key == null) {
-                JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (ValidationHelper.validateKeyGenerate(key, process))
                 return;
-            }
 
             try {
                 new File(outputComponent.getFolderDest()).mkdirs();
                 IAsymmetrical.saveKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key, outputComponent.getFullPath());
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpace();
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (IOException e) {
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
             }
+            process.dispose();
         });
     }
 
@@ -119,7 +117,6 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
             var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
             var name = IAsymmetrical.KeyFactory.Algorithms.valueOf(algorithmKey.getName());
             key = IAsymmetrical.KeyFactory.generateKey(name, algorithmKey.getSize());
-            if (key == null) return;
             keyGenerateComponent.setPrivateKey(IAsymmetrical.encodeKeyToBase64(key.privateKey()));
             keyGenerateComponent.setPublicKey(IAsymmetrical.encodeKeyToBase64(key.publicKey()));
             process.dispose();

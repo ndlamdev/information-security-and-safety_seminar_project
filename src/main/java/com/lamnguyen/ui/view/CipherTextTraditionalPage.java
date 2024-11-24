@@ -80,8 +80,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
     }
 
     public void encryptMode() {
-        if (action != null)
-            this.remove(action);
+        if (action != null) this.remove(action);
         action = new JButton() {{
             setPreferredSize(new Dimension(500, 50));
             setText("Mã hóa");
@@ -93,8 +92,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
     }
 
     public void decryptMode() {
-        if (action != null)
-            this.remove(action);
+        if (action != null) this.remove(action);
         action = new JButton() {{
             setPreferredSize(new Dimension(500, 50));
             setText("Giải hóa");
@@ -112,26 +110,24 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
             var alg = selectAlgorithmComponent.getAlgorithm();
             if (!ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
                 return;
+
             var cipher = ITraditionalCipher.Factory.createEncrypt(alg.algorithm(), alg.language());
             try {
                 cipher.loadKey(key);
                 cipher.init(mode);
             } catch (Exception e) {
-                e.printStackTrace(System.out);
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
                 return;
             }
 
-            process.dispose();
             try {
                 outputTextComponent.setTextJTextArea(cipher.doFinal(text));
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thành công");
             } catch (Exception e) {
-                process.dispose();
                 JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
+            process.dispose();
         });
     }
 

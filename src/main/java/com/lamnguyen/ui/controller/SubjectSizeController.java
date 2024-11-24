@@ -26,9 +26,14 @@ public class SubjectSizeController extends Observable {
         return instance;
     }
 
-    public void onChange() {
+    public void onChange(Size size) {
         setChanged();
         notifyObservers(size);
+    }
+
+    public void onChange() {
+        setChanged();
+        notifyObservers();
     }
 
     @Getter

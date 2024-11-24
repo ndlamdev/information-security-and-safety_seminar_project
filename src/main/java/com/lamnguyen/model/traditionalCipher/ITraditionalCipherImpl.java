@@ -9,6 +9,8 @@
 package com.lamnguyen.model.traditionalCipher;
 
 public interface ITraditionalCipherImpl {
+    TraditionalKey<?> getKey();
+
     byte[] doFinal(byte[] data) throws Exception;
 
     String doFinal(String data) throws Exception;

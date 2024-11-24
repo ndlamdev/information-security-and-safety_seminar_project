@@ -118,18 +118,15 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
                 cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
             } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
                      InvalidAlgorithmParameterException e) {
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
                 return;
             }
             try {
                 outputTextComponent.setTextJTextArea(cipher.encryptStringBase64(text));
             } catch (IllegalBlockSizeException | BadPaddingException e) {
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
             }
-
             process.dispose();
         });
     }
@@ -140,22 +137,26 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
             var alg = selectAlgorithmComponent.getAlgorithm();
             if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
                 return;
+
             ISymmetricalDecrypt cipher = null;
             try {
                 cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
             } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
                      InvalidAlgorithmParameterException e) {
-                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
+                return;
             }
 
             var data = cipher.decryptBase64ToString(text);
-            process.dispose();
             if (data == null) {
                 JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 outputTextComponent.setTextJTextArea(data);
                 JOptionPane.showMessageDialog(null, "Thành công!");
             }
+
+            process.dispose();
         });
 
     }

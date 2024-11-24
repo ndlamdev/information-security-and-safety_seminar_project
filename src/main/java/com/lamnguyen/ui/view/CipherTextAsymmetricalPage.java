@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.model.asymmetrical.IAsymmetrical;
 import com.lamnguyen.ui.Application;
@@ -16,7 +17,6 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;

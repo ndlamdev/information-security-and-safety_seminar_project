@@ -8,6 +8,8 @@
 
 package com.lamnguyen.ui.view;
 
+import com.lamnguyen.helper.DialogProgressHelper;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.hash.impl.HashFileImpl;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
@@ -64,18 +66,19 @@ public class HashFilePage extends JPanel implements Observer {
     }
 
     private void hashFile() {
-        var file = dropAndDragComponent.getFile();
-        if (file == null) {
-            JOptionPane.showMessageDialog(null, "Chưa chọn file mã hóa!", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+        DialogProgressHelper.runProcess(process -> {
+            var file = dropAndDragComponent.getFile();
+            if (ValidationHelper.validateFile(file, process))
+                return;
 
-        var alg = selectHashAlgorithmComponent.getAlgorithm();
+            var alg = selectHashAlgorithmComponent.getAlgorithm();
 
-        try {
-            output.setTextJTextArea(HashFileImpl.getInstance(alg).hash(file.getAbsolutePath()));
-        } catch (Exception ignored) {
-        }
+            try {
+                output.setTextJTextArea(HashFileImpl.getInstance(alg).hash(file.getAbsolutePath()));
+            } catch (Exception ignored) {
+            }
+            process.dispose();
+        });
     }
 
     @Override

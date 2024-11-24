@@ -25,7 +25,7 @@ public class SubstitutionCipher extends ATraditionalCipher {
     private Map<Character, Character> key;
 
     public SubstitutionCipher(Map<Character, Character> key, SecureLanguage language) {
-        super(language);
+        super(new TraditionalKey<>(key), language);
         this.key = key;
     }
 

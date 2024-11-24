@@ -9,6 +9,7 @@
 package com.lamnguyen.model.traditionalCipher.decrypt;
 
 import com.lamnguyen.helper.MatrixHelper;
+import com.lamnguyen.model.traditionalCipher.TraditionalKey;
 import com.lamnguyen.model.traditionalCipher.encrypt.HillEncrypt;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ public class HillDecrypt extends ATraditionalDecrypt {
     private final String splitString = new String(new byte[]{0});
 
     public HillDecrypt(int[][] key, Map<Character, Integer> mapChar) throws Exception {
-        super(mapChar);
+        super(new TraditionalKey<>(key), mapChar);
         var inverseKey = MatrixHelper.inverseMatrix(key, mapChar.size());
         this.decrypt = new HillEncrypt(inverseKey, mapChar);
     }

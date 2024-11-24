@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.SignatureAlgorithmConfig;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.model.asymmetrical.IAsymmetrical;
@@ -20,7 +21,6 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectSignatureAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -83,22 +83,19 @@ public class VerifySignatureFilePage extends JPanel implements Observer {
             if (!ValidationHelper.validateFile(file, process) || ValidationHelper.validateKey(key, process) || !ValidationHelper.validateSignature(signature, process))
                 return;
 
-            IVerifySignatureFile verifier = null;
             try {
-                verifier = VerifySignatureFileImpl.getInstance(alg, key.publicKey());
-                process.dispose();
-            } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
-                process.dispose();
-                return;
-            }
-            try {
+                IVerifySignatureFile verifier = VerifySignatureFileImpl.getInstance(alg, key.publicKey());
                 if (verifier.verify(file, signature)) {
-                    process.dispose();
                     JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thành công!");
+                    process.dispose();
                 } else throw new SignatureException("Lỗi");
-            } catch (IOException | SignatureException e) {
+
+            } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
                 process.dispose();
+            } catch (IOException | SignatureException e) {
                 JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
             }
         });
     }

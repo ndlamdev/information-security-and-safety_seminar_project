@@ -27,7 +27,7 @@ public class VigenereCipher extends ATraditionalCipher {
     private final Map<Character, Integer> mapChar = CharSetConfig.getMapChar(language, SHIFT_CHAR);
 
     public VigenereCipher(String key, SecureLanguage language) {
-        super(language);
+        super(new TraditionalKey<>(key), language);
         this.key = CharSetConfig.encodeStringToArrayCharEncode(key, mapChar, new HashMap<>());
     }
 

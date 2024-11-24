@@ -24,7 +24,7 @@ public class ShiftCipher extends ATraditionalCipher {
     private int key;
 
     public ShiftCipher(int key, SecureLanguage language) {
-        super(language);
+        super(new TraditionalKey<>(key), language);
         this.key = key;
     }
 

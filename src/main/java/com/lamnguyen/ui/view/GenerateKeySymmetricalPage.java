@@ -9,7 +9,9 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.KeyConfig;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 import com.lamnguyen.model.symmetrical.encrypt.ISymmetricalEncrypt;
 import com.lamnguyen.ui.Application;
@@ -17,7 +19,6 @@ import com.lamnguyen.ui.component.output.KeySymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,7 +75,7 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
 
         var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
         outputComponent = new OutputComponent() {{
-            setPathFolder(SettingHelper.getInstance().getWorkSpace() + "/key");
+            setPathFolder(SettingHelper.getInstance().getWorkSpace() + File.separator + "key");
             setTextButtonAction("Xuất file");
             setFileName(algorithmKey.getName() + "_" + algorithmKey.getSize());
             setExtensionFile(".keys");
@@ -100,23 +101,19 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
 
     private void saveKey() {
         DialogProgressHelper.runProcess(process -> {
-            if (encrypt == null) {
-                JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
+            if (ValidationHelper.validateKeyGenerate(encrypt.getKey(), process))
                 return;
-            }
 
             try {
                 new File(outputComponent.getFolderDest()).mkdirs();
                 encrypt.saveKey(outputComponent.getFullPath());
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpace();
-
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (IOException e) {
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
             }
+            process.dispose();
         });
     }
 

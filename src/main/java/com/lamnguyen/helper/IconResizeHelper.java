@@ -11,7 +11,6 @@ package com.lamnguyen.helper;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.net.URL;
 
 public class IconResizeHelper {
     public static ImageIcon initImageIcon(String path, int width, int height) {

@@ -9,11 +9,12 @@
 package com.lamnguyen.model.traditionalCipher.decrypt;
 
 import com.lamnguyen.model.traditionalCipher.ATraditionalCipherImpl;
+import com.lamnguyen.model.traditionalCipher.TraditionalKey;
 
 import java.util.Map;
 
 public abstract class ATraditionalDecrypt extends ATraditionalCipherImpl {
-    protected ATraditionalDecrypt(Map<Character, Integer> mapChar) {
+    protected ATraditionalDecrypt(TraditionalKey<?> key, Map<Character, Integer> mapChar) {
         super(mapChar);
     }
 }

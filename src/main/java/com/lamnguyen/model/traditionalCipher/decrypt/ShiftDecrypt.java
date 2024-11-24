@@ -8,6 +8,8 @@
 
 package com.lamnguyen.model.traditionalCipher.decrypt;
 
+import com.lamnguyen.model.traditionalCipher.TraditionalKey;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,7 +20,7 @@ public class ShiftDecrypt extends ATraditionalDecrypt {
     private final int key;
 
     public ShiftDecrypt(int key, Map<Character, Integer> mapChar) {
-        super(mapChar);
+        super(new TraditionalKey<>(key), mapChar);
         this.key = key;
     }
 

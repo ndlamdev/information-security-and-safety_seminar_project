@@ -15,28 +15,14 @@ public class DialogProgressHelper {
     public static void runProcess(String title, String content, Process process) {
         // Hiển thị hộp thoại trong luồng riêng
         new Thread(() -> {
-            var dialog = new JDialog((Frame) null, title, true);
-            // Tùy chỉnh giao diện hộp thoại
-            dialog.setLayout(new BorderLayout());
-            dialog.setSize(300, 100);
-            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-            dialog.setLocationRelativeTo(null);
-
-            // Tạo thanh tiến trình
-            JProgressBar progressBar = new JProgressBar();
-            progressBar.setIndeterminate(true); // Chế độ tiến trình không xác định
-            progressBar.setString(content);
-            progressBar.setStringPainted(true);
-
-            // Thêm thanh tiến trình vào hộp thoại
-            dialog.add(progressBar, BorderLayout.CENTER);
+            var dialogProcess = new DialogProcess(title, content);
 
             new Thread(() -> {
                 SwingUtilities.invokeLater(() -> {
-                    dialog.setVisible(true);
+                    dialogProcess.dialog.setVisible(true);
                 });
             }).start();
-            process.run(new DialogProcess(dialog));
+            process.run(dialogProcess);
         }).start();
 
     }
@@ -52,8 +38,22 @@ public class DialogProgressHelper {
     public static class DialogProcess {
         private final JDialog dialog;
 
-        public DialogProcess(JDialog dialog) {
-            this.dialog = dialog;
+        public DialogProcess(String title, String content) {
+            this.dialog = new JDialog((Frame) null, title, true);
+            // Tùy chỉnh giao diện hộp thoại
+            dialog.setLayout(new BorderLayout());
+            dialog.setSize(300, 100);
+            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            dialog.setLocationRelativeTo(null);
+
+            // Tạo thanh tiến trình
+            JProgressBar progressBar = new JProgressBar();
+            progressBar.setIndeterminate(true); // Chế độ tiến trình không xác định
+            progressBar.setString(content);
+            progressBar.setStringPainted(true);
+
+            // Thêm thanh tiến trình vào hộp thoại
+            dialog.add(progressBar, BorderLayout.CENTER);
         }
 
         public void dispose() {

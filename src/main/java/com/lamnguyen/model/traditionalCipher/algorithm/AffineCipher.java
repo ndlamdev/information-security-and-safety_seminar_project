@@ -24,7 +24,7 @@ public class AffineCipher extends ATraditionalCipher {
     private AffineKey key;
 
     public AffineCipher(AffineKey key, SecureLanguage lang) {
-        super(lang);
+        super(new TraditionalKey<>(key), lang);
         this.key = key;
     }
 

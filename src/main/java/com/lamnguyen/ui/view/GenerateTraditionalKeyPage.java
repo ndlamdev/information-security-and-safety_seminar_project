@@ -8,6 +8,7 @@
 
 package com.lamnguyen.ui.view;
 
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
 import com.lamnguyen.model.traditionalCipher.TraditionalKey;
@@ -17,7 +18,6 @@ import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateTraditionalKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
-import com.lamnguyen.helper.DialogProgressHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -152,6 +152,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
         DialogProgressHelper.runProcess(process -> {
             if (cipher == null) {
                 JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
                 return;
             }
 
@@ -160,12 +161,11 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
                 cipher.saveKey(outputComponent.getFullPath());
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpace();
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (IOException e) {
-                process.dispose();
                 JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);
             }
+            process.dispose();
         });
 
     }

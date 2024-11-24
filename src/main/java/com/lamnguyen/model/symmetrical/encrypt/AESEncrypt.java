@@ -8,8 +8,8 @@
 
 package com.lamnguyen.model.symmetrical.encrypt;
 
-import lombok.NoArgsConstructor;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
+import lombok.NoArgsConstructor;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
@@ -17,16 +17,11 @@ import javax.crypto.spec.IvParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 @NoArgsConstructor
 public class AESEncrypt extends ASymmetricalEncrypt {
     public AESEncrypt(String mode, String padding) {
         super(mode, padding);
-        byte[] iv = new byte[16];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(iv);
-        ivSpec = new IvParameterSpec(iv);
     }
 
     public AESEncrypt(String mode, String padding, IvParameterSpec iv) {

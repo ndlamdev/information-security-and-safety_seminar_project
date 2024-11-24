@@ -8,13 +8,15 @@
 
 package com.lamnguyen.model.traditionalCipher.decrypt;
 
+import com.lamnguyen.model.traditionalCipher.TraditionalKey;
+
 import java.util.Map;
 
 public class SubstitutionDecrypt extends ATraditionalDecrypt {
     private final Map<Character, Character> key;
 
     public SubstitutionDecrypt(Map<Character, Character> key, Map<Character, Integer> mapChar) {
-        super(mapChar);
+        super(new TraditionalKey<>(key), mapChar);
         this.key = key;
     }
 

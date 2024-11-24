@@ -8,10 +8,18 @@
 
 package com.lamnguyen.model.traditionalCipher;
 
-public abstract class ATraditionalCipher implements ITraditionalCipher {
+import com.lamnguyen.config.CharSetConfig;
+
+public abstract class ATraditionalCipher extends ATraditionalCipherImpl implements ITraditionalCipher {
     protected final ITraditionalCipher.SecureLanguage language;
 
+    protected ATraditionalCipher(TraditionalKey<?> key, SecureLanguage language) {
+        super(key, CharSetConfig.getMapChar(language));
+        this.language = language;
+    }
+
     protected ATraditionalCipher(SecureLanguage language) {
+        super(null, CharSetConfig.getMapChar(language));
         this.language = language;
     }
 }

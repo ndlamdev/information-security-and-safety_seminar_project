@@ -26,7 +26,7 @@ public class HillCipher extends ATraditionalCipher {
     private ITraditionalCipherImpl cipher;
 
     public HillCipher(int[][] key, SecureLanguage lang) {
-        super(lang);
+        super(new TraditionalKey<>(key), lang);
         this.key = key;
     }
 
