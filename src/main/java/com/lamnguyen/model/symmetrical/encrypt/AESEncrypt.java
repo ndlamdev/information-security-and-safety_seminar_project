@@ -15,8 +15,11 @@ import lombok.NoArgsConstructor;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.Arrays;
+import java.util.Base64;
 
 @NoArgsConstructor
 public class AESEncrypt extends ASymmetricalEncrypt {
@@ -57,5 +60,36 @@ public class AESEncrypt extends ASymmetricalEncrypt {
             }
             return cipher.doFinal(PaddingUtil.addPadding(16, data.getBytes(StandardCharsets.UTF_8)));
         }
+
+    }
+
+    @Override
+    public void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+        var file = new File(source);
+        DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
+        DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest, append)));
+        byte[] buffer = new byte[10 * 1024];
+        int bytesRead;
+        var total = file.length();
+        while ((bytesRead = input.read(buffer)) != -1) {
+            if (total > bytesRead) {
+                output.write(cipher.update(buffer));
+                total -= bytesRead;
+                continue;
+            }
+
+            try {
+                output.write(cipher.doFinal(buffer, 0, bytesRead));
+            } catch (IllegalBlockSizeException e) {
+                try {
+                    init(Cipher.ENCRYPT_MODE, true);
+                } catch (InvalidAlgorithmParameterException ignored) {
+                    init(Cipher.ENCRYPT_MODE, false);
+                }
+                output.write(cipher.doFinal(PaddingUtil.addPadding(16, Arrays.copyOf(buffer, bytesRead))));
+            }
+        }
+        input.close();
+        output.close();
     }
 }

@@ -31,5 +31,5 @@ public interface ISymmetricalDecrypt extends ISymmetrical {
      * @throws IllegalBlockSizeException Lỗi
      * @throws BadPaddingException       Lỗi
      */
-    void decryptFile(String source, String dest, long skip) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException;
+    void decryptFile(String source, String dest, long skip) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, NoSuchAlgorithmException;
 }

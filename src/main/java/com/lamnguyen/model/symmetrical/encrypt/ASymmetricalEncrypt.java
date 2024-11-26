@@ -90,25 +90,14 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @param append Có thêm vào tệp đích nếu nó đã tồn tại hay không.
      */
     @Override
-    public final void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
-        DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(source)));
-        BufferedOutputStream bufferOutput = new BufferedOutputStream(new FileOutputStream(dest, append));
-        CipherOutputStream output = new CipherOutputStream(bufferOutput, cipher);
-
-        byte[] buffer = new byte[1024 * 10];
-        int i;
-
-        try {
-            while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
-        } catch (Exception e) {
-            init(Cipher.ENCRYPT_MODE, true);
-            while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
-        } finally {
-            input.close();
-        }
-
-        buffer = cipher.doFinal();
-        if (buffer != null) output.write(buffer);
+    public void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+        DataInputStream bufferedStream = new DataInputStream(new BufferedInputStream(new FileInputStream(source)));
+        DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest, append)));
+        CipherInputStream input = new CipherInputStream(bufferedStream, cipher);
+        byte[] buffer = new byte[1024 * 16];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) output.write(buffer, 0, bytesRead);
+        input.close();
         output.close();
     }
 

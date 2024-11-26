@@ -16,11 +16,13 @@ import com.lamnguyen.model.symmetrical.ISymmetrical;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Arrays;
 
 @NoArgsConstructor
 public class AESWrapPadEncrypt extends ASymmetricalEncrypt {
@@ -60,5 +62,17 @@ public class AESWrapPadEncrypt extends ASymmetricalEncrypt {
     @Override
     public byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
         return cipher.wrap(new SecretKeySpec(PaddingUtil.addPadding(16, data.getBytes(StandardCharsets.UTF_8)), Algorithms.AES.name()));
+    }
+
+    @Override
+    public void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+        DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(source)));
+        DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest, append)));
+        byte[] buffer = new byte[24 * 512];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1)
+            output.write(encrypt(new String(Arrays.copyOf(buffer, bytesRead))));
+        input.close();
+        output.close();
     }
 }

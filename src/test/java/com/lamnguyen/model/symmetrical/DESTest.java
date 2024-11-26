@@ -13,6 +13,6 @@ import org.junit.jupiter.api.Test;
 public class DESTest {
     @Test
     void allTest() throws Exception {
-        SymmetricalTest.allTest(ISymmetrical.Algorithms.DES.name(), 128);
+        SymmetricalTest.allTest(ISymmetrical.Algorithms.DES.name(), 56);
     }
 }

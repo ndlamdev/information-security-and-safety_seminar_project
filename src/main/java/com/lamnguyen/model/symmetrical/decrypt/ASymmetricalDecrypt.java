@@ -15,10 +15,12 @@ import com.lamnguyen.utils.PaddingUtil;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Arrays;
 import java.util.Base64;
 
 public abstract class ASymmetricalDecrypt extends ASymmetrical implements ISymmetricalDecrypt {
@@ -61,31 +63,24 @@ public abstract class ASymmetricalDecrypt extends ASymmetrical implements ISymme
      * @param skip   Số byte sẽ skip để đến được phần nội dung.
      */
     @Override
-    public final void decryptFile(String source, String dest, long skip) throws IOException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException {
-        BufferedInputStream bufferInput = new BufferedInputStream(new FileInputStream(source));
-        CipherInputStream input = new CipherInputStream(bufferInput, cipher);
+    public void decryptFile(String source, String dest, long skip) throws IOException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, NoSuchAlgorithmException {
+        var file = new File(source);
+        DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
         DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
         if (input.skip(skip) != skip) throw new IOException();
-        byte[] buffer = new byte[1024 * 10];
-        int i;
-
-        try {
-            while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
-        } catch (Exception e) {
-            input.close();
-            output.close();
-
-            cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
-            input = new CipherInputStream(bufferInput, cipher);
-            output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest)));
-
-            while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
-        } finally {
-            input.close();
+        byte[] buffer = new byte[10 * 1024];
+        var bytesRead = 0;
+        var total = file.length();
+        while ((bytesRead = input.read(buffer)) != -1) {
+            if (total <= bytesRead) {
+                output.write(PaddingUtil.removePadding(cipher.doFinal(Arrays.copyOf(buffer, bytesRead))));
+                break;
+            }
+            var update = cipher.update(buffer);
+            output.write(update);
+            total -= bytesRead;
         }
-
-        buffer = cipher.doFinal();
-        if (buffer != null) output.write(buffer);
+        input.close();
         output.close();
     }
 }

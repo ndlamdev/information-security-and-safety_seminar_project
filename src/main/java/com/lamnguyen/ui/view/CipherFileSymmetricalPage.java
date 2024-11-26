@@ -117,6 +117,7 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {
+            e.printStackTrace(System.out);
             JOptionPane.showMessageDialog(null, "File key không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -147,7 +148,7 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
                 if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
                 cipher.encryptFile(file, outputComponent.getFullPath(), false);
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                    application.reloadWorkSpaceAsync();
+                    application.reloadWorkSpaceSync();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (NoSuchProviderException | InvalidKeyException | NoSuchAlgorithmException |
                      IllegalBlockSizeException | IOException |
@@ -168,6 +169,7 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
 
             try {
                 var cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
+                if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
                 cipher.decryptFile(file, outputComponent.getFullPath(), 0);
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpaceSync();

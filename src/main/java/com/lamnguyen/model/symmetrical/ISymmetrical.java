@@ -99,6 +99,7 @@ public interface ISymmetrical {
         outputStream.writeUTF(algorithm);
         outputStream.writeUTF(Base64.getEncoder().encodeToString(key.getEncoded()));
         if (iv == null) {
+            outputStream.writeUTF("None");
             outputStream.close();
             return;
         }

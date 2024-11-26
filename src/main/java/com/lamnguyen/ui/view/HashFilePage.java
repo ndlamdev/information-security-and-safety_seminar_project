@@ -47,7 +47,7 @@ public class HashFilePage extends JPanel implements Observer {
         sizeController.addObserver(dropAndDragComponent);
         this.add(dropAndDragComponent);
 
-        selectHashAlgorithmComponent = new SelectHashAlgorithmComponent();
+        selectHashAlgorithmComponent = new SelectHashAlgorithmComponent(this);
         sizeController.addObserver(selectHashAlgorithmComponent);
         this.add(selectHashAlgorithmComponent);
 
@@ -68,13 +68,13 @@ public class HashFilePage extends JPanel implements Observer {
     private void hashFile() {
         DialogProgressHelper.runProcess(process -> {
             var file = dropAndDragComponent.getFile();
-            if (ValidationHelper.validateFile(file, process))
+            if (!ValidationHelper.validateFile(file, process))
                 return;
 
             var alg = selectHashAlgorithmComponent.getAlgorithm();
 
             try {
-                output.setTextJTextArea(HashFileImpl.getInstance(alg).hash(file.getAbsolutePath()));
+                setHashString(HashFileImpl.getInstance(alg).hash(file.getAbsolutePath()));
             } catch (Exception ignored) {
             }
             process.dispose();
@@ -86,5 +86,9 @@ public class HashFilePage extends JPanel implements Observer {
         var sizeParent = this.getParent().getSize();
         output.setCustomSize(new Dimension(sizeParent.width - 200, 150));
         dropAndDragComponent.setCustomSize(new Dimension(sizeParent.width - 400, sizeParent.height - V_GAP * 5 - 50 - 100 - output.getHeight()));
+    }
+
+    public void setHashString(String s) {
+        output.setTextJTextArea(s);
     }
 }

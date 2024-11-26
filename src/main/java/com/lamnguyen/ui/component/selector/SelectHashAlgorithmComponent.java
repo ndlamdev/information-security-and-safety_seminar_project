@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.component.selector;
 
 import com.lamnguyen.config.HashAlgorithmConfig;
+import com.lamnguyen.ui.view.HashFilePage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,8 +20,10 @@ public class SelectHashAlgorithmComponent extends JPanel implements Observer {
     private final int RADIUS = 20;
     private final int STROKE_WIDTH = 2;
     private JComboBox<String> jcbAlgorithm;
+    private final HashFilePage hashFilePage;
 
-    public SelectHashAlgorithmComponent() {
+    public SelectHashAlgorithmComponent(HashFilePage hashFilePage) {
+        this.hashFilePage = hashFilePage;
         this.setOpaque(false);
         this.init();
         this.event();
@@ -34,6 +37,7 @@ public class SelectHashAlgorithmComponent extends JPanel implements Observer {
 
         jcbAlgorithm = new JComboBox<>(HashAlgorithmConfig.getInstance().getHashs().toArray(String[]::new)) {{
             addActionListener(actionEvent -> {
+                hashFilePage.setHashString("");
             });
         }};
         this.add(jcbAlgorithm);
