@@ -12,18 +12,21 @@ import com.lamnguyen.model.symmetrical.decrypt.*;
 import com.lamnguyen.model.symmetrical.encrypt.*;
 
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.ChaCha20ParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.Base64;
 
 public interface ISymmetrical {
-
     /**
      * Tải khóa bí mật vào cipher.
      *
@@ -32,7 +35,7 @@ public interface ISymmetrical {
      * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại
      * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán
      */
-    void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException;
+    void loadKey(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException;
 
     /**
      * Lấy khóa bí mật hiện tại.
@@ -41,7 +44,7 @@ public interface ISymmetrical {
      */
     SecretKey getKey();
 
-    IvParameterSpec getIvSpec();
+    AlgorithmParameterSpec getIvSpec();
 
     /**
      * Tạo SecretKey từ chuỗi Base64 đã mã hóa.
@@ -87,25 +90,6 @@ public interface ISymmetrical {
         };
     }
 
-    private static ISymmetricalEncrypt getInstanceSymmetricalEncrypt(Algorithms algorithm, String mode, String padding, IvParameterSpec iv) {
-        return switch (algorithm) {
-            case AES -> new AESEncrypt(mode, padding, iv);
-            case AESWrap -> new AESWrapEncrypt(mode, padding, iv);
-            case AESWrapPad -> new AESWrapPadEncrypt(mode, padding, iv);
-            case ARCFOUR -> new ARCFOUREncrypt(mode, padding, iv);
-            case Blowfish -> new BlowfishEncrypt(mode, padding, iv);
-            case ChaCha20 -> new ChaCha20Encrypt(mode, padding, iv);
-            case ChaCha20Poly1305 -> new ChaCha20Poly1305Encrypt(mode, padding, iv);
-            case DES -> new DESEncrypt(mode, padding, iv);
-            case DESede -> new DESedeEncrypt(mode, padding, iv);
-            case DESedeWrap -> new DESedeWrapEncrypt(mode, padding, iv);
-            case RC2 -> new RC2Encrypt(mode, padding, iv);
-            case RC4 -> new RC4Encrypt(mode, padding, iv);
-            case RC5 -> new RC5Encrypt(mode, padding, iv);
-        };
-    }
-
-
     default void saveKey(String file) throws IOException {
         var key = getKey();
         var iv = getIvSpec();
@@ -114,8 +98,29 @@ public interface ISymmetrical {
         DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file), 1024 * 10));
         outputStream.writeUTF(algorithm);
         outputStream.writeUTF(Base64.getEncoder().encodeToString(key.getEncoded()));
-        if (iv != null)
-            outputStream.writeUTF(Base64.getEncoder().encodeToString(iv.getIV()));
+        if (iv == null) {
+            outputStream.close();
+            return;
+        }
+        switch (iv) {
+            case IvParameterSpec spec -> {
+                outputStream.writeUTF(IvParameterSpec.class.getName());
+                outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getIV()));
+            }
+            case ChaCha20ParameterSpec spec -> {
+                outputStream.writeUTF(ChaCha20ParameterSpec.class.getName());
+                outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getNonce()));
+                outputStream.writeInt(spec.getCounter());
+            }
+            case ChaCha20Poly1305Spec spec -> {
+                outputStream.writeUTF(ChaCha20Poly1305Spec.class.getName());
+                outputStream.writeUTF(spec.getAAD());
+                outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getIv().getIV()));
+            }
+            default -> {
+                outputStream.writeUTF("None");
+            }
+        }
         outputStream.close();
     }
 
@@ -123,15 +128,17 @@ public interface ISymmetrical {
         public static SymmetricalKey readKey(String file) throws IOException {
             DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file), 1024 * 10));
             String algorithm = input.readUTF();
-            String base64 = input.readUTF();
-            try {
-                String ivBase64 = input.readUTF();
-                return new SymmetricalKey(new SecretKeySpec(Base64.getDecoder().decode(base64), algorithm), new IvParameterSpec(Base64.getDecoder().decode(ivBase64)));
-            } catch (Exception e) {
-                return new SymmetricalKey(new SecretKeySpec(Base64.getDecoder().decode(base64), algorithm), null);
-            } finally {
-                input.close();
+            String keyBase64 = input.readUTF();
+            AlgorithmParameterSpec iv = null;
+            String nameIV = input.readUTF();
+            if (nameIV.equals(IvParameterSpec.class.getName())) {
+                iv = new IvParameterSpec(Base64.getDecoder().decode(input.readUTF()));
+            } else if (nameIV.equals(ChaCha20ParameterSpec.class.getName())) {
+                iv = new ChaCha20ParameterSpec(Base64.getDecoder().decode(input.readUTF()), input.readInt());
+            } else if (nameIV.equals(ChaCha20Poly1305Spec.class.getName())) {
+                iv = new ChaCha20Poly1305Spec(input.readUTF(), Base64.getDecoder().decode(input.readUTF()));
             }
+            return new SymmetricalKey(new SecretKeySpec(Base64.getDecoder().decode(keyBase64), algorithm), iv);
         }
     }
 
@@ -143,7 +150,7 @@ public interface ISymmetrical {
             case ARCFOUR -> Cipher.getInstance("ARCFOUR");
             case Blowfish -> Cipher.getInstance("Blowfish");
             case ChaCha20 -> Cipher.getInstance("ChaCha20");
-            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20Poly1305");
+            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20-Poly1305");
             case DES -> Cipher.getInstance("DES");
             case DESede -> Cipher.getInstance("DESede");
             case DESedeWrap -> Cipher.getInstance("DESedeWrap");
@@ -153,22 +160,22 @@ public interface ISymmetrical {
         };
     }
 
-    static Cipher getCipherInstance(Algorithms algorithms, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    static Cipher getCipherInstance(Algorithms algorithms, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         String extension = (mode == null || mode.isBlank() ? "" : "/" + mode) + (padding == null || padding.isBlank() ? "" : "/" + padding);
         return switch (algorithms) {
-            case AES -> Cipher.getInstance("AES" + extension);
-            case AESWrap -> Cipher.getInstance("AESWrap" + extension);
-            case AESWrapPad -> Cipher.getInstance("AESWrapPad" + extension);
-            case ARCFOUR -> Cipher.getInstance("ARCFOUR" + extension);
-            case Blowfish -> Cipher.getInstance("Blowfish" + extension);
-            case ChaCha20 -> Cipher.getInstance("ChaCha20" + extension);
-            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20Poly1305" + extension);
-            case DES -> Cipher.getInstance("DES" + extension);
-            case DESede -> Cipher.getInstance("DESede" + extension);
-            case DESedeWrap -> Cipher.getInstance("DESedeWrap" + extension);
-            case RC2 -> Cipher.getInstance("RC2" + extension);
-            case RC4 -> Cipher.getInstance("RC4" + extension);
-            case RC5 -> Cipher.getInstance("RC5" + extension);
+            case AES -> Cipher.getInstance("AES" + extension, "SunJCE");
+            case AESWrap -> Cipher.getInstance("AESWrap" + extension, "SunJCE");
+            case AESWrapPad -> Cipher.getInstance("AESWrapPad" + extension, "SunJCE");
+            case ARCFOUR -> Cipher.getInstance("ARCFOUR" + extension, "SunJCE");
+            case Blowfish -> Cipher.getInstance("Blowfish" + extension, "SunJCE");
+            case ChaCha20 -> Cipher.getInstance("ChaCha20" + extension, "SunJCE");
+            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20-Poly1305" + extension, "SunJCE");
+            case DES -> Cipher.getInstance("DES" + extension, "SunJCE");
+            case DESede -> Cipher.getInstance("DESede" + extension, "SunJCE");
+            case DESedeWrap -> Cipher.getInstance("DESedeWrap" + extension, "SunJCE");
+            case RC2 -> Cipher.getInstance("RC2" + extension, "SunJCE");
+            case RC4 -> Cipher.getInstance("RC4" + extension, "SunJCE");
+            case RC5 -> Cipher.getInstance("RC5" + extension, "SunJCE");
         };
     }
 
@@ -185,10 +192,10 @@ public interface ISymmetrical {
          * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
          * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
          */
-        public static ISymmetricalEncrypt createEncrypt(Algorithms algorithm, String mode, String padding, int keySize) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+        public static ISymmetricalEncrypt createEncrypt(Algorithms algorithm, String mode, String padding, int keySize) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
             var instance = getInstanceSymmetricalEncrypt(algorithm, mode, padding);
 
-            instance.loadKey(instance.generateKey(keySize));
+            instance.loadKey(new SymmetricalKey(instance.generateKey(keySize), instance.getIvSpec()));
             return instance;
         }
 
@@ -204,10 +211,10 @@ public interface ISymmetrical {
          * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
          * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
          */
-        public static ISymmetricalEncrypt createEncrypt(Algorithms algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-            var instance = getInstanceSymmetricalEncrypt(algorithm, mode, padding, key.iv());
+        public static ISymmetricalEncrypt createEncrypt(Algorithms algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
+            var instance = getInstanceSymmetricalEncrypt(algorithm, mode, padding);
 
-            instance.loadKey(key.key());
+            instance.loadKey(key);
             return instance;
         }
 
@@ -223,11 +230,8 @@ public interface ISymmetrical {
          * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
          * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
          */
-        public static ISymmetricalEncrypt createEncrypt(String algorithm, String mode, String padding, int keySize) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-            var instance = getInstanceSymmetricalEncrypt(ISymmetrical.Algorithms.valueOf(algorithm), mode, padding);
-
-            instance.loadKey(instance.generateKey(keySize));
-            return instance;
+        public static ISymmetricalEncrypt createEncrypt(String algorithm, String mode, String padding, int keySize) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
+            return createEncrypt(Algorithms.valueOf(algorithm), mode, padding, keySize);
         }
 
         /**
@@ -242,11 +246,8 @@ public interface ISymmetrical {
          * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
          * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
          */
-        public static ISymmetricalEncrypt createEncrypt(String algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-            var instance = getInstanceSymmetricalEncrypt(ISymmetrical.Algorithms.valueOf(algorithm), mode, padding, key.iv());
-
-            instance.loadKey(key.key());
-            return instance;
+        public static ISymmetricalEncrypt createEncrypt(String algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
+            return createEncrypt(Algorithms.valueOf(algorithm), mode, padding, key);
         }
 
         /**
@@ -261,7 +262,7 @@ public interface ISymmetrical {
          * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
          * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
          */
-        public static ISymmetricalDecrypt createDecrypt(Algorithms algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+        public static ISymmetricalDecrypt createDecrypt(Algorithms algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
             return switch (algorithm) {
                 case AES -> new AESDecrypt(key, mode, padding);
                 case AESWrap -> new AESWrapDecrypt(key, mode, padding);
@@ -291,8 +292,8 @@ public interface ISymmetrical {
          * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại.
          * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán.
          */
-        public static ISymmetricalDecrypt createDecrypt(String algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-            return createDecrypt(ISymmetrical.Algorithms.valueOf(algorithm), mode, padding, key);
+        public static ISymmetricalDecrypt createDecrypt(String algorithm, String mode, String padding, SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
+            return createDecrypt(Algorithms.valueOf(algorithm), mode, padding, key);
         }
     }
 

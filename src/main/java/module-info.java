@@ -3,6 +3,7 @@ module seminar {
     requires java.desktop;
     requires java.prefs;
     requires static lombok;
+    requires org.bouncycastle.provider;
 
     exports com.lamnguyen;
 }

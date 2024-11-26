@@ -41,7 +41,7 @@ public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASy
     }
 
     @Override
-    public final void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public final void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
         var cipherEncrypt = ISymmetrical.Factory.createEncrypt(algorithm, null, null, sizeKey);
         var key = cipherEncrypt.getKey();
         DataOutputStream output = new DataOutputStream(new FileOutputStream(dest));

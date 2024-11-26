@@ -12,15 +12,17 @@ import javax.swing.*;
 import java.awt.*;
 
 public class DialogProgressHelper {
+    private static boolean[] running = new boolean[1];
+
     public static void runProcess(String title, String content, Process process) {
+        if (running[0]) return;
+        running[0] = true;
         // Hiển thị hộp thoại trong luồng riêng
         new Thread(() -> {
             var dialogProcess = new DialogProcess(title, content);
 
             new Thread(() -> {
-                SwingUtilities.invokeLater(() -> {
-                    dialogProcess.dialog.setVisible(true);
-                });
+                dialogProcess.dialog.setVisible(true);
             }).start();
             process.run(dialogProcess);
         }).start();
@@ -58,6 +60,7 @@ public class DialogProgressHelper {
 
         public void dispose() {
             dialog.dispose();
+            running[0] = false;
         }
     }
 }

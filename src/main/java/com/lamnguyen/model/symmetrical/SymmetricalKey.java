@@ -10,6 +10,7 @@ package com.lamnguyen.model.symmetrical;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import java.security.spec.AlgorithmParameterSpec;
 
-public record SymmetricalKey(SecretKey key, IvParameterSpec iv) {
+public record SymmetricalKey(SecretKey key, AlgorithmParameterSpec iv) {
 }

@@ -33,10 +33,10 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
     private KeyAsymmetricalGenerateComponent keyGenerateComponent;
     private SelectAlgorithmGenerateKeyComponent selectAlgorithmComponent;
     private OutputComponent outputComponent;
-    private SubjectSizeController sizeController = SubjectSizeController.getInstance();
+    private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private JButton buttonCreate;
     private JPanel panelSpace;
-    private Application application;
+    private final Application application;
     private final int V_GAP = 20;
 
     public GenerateKeyAsymmetricalPage(Application application) {
@@ -88,14 +88,15 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
 
     private void saveKey() {
         DialogProgressHelper.runProcess(process -> {
-            if (ValidationHelper.validateKeyGenerate(key, process))
+            if (!ValidationHelper.validateKeyGenerate(key, process))
                 return;
 
             try {
-                new File(outputComponent.getFolderDest()).mkdirs();
+                var file = new File(outputComponent.getFolderDest());
+                if (!file.exists() && !file.mkdirs()) throw new IOException();
                 IAsymmetrical.saveKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key, outputComponent.getFullPath());
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                    application.reloadWorkSpace();
+                    application.reloadWorkSpaceSync();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);

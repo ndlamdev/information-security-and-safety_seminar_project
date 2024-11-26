@@ -47,16 +47,16 @@ public class TreeFileComponent extends JScrollPane {
         this.path = path;
         var file = new File(path);
         if (!file.exists()) return;
-        tree.setModel(new DefaultTreeModel(setPathHelper(file)));
+        tree.setModel(new DefaultTreeModel(setPathHelper(file), true));
         tree.setTransferHandler(new FileTransferHandler(tree, path));
         tree.setVisible(true);
     }
 
     private DefaultMutableTreeNode setPathHelper(File file) {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(file.getName());
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(file.getName(), true);
         var listFile = file.listFiles(File::isFile);
         if (listFile != null)
-            Arrays.stream(listFile).forEach(it -> root.add(new DefaultMutableTreeNode(it.getName())));
+            Arrays.stream(listFile).forEach(it -> root.add(new DefaultMutableTreeNode(it.getName(), false)));
         var listDir = file.listFiles(File::isDirectory);
 
         if (listDir != null)

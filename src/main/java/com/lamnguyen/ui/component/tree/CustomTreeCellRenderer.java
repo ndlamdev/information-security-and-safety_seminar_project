@@ -20,11 +20,7 @@ public class CustomTreeCellRenderer extends DefaultTreeCellRenderer {
                                                   boolean leaf, int row, boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
-        if (leaf && row != 0) {
-            setIcon(childIcon);  // Use child icon for leaf nodes
-        } else {
-            setIcon(parentIcon); // Use parent icon for non-leaf nodes (parents)
-        }
+        setIcon(leaf ? childIcon : parentIcon);
         return this;
     }
 }

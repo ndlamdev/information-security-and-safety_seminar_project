@@ -10,6 +10,7 @@ package com.lamnguyen.ui.view;
 
 import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
 import com.lamnguyen.model.traditionalCipher.TraditionalKey;
 import com.lamnguyen.model.traditionalCipher.algorithm.AffineCipher;
@@ -150,17 +151,16 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
 
     private void saveKey() {
         DialogProgressHelper.runProcess(process -> {
-            if (cipher == null) {
-                JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
-                process.dispose();
+            if (!ValidationHelper.validateKeyGenerate(cipher.getKey(), process))
                 return;
-            }
+
 
             try {
-                new File(outputComponent.getFolderDest()).mkdirs();
+                var file = new File(outputComponent.getFolderDest());
+                if (!file.exists() && !file.mkdirs()) throw new IOException();
                 cipher.saveKey(outputComponent.getFullPath());
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                    application.reloadWorkSpace();
+                    application.reloadWorkSpaceSync();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, "Lưu file tất bại!", "Error", JOptionPane.ERROR_MESSAGE);

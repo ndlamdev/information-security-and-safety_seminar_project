@@ -9,14 +9,14 @@
 package com.lamnguyen.model.symmetrical.encrypt;
 
 import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.utils.IVUtil;
+import com.lamnguyen.utils.PaddingUtil;
 import lombok.NoArgsConstructor;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
 
 @NoArgsConstructor
 public class AESEncrypt extends ASymmetricalEncrypt {
@@ -29,7 +29,7 @@ public class AESEncrypt extends ASymmetricalEncrypt {
     }
 
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchProviderException {
         cipher = ISymmetrical.getCipherInstance(Algorithms.AES, mode, padding);
     }
 
@@ -41,6 +41,21 @@ public class AESEncrypt extends ASymmetricalEncrypt {
      */
     @Override
     protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
+        ivSpec = IVUtil.generateIV(16);
         return KeyGenerator.getInstance(Algorithms.AES.name());
+    }
+
+    @Override
+    public byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+        try {
+            return cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
+        } catch (IllegalBlockSizeException e) {
+            try {
+                init(Cipher.ENCRYPT_MODE, true);
+            } catch (InvalidAlgorithmParameterException ignored) {
+                init(Cipher.ENCRYPT_MODE, false);
+            }
+            return cipher.doFinal(PaddingUtil.addPadding(16, data.getBytes(StandardCharsets.UTF_8)));
+        }
     }
 }

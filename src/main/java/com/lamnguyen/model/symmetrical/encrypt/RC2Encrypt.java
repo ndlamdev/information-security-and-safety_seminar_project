@@ -15,6 +15,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 @NoArgsConstructor
 public class RC2Encrypt extends ASymmetricalEncrypt {
@@ -27,7 +28,7 @@ public class RC2Encrypt extends ASymmetricalEncrypt {
     }
 
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         cipher = ISymmetrical.getCipherInstance(Algorithms.RC2, mode, padding);
     }
 
@@ -39,6 +40,6 @@ public class RC2Encrypt extends ASymmetricalEncrypt {
      */
     @Override
     protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance("RC2");
+        return KeyGenerator.getInstance(Algorithms.RC2.name());
     }
 }

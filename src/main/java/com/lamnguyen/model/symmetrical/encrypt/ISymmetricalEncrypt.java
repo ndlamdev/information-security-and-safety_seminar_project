@@ -14,6 +14,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public interface ISymmetricalEncrypt extends ISymmetrical {
     /**
@@ -22,7 +25,7 @@ public interface ISymmetricalEncrypt extends ISymmetrical {
      * @param size Kích thước của khóa cần tạo.
      * @return Khóa bí mật được tạo.
      */
-    SecretKey generateKey(int size);
+    SecretKey generateKey(int size) throws NoSuchAlgorithmException;
 
     /**
      * Mã hóa dữ liệu đã cho bằng khóa đã tải.
@@ -32,7 +35,7 @@ public interface ISymmetricalEncrypt extends ISymmetrical {
      * @throws IllegalBlockSizeException Nếu kích thước khối không hợp lệ.
      * @throws BadPaddingException       Nếu padding không hợp lệ.
      */
-    byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException;
+    byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException;
 
     /**
      * Mã hóa dữ liệu đã cho và mã hóa kết quả bằng Base64.
@@ -42,7 +45,7 @@ public interface ISymmetricalEncrypt extends ISymmetrical {
      * @throws IllegalBlockSizeException Nếu kích thước khối không hợp lệ.
      * @throws BadPaddingException       Nếu padding không hợp lệ.
      */
-    String encryptStringBase64(String data) throws IllegalBlockSizeException, BadPaddingException;
+    String encryptStringBase64(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException;
 
     /**
      * Mã hóa nội dung của tệp nguồn và ghi dữ liệu đã mã hóa vào tệp đích.
@@ -54,5 +57,5 @@ public interface ISymmetricalEncrypt extends ISymmetrical {
      * @throws IllegalBlockSizeException Lỗi
      * @throws BadPaddingException       Lỗi
      */
-    void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException;
+    void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException;
 }

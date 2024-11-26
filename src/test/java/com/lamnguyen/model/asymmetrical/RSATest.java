@@ -6,7 +6,7 @@
  * User: lam-nguyen
  **/
 
-package com.lamnguyen.model.asymmertrical;
+package com.lamnguyen.model.asymmetrical;
 
 import com.lamnguyen.model.asymmetrical.decrypt.IASymmetricalDecrypt;
 import com.lamnguyen.model.asymmetrical.decrypt.RSADecrypt;

@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
+import com.lamnguyen.helper.DialogOverFileHelper;
 import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.helper.ValidationHelper;
@@ -26,11 +27,13 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
@@ -49,6 +52,7 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
     public CipherFileSymmetricalPage(Application application) {
         this.application = application;
         this.init();
+        this.event();
     }
 
     private void init() {
@@ -87,6 +91,25 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
         encryptMode();
     }
 
+    private void event() {
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control D"), "Ctrl_D");
+        getActionMap().put("Ctrl_D", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CipherFileSymmetricalPage.this.decryptMode();
+            }
+        });
+
+        // Add Key Binding for Ctrl + E
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control E"), "Ctrl_E");
+        getActionMap().put("Ctrl_E", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CipherFileSymmetricalPage.this.encryptMode();
+            }
+        });
+    }
+
     public Void loadFileKey(File file) {
         if (file == null) return null;
         try {
@@ -121,12 +144,15 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
 
             try {
                 var cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
+                if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
                 cipher.encryptFile(file, outputComponent.getFullPath(), false);
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                    application.reloadWorkSpace();
+                    application.reloadWorkSpaceAsync();
                 JOptionPane.showMessageDialog(null, "Thành công!");
-            } catch (InvalidKeyException | NoSuchAlgorithmException | IllegalBlockSizeException | IOException |
+            } catch (NoSuchProviderException | InvalidKeyException | NoSuchAlgorithmException |
+                     IllegalBlockSizeException | IOException |
                      BadPaddingException | NoSuchPaddingException | InvalidAlgorithmParameterException e) {
+                e.printStackTrace(System.out);
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
             }
             process.dispose();
@@ -144,16 +170,16 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
                 var cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
                 cipher.decryptFile(file, outputComponent.getFullPath(), 0);
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
-                    application.reloadWorkSpace();
+                    application.reloadWorkSpaceSync();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException | IllegalBlockSizeException |
-                     IOException | BadPaddingException | NoSuchPaddingException | InvalidKeyException e) {
+                     IOException | BadPaddingException | NoSuchPaddingException | InvalidKeyException |
+                     NoSuchProviderException e) {
                 e.printStackTrace(System.out);
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
             }
             process.dispose();
         });
-
     }
 
     private void setFileNameOut(String pathFile, SelectCipherAlgorithmComponent.Algorithm algorithm) {

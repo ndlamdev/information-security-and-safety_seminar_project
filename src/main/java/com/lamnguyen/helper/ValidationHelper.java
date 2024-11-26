@@ -108,4 +108,12 @@ public class ValidationHelper {
         process.dispose();
         return false;
     }
+
+    public static boolean validateKeyGenerate(TraditionalKey<?> key, DialogProgressHelper.DialogProcess process) {
+        if (key != null) return true;
+
+        JOptionPane.showMessageDialog(null, "Vui lòng tạo khóa trước!", "Error", JOptionPane.ERROR_MESSAGE);
+        process.dispose();
+        return false;
+    }
 }

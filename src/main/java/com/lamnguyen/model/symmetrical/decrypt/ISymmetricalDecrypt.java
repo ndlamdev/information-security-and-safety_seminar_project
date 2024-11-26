@@ -12,11 +12,14 @@ import com.lamnguyen.model.symmetrical.ISymmetrical;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public interface ISymmetricalDecrypt extends ISymmetrical {
-    String decrypt(byte[] data);
+    String decrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, NoSuchAlgorithmException;
 
-    String decryptBase64ToString(String data);
+    String decryptBase64ToString(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException, NoSuchAlgorithmException;
 
     /**
      * Giải mã nội dung của tệp nguồn và ghi dữ liệu đã mã hóa vào tệp đích.
@@ -28,5 +31,5 @@ public interface ISymmetricalDecrypt extends ISymmetrical {
      * @throws IllegalBlockSizeException Lỗi
      * @throws BadPaddingException       Lỗi
      */
-    void decryptFile(String source, String dest, long skip) throws IOException, IllegalBlockSizeException, BadPaddingException;
+    void decryptFile(String source, String dest, long skip) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException;
 }

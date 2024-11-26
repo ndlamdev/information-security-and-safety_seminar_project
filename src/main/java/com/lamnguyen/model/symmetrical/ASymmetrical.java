@@ -11,19 +11,23 @@ package com.lamnguyen.model.symmetrical;
 import lombok.Getter;
 
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.spec.AlgorithmParameterSpec;
 
 public abstract class ASymmetrical implements ISymmetrical {
+    @Getter
     protected SecretKey key;
     protected Cipher cipher;
     protected String mode, padding;
     @Getter
-    protected IvParameterSpec ivSpec;
+    protected AlgorithmParameterSpec ivSpec;
 
     public ASymmetrical(String mode, String padding) {
         this.mode = mode;
@@ -45,18 +49,9 @@ public abstract class ASymmetrical implements ISymmetrical {
      * @throws InvalidKeyException      Lỗi key không phù hợp với thuật toán
      */
     @Override
-    public void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
-        this.key = key;
-    }
-
-    /**
-     * Lấy khóa bí mật của thuật toán.
-     *
-     * @return key Khóa bí mật của thuật toán.
-     */
-    @Override
-    public SecretKey getKey() {
-        return this.key;
+    public void loadKey(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
+        this.key = key.key();
+        this.ivSpec = key.iv();
     }
 
     /**
@@ -65,10 +60,14 @@ public abstract class ASymmetrical implements ISymmetrical {
      * @throws NoSuchPaddingException   Lỗi khi thêm padding vào thuật toán
      * @throws NoSuchAlgorithmException Lỗi thuật toán không tồn tại
      */
-    protected abstract void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException;
+    protected abstract void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchProviderException;
 
-
-    protected String getExtension() {
-        return (mode == null || mode.isBlank() ? "" : "/" + mode) + (padding == null || padding.isBlank() ? "" : "/" + padding);
+    protected void init(int mode, boolean hasIv) throws InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException {
+        if (!hasIv) {
+            cipher.init(mode, key);
+            return;
+        }
+        if (ivSpec == null) throw new IllegalBlockSizeException();
+        cipher.init(mode, key, ivSpec);
     }
 }
