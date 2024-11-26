@@ -9,12 +9,14 @@
 package com.lamnguyen.model.symmetrical.encrypt;
 
 import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.utils.IVUtil;
 import lombok.NoArgsConstructor;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 @NoArgsConstructor
 public class ChaCha20Encrypt extends ASymmetricalEncrypt {
@@ -27,7 +29,7 @@ public class ChaCha20Encrypt extends ASymmetricalEncrypt {
     }
 
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         cipher = ISymmetrical.getCipherInstance(Algorithms.ChaCha20, mode, padding);
     }
 
@@ -40,6 +42,7 @@ public class ChaCha20Encrypt extends ASymmetricalEncrypt {
      */
     @Override
     protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance("ChaCha20");
+        ivSpec = IVUtil.generateChaCha20IV(12);
+        return KeyGenerator.getInstance(Algorithms.ChaCha20.name());
     }
 }

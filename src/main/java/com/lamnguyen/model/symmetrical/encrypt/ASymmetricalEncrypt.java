@@ -9,6 +9,8 @@
 package com.lamnguyen.model.symmetrical.encrypt;
 
 import com.lamnguyen.model.symmetrical.ASymmetrical;
+import com.lamnguyen.model.symmetrical.SymmetricalKey;
+import com.lamnguyen.utils.PaddingUtil;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -17,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.Arrays;
 import java.util.Base64;
 
 public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymmetricalEncrypt {
@@ -24,6 +28,7 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
     public ASymmetricalEncrypt(String mode, String padding) {
         super(mode, padding);
     }
+
     public ASymmetricalEncrypt(String mode, String padding, IvParameterSpec iv) {
         super(mode, padding, iv);
     }
@@ -41,11 +46,14 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @throws InvalidKeyException      Nếu khóa không hợp lệ.
      */
     @Override
-    public final void loadKey(SecretKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+    public void loadKey(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
         super.loadKey(key);
         initCipher();
-        if (ivSpec != null) cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
-        else cipher.init(Cipher.ENCRYPT_MODE, key);
+        try {
+            init(Cipher.ENCRYPT_MODE, true);
+        } catch (InvalidAlgorithmParameterException | IllegalBlockSizeException ignored) {
+            init(Cipher.ENCRYPT_MODE, false);
+        }
     }
 
     /**
@@ -57,7 +65,7 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @throws BadPaddingException       Nếu padding không hợp lệ.
      */
     @Override
-    public final byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException {
+    public byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
         return cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -70,7 +78,7 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @throws BadPaddingException       Nếu padding không hợp lệ.
      */
     @Override
-    public final String encryptStringBase64(String data) throws IllegalBlockSizeException, BadPaddingException {
+    public final String encryptStringBase64(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
         return Base64.getEncoder().encodeToString(encrypt(data));
     }
 
@@ -82,18 +90,25 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @param append Có thêm vào tệp đích nếu nó đã tồn tại hay không.
      */
     @Override
-    public final void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException {
-        BufferedInputStream bufferInput = new BufferedInputStream(new FileInputStream(source));
-        CipherInputStream input = new CipherInputStream(bufferInput, cipher);
-        DataOutputStream output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(dest, append)));
+    public final void encryptFile(String source, String dest, boolean append) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+        DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(source)));
+        BufferedOutputStream bufferOutput = new BufferedOutputStream(new FileOutputStream(dest, append));
+        CipherOutputStream output = new CipherOutputStream(bufferOutput, cipher);
 
         byte[] buffer = new byte[1024 * 10];
         int i;
-        while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
-        input.close();
 
-        byte[] finalBuffer = cipher.doFinal();
-        if (finalBuffer != null) output.write(finalBuffer);
+        try {
+            while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
+        } catch (Exception e) {
+            init(Cipher.ENCRYPT_MODE, true);
+            while ((i = input.read(buffer)) != -1) output.write(buffer, 0, i);
+        } finally {
+            input.close();
+        }
+
+        buffer = cipher.doFinal();
+        if (buffer != null) output.write(buffer);
         output.close();
     }
 
@@ -112,13 +127,9 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @return Khóa bí mật được tạo.
      */
     @Override
-    public final SecretKey generateKey(int size) {
-        try {
-            KeyGenerator keyGen = initKeyGenerator();
-            keyGen.init(size);
-            return keyGen.generateKey();
-        } catch (Exception e) {
-            return null;
-        }
+    public final SecretKey generateKey(int size) throws NoSuchAlgorithmException {
+        KeyGenerator keyGen = initKeyGenerator();
+        keyGen.init(size);
+        return keyGen.generateKey();
     }
 }

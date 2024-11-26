@@ -62,16 +62,6 @@ public class CipherAlgorithmConfig {
                 add("NoPadding");
                 add("PKCS5Padding");
             }}));
-            add(new Algorithm(ISymmetrical.Algorithms.DESede.name(), new ArrayList<>() {{
-                add("");
-                add("ECB");
-            }}, new ArrayList<>() {{
-                add("");
-                add("PKCS1Padding");
-                add("OAEPWithSHA-1AndMGF1Padding");
-                add("OAEPWithSHA-256AndMGF1Padding");
-            }}));
-
             add(new Algorithm(ISymmetrical.Algorithms.AESWrap.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.AESWrapPad.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.ARCFOUR.name(), new ArrayList<>(), new ArrayList<>()));
@@ -81,7 +71,7 @@ public class CipherAlgorithmConfig {
             add(new Algorithm(ISymmetrical.Algorithms.DESedeWrap.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.RC2.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.RC4.name(), new ArrayList<>(), new ArrayList<>()));
-            add(new Algorithm(ISymmetrical.Algorithms.RC4.name(), new ArrayList<>(), new ArrayList<>()));
+//            add(new Algorithm(ISymmetrical.Algorithms.RC4.name(), new ArrayList<>(), new ArrayList<>()));
         }};
 
         algorithmAsymmetrical = new ArrayList<>() {{

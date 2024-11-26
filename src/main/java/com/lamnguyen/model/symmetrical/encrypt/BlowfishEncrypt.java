@@ -15,6 +15,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 @NoArgsConstructor
 public class BlowfishEncrypt extends ASymmetricalEncrypt {
@@ -27,7 +28,7 @@ public class BlowfishEncrypt extends ASymmetricalEncrypt {
     }
 
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         cipher = ISymmetrical.getCipherInstance(Algorithms.Blowfish, mode, padding);
     }
 
@@ -39,6 +40,6 @@ public class BlowfishEncrypt extends ASymmetricalEncrypt {
      */
     @Override
     protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance("Blowfish");
+        return KeyGenerator.getInstance(Algorithms.Blowfish.name());
     }
 }

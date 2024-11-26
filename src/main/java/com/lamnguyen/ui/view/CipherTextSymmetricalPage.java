@@ -27,10 +27,12 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -49,6 +51,7 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
     public CipherTextSymmetricalPage(Application application) {
         this.application = application;
         this.init();
+        this.event();
     }
 
     private void init() {
@@ -79,6 +82,25 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
             setPreferredSize(new Dimension(500, 50));
         }};
         this.add(action);
+    }
+
+    private void event() {
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control D"), "Ctrl_D");
+        getActionMap().put("Ctrl_D", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CipherTextSymmetricalPage.this.decryptMode();
+            }
+        });
+
+        // Add Key Binding for Ctrl + E
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control E"), "Ctrl_E");
+        getActionMap().put("Ctrl_E", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CipherTextSymmetricalPage.this.encryptMode();
+            }
+        });
     }
 
     public void encryptMode() {
@@ -113,21 +135,21 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
             var alg = selectAlgorithmComponent.getAlgorithm();
             if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
                 return;
-            ISymmetricalEncrypt cipher = null;
             try {
-                cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-                     InvalidAlgorithmParameterException e) {
+                ISymmetricalEncrypt cipher = ISymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
+                outputTextComponent.setTextJTextArea(cipher.encryptStringBase64(text));
+                JOptionPane.showMessageDialog(null, "Thành công!");
+                process.dispose();
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException |
+                     BadPaddingException | NoSuchProviderException e) {
+                e.printStackTrace(System.out);
                 JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
                 process.dispose();
-                return;
+            } catch (InvalidKeyException | IllegalBlockSizeException | InvalidAlgorithmParameterException e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
             }
-            try {
-                outputTextComponent.setTextJTextArea(cipher.encryptStringBase64(text));
-            } catch (IllegalBlockSizeException | BadPaddingException e) {
-                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            process.dispose();
         });
     }
 
@@ -138,25 +160,24 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
             if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
                 return;
 
-            ISymmetricalDecrypt cipher = null;
             try {
-                cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
-            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
-                     InvalidAlgorithmParameterException e) {
-                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-                process.dispose();
-                return;
-            }
+                ISymmetricalDecrypt cipher = ISymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding(), key);
 
-            var data = cipher.decryptBase64ToString(text);
-            if (data == null) {
-                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
-            } else {
+                var data = cipher.decryptBase64ToString(text);
+
                 outputTextComponent.setTextJTextArea(data);
                 JOptionPane.showMessageDialog(null, "Thành công!");
+                process.dispose();
+            } catch (NoSuchPaddingException | IllegalArgumentException | NoSuchAlgorithmException |
+                     BadPaddingException | NoSuchProviderException e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
+            } catch (InvalidKeyException | IllegalBlockSizeException | InvalidAlgorithmParameterException e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
             }
-
-            process.dispose();
         });
 
     }

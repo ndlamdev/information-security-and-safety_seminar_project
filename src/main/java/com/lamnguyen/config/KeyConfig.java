@@ -50,6 +50,9 @@ public class KeyConfig {
             put(ISymmetrical.Algorithms.ChaCha20.name(), new ArrayList<>() {{
                 add("256");
             }});
+            put(ISymmetrical.Algorithms.ChaCha20Poly1305.name(), new ArrayList<>() {{
+                add("256");
+            }});
             put(ISymmetrical.Algorithms.DESede.name(), new ArrayList<>() {{
                 add("112");
                 add("168");

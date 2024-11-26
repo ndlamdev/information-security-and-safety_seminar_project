@@ -11,22 +11,24 @@ package com.lamnguyen.model.symmetrical.decrypt;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 import com.lamnguyen.model.symmetrical.SymmetricalKey;
 
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 public class AESDecrypt extends ASymmetricalDecrypt {
-    public AESDecrypt(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+    public AESDecrypt(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
         super(key);
     }
 
-    public AESDecrypt(SymmetricalKey key, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException {
+    public AESDecrypt(SymmetricalKey key, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
         super(key, mode, padding);
     }
 
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         cipher = ISymmetrical.getCipherInstance(Algorithms.AES, mode, padding);
     }
 }

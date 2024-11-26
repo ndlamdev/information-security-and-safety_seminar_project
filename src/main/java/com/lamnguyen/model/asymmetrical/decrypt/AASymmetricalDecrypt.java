@@ -17,10 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
+import java.security.*;
 import java.util.Base64;
 
 public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASymmetricalDecrypt {
@@ -34,7 +31,7 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
     }
 
     @Override
-    public final void decryptFile(String source, String dest) throws HeaderException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException {
+    public final void decryptFile(String source, String dest) throws HeaderException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException, NoSuchProviderException {
         HeaderFileEncrypt header = loadHeader(source);
         if (header == null) throw new HeaderException("Không tồn tại header");
 

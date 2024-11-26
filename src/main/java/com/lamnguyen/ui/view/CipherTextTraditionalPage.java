@@ -21,6 +21,7 @@ import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -43,6 +44,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
     public CipherTextTraditionalPage(Application application) {
         this.application = application;
         this.init();
+        this.event();
     }
 
     private void init() {
@@ -77,6 +79,25 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
         selectAlgorithmComponent = new SelectCipherTraditionalAlgorithmComponent(onAlgChange);
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
+    }
+
+    private void event() {
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control D"), "Ctrl_D");
+        getActionMap().put("Ctrl_D", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CipherTextTraditionalPage.this.decryptMode();
+            }
+        });
+
+        // Add Key Binding for Ctrl + E
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control E"), "Ctrl_E");
+        getActionMap().put("Ctrl_E", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CipherTextTraditionalPage.this.encryptMode();
+            }
+        });
     }
 
     public void encryptMode() {

@@ -12,10 +12,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
+import java.security.*;
 
 public interface IASymmetricalDecrypt {
     void loadKey(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
@@ -26,7 +23,7 @@ public interface IASymmetricalDecrypt {
 
     String decryptBase64ToString(String data) throws IllegalBlockSizeException, BadPaddingException;
 
-    void decryptFile(String source, String dest) throws AASymmetricalDecrypt.HeaderException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException;
+    void decryptFile(String source, String dest) throws AASymmetricalDecrypt.HeaderException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException, NoSuchProviderException;
 
      class HeaderException extends Exception {
 

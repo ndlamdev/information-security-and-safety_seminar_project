@@ -8,13 +8,19 @@
 
 package com.lamnguyen.model.symmetrical.encrypt;
 
+import com.lamnguyen.model.symmetrical.SymmetricalKey;
+import com.lamnguyen.utils.PaddingUtil;
 import lombok.NoArgsConstructor;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 @NoArgsConstructor
 public class AESWrapEncrypt extends ASymmetricalEncrypt {
@@ -27,7 +33,7 @@ public class AESWrapEncrypt extends ASymmetricalEncrypt {
     }
 
     @Override
-    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    protected void initCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         cipher = ISymmetrical.getCipherInstance(Algorithms.AESWrap, mode, padding);
     }
 
@@ -39,6 +45,19 @@ public class AESWrapEncrypt extends ASymmetricalEncrypt {
      */
     @Override
     protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance("AES");
+        return KeyGenerator.getInstance(Algorithms.AES.name());
+    }
+
+    @Override
+    public void loadKey(SymmetricalKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, NoSuchProviderException {
+        this.key = key.key();
+        this.ivSpec = key.iv();
+        initCipher();
+        init(Cipher.WRAP_MODE, false);
+    }
+
+    @Override
+    public byte[] encrypt(String data) throws IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, InvalidKeyException {
+        return cipher.wrap(new SecretKeySpec(PaddingUtil.addPadding(16, data.getBytes(StandardCharsets.UTF_8)), Algorithms.AES.name()));
     }
 }

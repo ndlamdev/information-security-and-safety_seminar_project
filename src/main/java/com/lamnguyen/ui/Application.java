@@ -58,7 +58,7 @@ public class Application extends JFrame {
         this.init();
         this.setVisible(true);
         sizeController.onChange();
-        reloadWorkSpace();
+        reloadWorkSpaceAsync();
     }
 
     private void init() {
@@ -177,16 +177,22 @@ public class Application extends JFrame {
         if (file == null) return;
         SettingHelper.getInstance().setWorkSpace(file.getAbsolutePath());
         pathWorkSpace = file.getAbsolutePath();
-        reloadWorkSpace();
+        reloadWorkSpaceAsync();
     }
 
-    public void reloadWorkSpace() {
+    public void reloadWorkSpaceAsync() {
         DialogProgressHelper.runProcess(process -> {
             tree.setPath(pathWorkSpace);
             listKey.setPath(pathWorkSpace);
             process.dispose();
         });
     }
+
+    public void reloadWorkSpaceSync(){
+        tree.setPath(pathWorkSpace);
+        listKey.setPath(pathWorkSpace);
+    }
+
 
     public static void setup() {
         FlatMacLightLaf.setup();

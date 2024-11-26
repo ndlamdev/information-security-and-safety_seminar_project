@@ -15,10 +15,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
 
 public interface IASymmetricalEncrypt {
     void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
@@ -31,5 +28,5 @@ public interface IASymmetricalEncrypt {
 
     String encryptStringToBase64(String data) throws IllegalBlockSizeException, BadPaddingException;
 
-    void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
+    void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException;
 }
