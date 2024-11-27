@@ -10,7 +10,6 @@ package com.lamnguyen.model.symmetrical.encrypt;
 
 import com.lamnguyen.model.symmetrical.ASymmetrical;
 import com.lamnguyen.model.symmetrical.SymmetricalKey;
-import com.lamnguyen.utils.PaddingUtil;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -20,7 +19,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Arrays;
 import java.util.Base64;
 
 public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymmetricalEncrypt {

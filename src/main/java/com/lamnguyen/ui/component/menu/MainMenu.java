@@ -14,8 +14,6 @@ import com.lamnguyen.ui.controller.MainMenuController;
 import com.lamnguyen.ui.controller.navigation.IJNavigation;
 
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class MainMenu extends JMenuBar {
     private IJNavigation navigation;
@@ -36,10 +34,13 @@ public class MainMenu extends JMenuBar {
             exitMenuItem,
             symmetricalKeyMenuItem,
             asymmetricalKeyMenuItem,
-            traditionalKey,
-            hashMenuItem,
+            traditionalKeyMenuItem,
+            hashFileMenuItem,
+            hashTextMenuItem,
             signFileMenuItem,
-            verifySignatureFileMenuItem;
+            signTextMenuItem,
+            verifySignatureFileMenuItem,
+            verifySignatureTextMenuItem;
 
     @Getter
     private JMenu symmetricalFileMenu,
@@ -51,7 +52,10 @@ public class MainMenu extends JMenuBar {
             generateKeyMenu,
             fileMenu,
             textMenu,
-            signatureMenu,
+            hashMenu,
+            signatureElectricMenu,
+            signMenu,
+            verifySignatureMenu,
             aboutMenu;
 
     public MainMenu(IJNavigation navigation, Application application) {
@@ -61,7 +65,8 @@ public class MainMenu extends JMenuBar {
         this.initMenuItemHome();
         this.initMenuItemFile();
         this.initMenuItemText();
-        this.initMenuItemSignatureFile();
+        this.initMenuHash();
+        this.initMenuItemSignatureElectric();
         this.initMenuItemGenerateKey();
     }
 
@@ -80,18 +85,11 @@ public class MainMenu extends JMenuBar {
         textMenu = new JMenu("Văn bản");
         this.add(textMenu);
 
-        hashMenuItem = new JMenu("Hash") {{
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    navigation.push(IJNavigation.NamePage.HashFilePage);
-                }
-            });
-        }};
-        this.add(hashMenuItem);
+        hashMenu = new JMenu("Hash");
+        this.add(hashMenu);
 
-        signatureMenu = new JMenu("Chử ký điện tử");
-        this.add(signatureMenu);
+        signatureElectricMenu = new JMenu("Chữ ký điện tử");
+        this.add(signatureElectricMenu);
 
         aboutMenu = new JMenu("About");
         this.add(aboutMenu);
@@ -166,6 +164,18 @@ public class MainMenu extends JMenuBar {
         traditionalTextMenu.add(decryptTextTraditionalMenuItem);
     }
 
+    private void initMenuHash() {
+        hashTextMenuItem = new JMenuItem("Hash text") {{
+            addActionListener(mainMenuController);
+        }};
+        hashMenu.add(hashTextMenuItem);
+
+        hashFileMenuItem = new JMenuItem("Hash file") {{
+            addActionListener(mainMenuController);
+        }};
+        hashMenu.add(hashFileMenuItem);
+    }
+
     private void initMenuItemHome() {
         openWorkSpace = new JMenuItem("Mở không gian làm việc") {{
             addActionListener(mainMenuController);
@@ -181,16 +191,33 @@ public class MainMenu extends JMenuBar {
         homeMenu.add(exitMenuItem);
     }
 
-    private void initMenuItemSignatureFile() {
-        signFileMenuItem = new JMenuItem("Ký") {{
-            addActionListener(mainMenuController);
-        }};
-        signatureMenu.add(signFileMenuItem);
+    private void initMenuItemSignatureElectric() {
+        signMenu = new JMenu("Ký");
+        signatureElectricMenu.add(signMenu);
 
-        verifySignatureFileMenuItem = new JMenuItem("Xác thực") {{
+        signFileMenuItem = new JMenuItem("Ký file") {{
             addActionListener(mainMenuController);
         }};
-        signatureMenu.add(verifySignatureFileMenuItem);
+        signMenu.add(signFileMenuItem);
+
+        signTextMenuItem = new JMenuItem("Ký văn bản") {{
+            addActionListener(mainMenuController);
+        }};
+        signMenu.add(signTextMenuItem);
+
+
+        verifySignatureMenu = new JMenu("Xác thực");
+        signatureElectricMenu.add(verifySignatureMenu);
+
+        verifySignatureFileMenuItem = new JMenuItem("Xác thực chữ ký file") {{
+            addActionListener(mainMenuController);
+        }};
+        verifySignatureMenu.add(verifySignatureFileMenuItem);
+
+        verifySignatureTextMenuItem = new JMenuItem("Xác thực chữ ký văn bản") {{
+            addActionListener(mainMenuController);
+        }};
+        verifySignatureMenu.add(verifySignatureTextMenuItem);
     }
 
     private void initMenuItemGenerateKey() {
@@ -204,11 +231,12 @@ public class MainMenu extends JMenuBar {
         }};
         generateKeyMenu.add(asymmetricalKeyMenuItem);
 
-        traditionalKey = new JMenuItem("Khóa mã hóa cổ điển") {{
+        traditionalKeyMenuItem = new JMenuItem("Khóa mã hóa cổ điển") {{
             addActionListener(mainMenuController);
         }};
-        generateKeyMenu.add(traditionalKey);
+        generateKeyMenu.add(traditionalKeyMenuItem);
     }
+
 
     public void changePageEncryptSymmetricalFile() {
         application.encryptFileSymmetrical();
@@ -267,15 +295,28 @@ public class MainMenu extends JMenuBar {
     }
 
     public void changePageSignFile() {
-        navigation.push(IJNavigation.NamePage.SignFilePage);
+        application.signFile();
+        navigation.push(IJNavigation.NamePage.SignPage);
+    }
+
+    public void changePageSignText() {
+        application.signText();
+        navigation.push(IJNavigation.NamePage.SignPage);
     }
 
     public void changePageVerifySignatureFile() {
-        navigation.push(IJNavigation.NamePage.VerifySignatureFilePage);
+        application.verifySignatureFile();
+        navigation.push(IJNavigation.NamePage.VerifySignaturePage);
+    }
+
+    public void changePageVerifySignatureText() {
+        application.verifySignatureText();
+        navigation.push(IJNavigation.NamePage.VerifySignaturePage);
     }
 
     public void changePageHashFile() {
-        navigation.push(IJNavigation.NamePage.HashFilePage);
+        application.hashFile();
+        navigation.push(IJNavigation.NamePage.HashPage);
     }
 
     public void changePageGenerateTraditionalKey() {
@@ -290,5 +331,10 @@ public class MainMenu extends JMenuBar {
     public void changePageDecryptTraditionalText() {
         application.decryptTextTraditional();
         navigation.push(IJNavigation.NamePage.CipherTextTraditionalPage);
+    }
+
+    public void changePageHashText() {
+        application.hashText();
+        navigation.push(IJNavigation.NamePage.HashPage);
     }
 }

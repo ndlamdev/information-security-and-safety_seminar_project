@@ -11,7 +11,8 @@ package com.lamnguyen.model.signature;
 import java.io.IOException;
 import java.security.SignatureException;
 
-public interface IVerifySignatureFile {
+public interface IVerifySignature {
+    boolean verifyFile(String source, String signature) throws IOException, SignatureException;
 
-    boolean verify(String source, String signature) throws IOException, SignatureException;
+    boolean verifyText(String text, String signature) throws SignatureException;
 }

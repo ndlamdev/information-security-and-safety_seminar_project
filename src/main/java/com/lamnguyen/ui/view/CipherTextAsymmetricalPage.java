@@ -9,19 +9,31 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
+import com.lamnguyen.helper.DialogOverFileHelper;
 import com.lamnguyen.helper.DialogProgressHelper;
+import com.lamnguyen.helper.SettingHelper;
+import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.model.asymmetrical.IAsymmetrical;
+import com.lamnguyen.model.symmetrical.ISymmetrical;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
 import com.lamnguyen.ui.component.key.InputKeyComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -34,6 +46,7 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
     private JButton action;
     private AsymmetricalKey key;
     private final int V_GAP = 20;
+    private boolean encryptMode = true;
 
 
     public CipherTextAsymmetricalPage(Application application) {
@@ -47,7 +60,7 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
 
         this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
-        inputTextComponent = new OutputInputTextComponent("Nhập văn bảng");
+        inputTextComponent = new OutputInputTextComponent("Nhập văn bản");
         sizeController.addObserver(inputTextComponent);
         this.add(inputTextComponent);
 
@@ -65,6 +78,16 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
         selectAlgorithmComponent = new SelectCipherAlgorithmComponent(CipherAlgorithmConfig.getInstance().getAlgorithmAsymmetrical());
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
+
+        action = new JButton() {{
+            setText("Mã hóa");
+            setPreferredSize(new Dimension(500, 50));
+            addActionListener(actionEvent -> {
+                if (encryptMode) encrypt();
+                else decrypt();
+            });
+        }};
+        this.add(action);
     }
 
     private void event() {
@@ -87,37 +110,67 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
     }
 
     public void encryptMode() {
-        if (action != null)
-            this.remove(action);
-        action = new JButton() {{
-            setText("Mã hóa");
-            setPreferredSize(new Dimension(500, 50));
-            addActionListener(actionEvent -> encrypt());
-        }};
-        this.add(action);
-        this.updateUI();
-        this.repaint();
+        encryptMode = true;
+        action.setText("Mã hóa");
     }
 
     public void decryptMode() {
-        if (action != null)
-            this.remove(action);
-        action = new JButton() {{
-            setText("Giải hóa");
-            setPreferredSize(new Dimension(500, 50));
-            addActionListener(actionEvent -> decrypt());
-        }};
-        this.add(action);
-        this.updateUI();
-        this.repaint();
+        encryptMode = false;
+        action.setText("Giải mã");
     }
 
     private void encrypt() {
-        DialogProgressHelper.runProcess(process -> process.dispose());
+        DialogProgressHelper.runProcess(process -> {
+            var text = inputTextComponent.getText();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+                return;
+            var cipher = IAsymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding());
+            try {
+                cipher.loadKey(key.publicKey());
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                     NoSuchProviderException e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
+                return;
+            }
+            try {
+                outputTextComponent.setTextJTextArea(cipher.encryptStringToBase64(text));
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IllegalBlockSizeException | BadPaddingException e) {
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            process.dispose();
+        });
     }
 
     private void decrypt() {
-        DialogProgressHelper.runProcess(process -> process.dispose());
+        DialogProgressHelper.runProcess(process -> {
+            var text = inputTextComponent.getText();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+                return;
+            var cipher = IAsymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding());
+            try {
+                cipher.loadKey(key.privateKey());
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                     NoSuchProviderException e) {
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
+                return;
+            }
+            try {
+                outputTextComponent.setTextJTextArea(cipher.decryptBase64ToString(text));
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IllegalBlockSizeException | IllegalArgumentException | BadPaddingException e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            process.dispose();
+        });
     }
 
 

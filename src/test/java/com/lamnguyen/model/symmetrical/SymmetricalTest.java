@@ -9,7 +9,7 @@
 package com.lamnguyen.model.symmetrical;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
-import com.lamnguyen.model.hash.impl.HashFileImpl;
+import com.lamnguyen.model.hash.impl.HashImpl;
 import com.lamnguyen.model.symmetrical.decrypt.ISymmetricalDecrypt;
 import com.lamnguyen.model.symmetrical.encrypt.ISymmetricalEncrypt;
 import org.junit.jupiter.api.Assertions;
@@ -81,8 +81,8 @@ public class SymmetricalTest {
             decrypt = ISymmetrical.Factory.createDecrypt(algorithms, mode, padding, key);
             encrypt.encryptFile(source, en, false);
             decrypt.decryptFile(en, de, 0);
-            System.out.println(algorithms + extension + " ---> " + HashFileImpl.getInstance(alg).hash(source) + " -> " + HashFileImpl.getInstance(alg).hash(de));
-            Assertions.assertEquals(HashFileImpl.getInstance(alg).hash(source), HashFileImpl.getInstance(alg).hash(de));
+            System.out.println(algorithms + extension + " ---> " + HashImpl.getInstance(alg).hashFile(source) + " -> " + HashImpl.getInstance(alg).hashFile(de));
+            Assertions.assertEquals(HashImpl.getInstance(alg).hashFile(source), HashImpl.getInstance(alg).hashFile(de));
         } catch (org.opentest4j.AssertionFailedError | Exception e) {
             e.printStackTrace(System.out);
             errorAlg.add(algorithms + extension);

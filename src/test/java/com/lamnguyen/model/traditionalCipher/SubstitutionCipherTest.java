@@ -57,7 +57,7 @@ public class SubstitutionCipherTest {
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
             traditionalKey = (TraditionalKey<Map<Character, Character>>) substitutionCipherEncrypt.generateKey("3");
-            substitutionCipherEncrypt.loadKey(traditionalKey);
+            substitutionCipherEncrypt.loadTraditionalKey(traditionalKey);
             substitutionCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             substitutionCipherDecrypt = new SubstitutionCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.VN);
             substitutionCipherDecrypt.init(ITraditionalCipher.SecureMode.DECRYPT);

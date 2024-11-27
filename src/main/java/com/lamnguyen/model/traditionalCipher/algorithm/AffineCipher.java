@@ -90,9 +90,10 @@ public class AffineCipher extends ATraditionalCipher {
     }
 
     @Override
-    public void loadKey(TraditionalKey<?> traditionalKey) throws Exception {
+    public void loadTraditionalKey(TraditionalKey<?> traditionalKey) throws Exception {
         try {
             this.key = (AffineKey) traditionalKey.contentKey();
+            this.traditionalKey = traditionalKey;
         } catch (Exception e) {
             throw new Exception("Key must be a AffineKey!");
         }

@@ -75,8 +75,6 @@ public class CipherAlgorithmConfig {
         }};
 
         algorithmAsymmetrical = new ArrayList<>() {{
-            add(new Algorithm(IAsymmetrical.Algorithms.DSA.name(), new ArrayList<>(), new ArrayList<>()));
-
             add(new Algorithm(IAsymmetrical.Algorithms.RSA.name(), new ArrayList<>() {{
                 add("ECB");
             }}, new ArrayList<>() {{
@@ -85,7 +83,7 @@ public class CipherAlgorithmConfig {
                 add("OAEPWithSHA-256AndMGF1Padding");
             }}));
 
-            add(new Algorithm(IAsymmetrical.Algorithms.ECIES.name(), new ArrayList<>(), new ArrayList<>()));
+//            add(new Algorithm(IAsymmetrical.Algorithms.ECIES.name(), new ArrayList<>(), new ArrayList<>()));
         }};
     }
 }

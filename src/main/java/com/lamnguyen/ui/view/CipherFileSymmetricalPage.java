@@ -84,7 +84,12 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
-        outputComponent = new OutputComponent(); //110
+        outputComponent = new OutputComponent() {{
+            setActionButtonAction(e -> {
+                if (encrypt) encryptFile();
+                else decryptFile();
+            });
+        }};
         sizeController.addObserver(outputComponent);
         this.add(outputComponent);
 
@@ -127,13 +132,11 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
     public void encryptMode() {
         encrypt = true;
         outputComponent.setTextButtonAction("Mã hóa!");
-        outputComponent.setActionButtonAction(actionEvent -> encryptFile());
     }
 
     public void decryptMode() {
         encrypt = false;
         outputComponent.setTextButtonAction("Giải mã!");
-        outputComponent.setActionButtonAction(actionEvent -> decryptFile());
     }
 
     private void encryptFile() {

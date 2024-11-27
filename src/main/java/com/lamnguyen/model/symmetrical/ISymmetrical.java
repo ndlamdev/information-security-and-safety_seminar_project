@@ -90,17 +90,11 @@ public interface ISymmetrical {
         };
     }
 
-    default void saveKey(String file) throws IOException {
-        var key = getKey();
-        var iv = getIvSpec();
-        var algorithm = key.getAlgorithm();
-
-        DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file), 1024 * 10));
-        outputStream.writeUTF(algorithm);
+    static void save(DataOutputStream outputStream, SecretKey key, AlgorithmParameterSpec iv) throws IOException {
+        outputStream.writeUTF(key.getAlgorithm());
         outputStream.writeUTF(Base64.getEncoder().encodeToString(key.getEncoded()));
         if (iv == null) {
             outputStream.writeUTF("None");
-            outputStream.close();
             return;
         }
         switch (iv) {
@@ -122,12 +116,25 @@ public interface ISymmetrical {
                 outputStream.writeUTF("None");
             }
         }
+    }
+
+    default void saveKey(String file) throws IOException {
+        var key = getKey();
+        var iv = getIvSpec();
+        DataOutputStream outputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file), 1024 * 10));
+        save(outputStream, key, iv);
         outputStream.close();
     }
 
     class KeyFactory {
         public static SymmetricalKey readKey(String file) throws IOException {
             DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file), 1024 * 10));
+            var result = readKey(input);
+            input.close();
+            return result;
+        }
+
+        public static SymmetricalKey readKey(DataInputStream input) throws IOException {
             String algorithm = input.readUTF();
             String keyBase64 = input.readUTF();
             AlgorithmParameterSpec iv = null;
@@ -141,6 +148,7 @@ public interface ISymmetrical {
             }
             return new SymmetricalKey(new SecretKeySpec(Base64.getDecoder().decode(keyBase64), algorithm), iv);
         }
+
     }
 
     static Cipher getCipherInstance(Algorithms algorithms) throws NoSuchPaddingException, NoSuchAlgorithmException {

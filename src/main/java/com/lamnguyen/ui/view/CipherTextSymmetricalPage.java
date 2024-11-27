@@ -46,6 +46,7 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
     @Getter
     private SymmetricalKey key;
     private final int V_GAP = 20;
+    private boolean encryptMode;
 
 
     public CipherTextSymmetricalPage(Application application) {
@@ -59,7 +60,7 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
 
         this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
-        inputTextComponent = new OutputInputTextComponent("Nhập văn bảng");
+        inputTextComponent = new OutputInputTextComponent("Nhập văn bản");
         sizeController.addObserver(inputTextComponent);
         this.add(inputTextComponent);
 
@@ -79,7 +80,12 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
         sizeController.addObserver(selectAlgorithmComponent);
 
         action = new JButton() {{
+            setText("Mã hóa");
             setPreferredSize(new Dimension(500, 50));
+            addActionListener(actionEvent -> {
+                if (encryptMode) encrypt();
+                else decrypt();
+            });
         }};
         this.add(action);
     }
@@ -104,29 +110,13 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
     }
 
     public void encryptMode() {
-        if (action != null)
-            this.remove(action);
-        action = new JButton() {{
-            setText("Mã hóa");
-            setPreferredSize(new Dimension(500, 50));
-            addActionListener(actionEvent -> encrypt());
-        }};
-        this.add(action);
-        this.updateUI();
-        this.repaint();
+        encryptMode = true;
+        action.setText("Mã hóa");
     }
 
     public void decryptMode() {
-        if (action != null)
-            this.remove(action);
-        action = new JButton() {{
-            setText("Giải hóa");
-            setPreferredSize(new Dimension(500, 50));
-            addActionListener(actionEvent -> decrypt());
-        }};
-        this.add(action);
-        this.updateUI();
-        this.repaint();
+        encryptMode = false;
+        action.setText("Giải hóa");
     }
 
     private void encrypt() {

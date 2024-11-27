@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.security.Signature;
 import java.security.SignatureException;
 
-public interface ISignVerifyFile {
+public interface ISignAndVerifyHelper {
     static void signVerifyHelper(Signature signature, String file) throws IOException, SignatureException {
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
         byte[] buffer = new byte[1024 * 10];

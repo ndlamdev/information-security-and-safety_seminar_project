@@ -11,6 +11,8 @@ package com.lamnguyen.model.signature;
 import java.io.IOException;
 import java.security.SignatureException;
 
-public interface ISignFile {
-    String sign(String source) throws IOException, SignatureException;
+public interface ISign {
+    String signFile(String source) throws IOException, SignatureException;
+
+    String signText(String text) throws SignatureException;
 }

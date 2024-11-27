@@ -39,6 +39,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
     private Function<SelectCipherTraditionalAlgorithmComponent.Algorithm, Void> onAlgChange;
     private JPanel panelSpace;
     private final int V_GAP = 20;
+    private boolean encryptMode;
 
 
     public CipherTextTraditionalPage(Application application) {
@@ -52,7 +53,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
 
         this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
-        inputTextComponent = new OutputInputTextComponent("Nhập văn bảng");
+        inputTextComponent = new OutputInputTextComponent("Nhập văn bản");
         sizeController.addObserver(inputTextComponent);
         this.add(inputTextComponent);
 
@@ -79,6 +80,15 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
         selectAlgorithmComponent = new SelectCipherTraditionalAlgorithmComponent(onAlgChange);
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
+
+        action = new JButton() {{
+            setPreferredSize(new Dimension(500, 50));
+            addActionListener(actionEvent -> {
+                if (encryptMode) doFinal(ITraditionalCipher.SecureMode.ENCRYPT);
+                else doFinal(ITraditionalCipher.SecureMode.DECRYPT);
+            });
+        }};
+        this.add(action);
     }
 
     private void event() {
@@ -101,29 +111,14 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
     }
 
     public void encryptMode() {
-        if (action != null) this.remove(action);
-        action = new JButton() {{
-            setPreferredSize(new Dimension(500, 50));
-            setText("Mã hóa");
-            addActionListener(actionEvent -> doFinal(ITraditionalCipher.SecureMode.ENCRYPT));
-        }};
-        this.add(action);
-        this.updateUI();
-        this.repaint();
+        encryptMode = true;
+        action.setText("Mã hóa");
     }
 
     public void decryptMode() {
-        if (action != null) this.remove(action);
-        action = new JButton() {{
-            setPreferredSize(new Dimension(500, 50));
-            setText("Giải hóa");
-            addActionListener(actionEvent -> doFinal(ITraditionalCipher.SecureMode.DECRYPT));
-        }};
-        this.add(action);
-        this.updateUI();
-        this.repaint();
+        encryptMode = false;
+        action.setText("Giải hóa");
     }
-
 
     private void doFinal(ITraditionalCipher.SecureMode mode) {
         DialogProgressHelper.runProcess(process -> {
@@ -134,7 +129,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
 
             var cipher = ITraditionalCipher.Factory.createEncrypt(alg.algorithm(), alg.language());
             try {
-                cipher.loadKey(key);
+                cipher.loadTraditionalKey(key);
                 cipher.init(mode);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ", "Error", JOptionPane.ERROR_MESSAGE);

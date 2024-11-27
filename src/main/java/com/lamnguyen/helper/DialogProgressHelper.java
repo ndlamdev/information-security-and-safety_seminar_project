@@ -8,6 +8,8 @@
 
 package com.lamnguyen.helper;
 
+import com.lamnguyen.model.asymmetrical.decrypt.IASymmetricalDecrypt;
+
 import javax.swing.*;
 import java.awt.*;
 

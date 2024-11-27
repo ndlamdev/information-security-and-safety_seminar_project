@@ -9,11 +9,8 @@
 package com.lamnguyen.model.hash.impl;
 
 import com.lamnguyen.model.hash.IHash;
-import org.bouncycastle.crypto.generators.SCrypt;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 public class BCryptHashPassword implements IHash {
     private static BCryptHashPassword instance;

@@ -48,7 +48,7 @@ public class VigenereCipherTest {
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
             traditionalKey = (TraditionalKey<String>) vigenereCipherEncrypt.generateKey("3");
-            vigenereCipherEncrypt.loadKey(traditionalKey);
+            vigenereCipherEncrypt.loadTraditionalKey(traditionalKey);
             vigenereCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             vigenereCipherDecrypt = new VigenereCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.VN);
             vigenereCipherDecrypt.init(ITraditionalCipher.SecureMode.DECRYPT);

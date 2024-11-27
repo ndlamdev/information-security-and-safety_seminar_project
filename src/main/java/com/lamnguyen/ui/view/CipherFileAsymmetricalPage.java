@@ -9,8 +9,15 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.CipherAlgorithmConfig;
+import com.lamnguyen.helper.DialogOverFileHelper;
 import com.lamnguyen.helper.DialogProgressHelper;
+import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.helper.ValidationHelper;
+import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
+import com.lamnguyen.model.asymmetrical.IAsymmetrical;
+import com.lamnguyen.model.asymmetrical.decrypt.AASymmetricalDecrypt;
+import com.lamnguyen.model.asymmetrical.decrypt.IASymmetricalDecrypt;
+import com.lamnguyen.model.asymmetrical.encrypt.IASymmetricalEncrypt;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 import com.lamnguyen.model.symmetrical.SymmetricalKey;
 import com.lamnguyen.ui.Application;
@@ -20,10 +27,18 @@ import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
@@ -36,7 +51,7 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
     private SelectCipherAlgorithmComponent selectCipherFileAlgorithmComponent, selectCipherKeyAlgorithmComponent;
     private boolean encrypt = true;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
-    private SymmetricalKey key;
+    private AsymmetricalKey key;
     private final int V_GAP = 20;
     private int heightDrop;
 
@@ -111,7 +126,7 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
     public Void loadFileKey(File file) {
         if (file == null) return null;
         try {
-            key = ISymmetrical.KeyFactory.readKey(file.getAbsolutePath());
+            key = IAsymmetrical.KeyFactory.readKey(file.getAbsolutePath());
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {
@@ -148,9 +163,29 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
             var algEncryptKey = selectCipherKeyAlgorithmComponent.getAlgorithm();
             if (!ValidationHelper.validateAlgorithm(algEncryptKey, process) || !ValidationHelper.validateAlgorithm(algEncryptFile, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateFile(file, process))
                 return;
-            // TODO
+            var cipher = IAsymmetrical.Factory.createEncrypt(algEncryptKey.algorithm());
+            try {
+                cipher.loadKey(key.publicKey());
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                     NoSuchProviderException e) {
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
+                return;
+            }
+            if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
+            try {
+                cipher.encryptFile(ISymmetrical.Algorithms.valueOf(algEncryptFile.algorithm()), algEncryptFile.mode(), algEncryptFile.padding(), file, outputComponent.getFullPath());
+                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                    application.reloadWorkSpaceSync();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IOException | IllegalBlockSizeException | BadPaddingException |
+                     InvalidAlgorithmParameterException | NoSuchPaddingException | NoSuchAlgorithmException |
+                     InvalidKeyException | NoSuchProviderException e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            process.dispose();
         });
-
     }
 
     private void decryptFile() {
@@ -159,7 +194,28 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
             var algDecryptFile = selectCipherKeyAlgorithmComponent.getAlgorithm();
             if (!ValidationHelper.validateAlgorithm(algDecryptFile, process) || !ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(key, process))
                 return;
-            // TODO
+            var cipher = IAsymmetrical.Factory.createDecrypt(algDecryptFile.algorithm());
+            try {
+                cipher.loadKey(key.privateKey());
+            } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
+                     NoSuchProviderException e) {
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
+                return;
+            }
+            if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
+            try {
+                cipher.decryptFile(file, outputComponent.getFullPath());
+                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                    application.reloadWorkSpaceSync();
+                JOptionPane.showMessageDialog(null, "Thành công!");
+            } catch (IOException | IllegalBlockSizeException | BadPaddingException |
+                     InvalidAlgorithmParameterException | NoSuchPaddingException | NoSuchAlgorithmException |
+                     InvalidKeyException | NoSuchProviderException | AASymmetricalDecrypt.HeaderException e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            process.dispose();
         });
     }
 

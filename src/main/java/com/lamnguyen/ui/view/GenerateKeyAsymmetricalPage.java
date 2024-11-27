@@ -9,6 +9,7 @@
 package com.lamnguyen.ui.view;
 
 import com.lamnguyen.config.KeyConfig;
+import com.lamnguyen.helper.DialogOverFileHelper;
 import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.helper.ValidationHelper;
@@ -94,6 +95,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
             try {
                 var file = new File(outputComponent.getFolderDest());
                 if (!file.exists() && !file.mkdirs()) throw new IOException();
+                if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
                 IAsymmetrical.saveKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key, outputComponent.getFullPath());
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpaceSync();

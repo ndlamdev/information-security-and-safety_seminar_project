@@ -11,6 +11,8 @@ package com.lamnguyen.ui.component.tree;
 import com.lamnguyen.helper.FileTransferable;
 
 import javax.swing.*;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -18,11 +20,14 @@ import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class TreeFileComponent extends JScrollPane {
     private String path;
     private JTree tree;
+    private DefaultTreeModel treeModel;
+    private File rootDir;
 
     public TreeFileComponent(String path) {
         this.init();
@@ -31,6 +36,7 @@ public class TreeFileComponent extends JScrollPane {
 
     public TreeFileComponent() {
         this.init();
+        this.event();
     }
 
     private void init() {
@@ -43,25 +49,57 @@ public class TreeFileComponent extends JScrollPane {
         this.setViewportView(tree);
     }
 
+    private void event() {
+        tree.addTreeWillExpandListener(new TreeWillExpandListener() {
+            @Override
+            public void treeWillExpand(TreeExpansionEvent event) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) event.getPath().getLastPathComponent();
+                if (node.getParent() == null) return;
+                node.removeAllChildren(); // Xóa dummy node
+                loadFiles(node, rootDir.getPath() + File.separator + node);
+                treeModel.reload(node); // Cập nhật lại node
+            }
+
+            @Override
+            public void treeWillCollapse(TreeExpansionEvent event) {
+                // Không cần xử lý sự kiện đóng node
+            }
+        });
+    }
+
     public void setPath(String path) {
         this.path = path;
-        var file = new File(path);
-        if (!file.exists()) return;
-        tree.setModel(new DefaultTreeModel(setPathHelper(file), true));
+        rootDir = new File(path);
+        if (!rootDir.exists()) return;
+        load();
         tree.setTransferHandler(new FileTransferHandler(tree, path));
         tree.setVisible(true);
     }
 
-    private DefaultMutableTreeNode setPathHelper(File file) {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode(file.getName(), true);
-        var listFile = file.listFiles(File::isFile);
-        if (listFile != null)
-            Arrays.stream(listFile).forEach(it -> root.add(new DefaultMutableTreeNode(it.getName(), false)));
-        var listDir = file.listFiles(File::isDirectory);
+    private void load() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(rootDir.getName());
+        treeModel = new DefaultTreeModel(root, true);
+        root.removeAllChildren();
+        loadFiles(root, rootDir.getPath());
+        treeModel.reload(root);
+        tree.setModel(treeModel);
+    }
 
-        if (listDir != null)
-            Arrays.stream(listDir).forEach(it -> root.add(setPathHelper(it)));
-        return root;
+    private static void loadFiles(DefaultMutableTreeNode node, String path) {
+        File dir = new File(path);
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles(File::isFile);
+            if (files == null) return;
+            Arrays.sort(files, Comparator.comparing(File::getName));
+            for (File file : files)
+                node.add(new DefaultMutableTreeNode(file.getName(), false));
+
+            files = dir.listFiles(File::isDirectory);
+            if (files == null) return;
+            Arrays.sort(files, Comparator.comparing(File::getName));
+            for (File file : files)
+                node.add(new DefaultMutableTreeNode(file.getName(), true));
+        }
     }
 
     static class FileTransferHandler extends TransferHandler {
@@ -100,5 +138,4 @@ public class TreeFileComponent extends JScrollPane {
             return new FileTransferable(fileList);
         }
     }
-
 }

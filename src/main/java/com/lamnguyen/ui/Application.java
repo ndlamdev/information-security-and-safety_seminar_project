@@ -20,11 +20,13 @@ import com.lamnguyen.ui.controller.navigation.IJNavigation;
 import com.lamnguyen.ui.controller.navigation.impl.JNavigation;
 import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.ui.view.*;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.security.Security;
 
 import static com.lamnguyen.ui.controller.navigation.IJNavigation.NamePage.GenerateTraditionalKeyPage;
 
@@ -42,15 +44,15 @@ public class Application extends JFrame {
     private TreeFileComponent tree;
     private CipherTextSymmetricalPage symmetricalTextPage;
     private CipherTextAsymmetricalPage asymmetricalTextPage;
-    private HashFilePage hashFile;
-    private SignFilePage signFilePage;
-    private VerifySignatureFilePage verifySignatureFilePage;
+    private HashPage hashPage;
+    private SignPage signPage;
+    private VerifySignaturePage verifySignaturePage;
     private GenerateTraditionalKeyPage generateTraditionalKeyPage;
     private CipherTextTraditionalPage traditionalTextPage;
     private int width, height;
     private CipherFileAsymmetricalPage asymmetricalFilePage;
 
-    public Application() {
+    private Application() {
         toolkit = Toolkit.getDefaultToolkit();
         width = toolkit.getScreenSize().width - 200;
         height = toolkit.getScreenSize().height - 100;
@@ -59,6 +61,12 @@ public class Application extends JFrame {
         this.setVisible(true);
         sizeController.onChange();
         reloadWorkSpaceAsync();
+    }
+
+    public static void run() {
+        setupUIManager();
+        Security.addProvider(new BouncyCastleProvider());
+        new Application();
     }
 
     private void init() {
@@ -98,9 +106,9 @@ public class Application extends JFrame {
         panelRight.add(IJNavigation.NamePage.CipherTextTraditionalPage.name(), traditionalTextPage);
         sizeController.addObserver(traditionalTextPage);
 
-        hashFile = new HashFilePage(this);
-        panelRight.add(IJNavigation.NamePage.HashFilePage.name(), hashFile);
-        sizeController.addObserver(hashFile);
+        hashPage = new HashPage(this);
+        panelRight.add(IJNavigation.NamePage.HashPage.name(), hashPage);
+        sizeController.addObserver(hashPage);
 
         generateKeySymmetricalPage = new GenerateKeySymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.GenerateKeySymmetricalPage.name(), generateKeySymmetricalPage);
@@ -114,13 +122,13 @@ public class Application extends JFrame {
         panelRight.add(GenerateTraditionalKeyPage.name(), generateTraditionalKeyPage);
         sizeController.addObserver(generateTraditionalKeyPage);
 
-        signFilePage = new SignFilePage(this);
-        panelRight.add(IJNavigation.NamePage.SignFilePage.name(), signFilePage);
-        sizeController.addObserver(signFilePage);
+        signPage = new SignPage(this);
+        panelRight.add(IJNavigation.NamePage.SignPage.name(), signPage);
+        sizeController.addObserver(signPage);
 
-        verifySignatureFilePage = new VerifySignatureFilePage(this);
-        panelRight.add(IJNavigation.NamePage.VerifySignatureFilePage.name(), verifySignatureFilePage);
-        sizeController.addObserver(verifySignatureFilePage);
+        verifySignaturePage = new VerifySignaturePage(this);
+        panelRight.add(IJNavigation.NamePage.VerifySignaturePage.name(), verifySignaturePage);
+        sizeController.addObserver(verifySignaturePage);
 
         panelLeft = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         addPropertyChangeListenerHelper(panelLeft, height / 7 * 4, height / 7 * 4);
@@ -188,13 +196,13 @@ public class Application extends JFrame {
         });
     }
 
-    public void reloadWorkSpaceSync(){
+    public void reloadWorkSpaceSync() {
         tree.setPath(pathWorkSpace);
         listKey.setPath(pathWorkSpace);
     }
 
 
-    public static void setup() {
+    private static void setupUIManager() {
         FlatMacLightLaf.setup();
 
         UIManager.put("Button.arc", 10);
@@ -218,6 +226,19 @@ public class Application extends JFrame {
     }
 
     public void signFile() {
+        signPage.signFileMode();
+    }
+
+    public void signText() {
+        signPage.signTextMode();
+    }
+
+    public void verifySignatureFile() {
+        verifySignaturePage.verifySignatureFileMode();
+    }
+
+    public void verifySignatureText() {
+        verifySignaturePage.verifySignatureTextMode();
     }
 
     public void encryptTextTraditional() {
@@ -243,5 +264,13 @@ public class Application extends JFrame {
                 sizeController.onChange();
             }
         });
+    }
+
+    public void hashText() {
+        hashPage.hashTextMode();
+    }
+
+    public void hashFile() {
+        hashPage.hashFileMode();
     }
 }

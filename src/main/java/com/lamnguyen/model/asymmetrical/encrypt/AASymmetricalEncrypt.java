@@ -11,6 +11,7 @@ package com.lamnguyen.model.asymmetrical.encrypt;
 import com.lamnguyen.model.asymmetrical.AAsymmetrical;
 import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.model.symmetrical.encrypt.ISymmetricalEncrypt;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -34,23 +35,35 @@ public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASy
     }
 
     @Override
-    public final void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public final void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
         this.key = key;
         initCipher();
         cipher.init(Cipher.ENCRYPT_MODE, key);
     }
 
     @Override
-    public final void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
-        var cipherEncrypt = ISymmetrical.Factory.createEncrypt(algorithm, null, null, sizeKey);
+    public final void encryptFile(ISymmetrical.Algorithms algorithm, String mode, String padding, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
+        ISymmetricalEncrypt cipherEncrypt = initCipher(algorithm, mode, padding);
         var key = cipherEncrypt.getKey();
+        var iv = cipherEncrypt.getIvSpec();
         DataOutputStream output = new DataOutputStream(new FileOutputStream(dest));
-        String base64Encode = encryptStringToBase64(ISymmetrical.encodeKeyToBase64(key));
-        output.writeUTF(algorithm.name());
-        output.writeUTF(base64Encode);
-        output.writeLong(output.size() + 8L);
+        ISymmetrical.save(output, key, iv);
+        output.flush();
+        output.writeLong(output.size() + 8);
         output.close();
         cipherEncrypt.encryptFile(source, dest, true);
+    }
+
+    private ISymmetricalEncrypt initCipher(ISymmetrical.Algorithms algorithm, String mode, String padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
+        return switch (algorithm) {
+            case AES, AESWrap, AESWrapPad -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 128);
+            case Blowfish -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 32);
+            case ChaCha20, ChaCha20Poly1305 -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 256);
+            case DES -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 56);
+            case DESede, DESedeWrap -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 112);
+            case RC2, RC4, ARCFOUR -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 113);
+            case RC5 -> null;
+        };
     }
 
     protected abstract KeyPairGenerator initKeyPairGenerator() throws NoSuchAlgorithmException;

@@ -13,7 +13,7 @@ import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.asymmetrical.AsymmetricalKey;
 import com.lamnguyen.model.asymmetrical.IAsymmetrical;
-import com.lamnguyen.model.signature.ISignFile;
+import com.lamnguyen.model.signature.ISign;
 import com.lamnguyen.model.signature.impl.SignFileImpl;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
@@ -24,6 +24,7 @@ import com.lamnguyen.ui.controller.SubjectSizeController;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -33,7 +34,7 @@ import java.security.SignatureException;
 import java.util.Observable;
 import java.util.Observer;
 
-public class SignFilePage extends JPanel implements Observer {
+public class SignPage extends JPanel implements Observer {
     private final Application application;
     private DropAndDragComponent dropAndDragComponent;
     private InputKeyComponent inputKeyComponent;
@@ -42,11 +43,17 @@ public class SignFilePage extends JPanel implements Observer {
     private AsymmetricalKey key;
     private OutputInputTextComponent resultComponent;
     private final int V_GAP = 20;
+    private CardLayout cardLayoutPanelInput;
+    private JPanel panelInput;
+    private OutputInputTextComponent inputTextComponent;
+    private boolean fileMode;
+    private JButton action;
 
 
-    public SignFilePage(Application application) {
+    public SignPage(Application application) {
         this.application = application;
         this.init();
+        this.event();
     }
 
     private void init() {
@@ -54,8 +61,20 @@ public class SignFilePage extends JPanel implements Observer {
 
         this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, V_GAP));
 
+        cardLayoutPanelInput = new CardLayout();
+        panelInput = new JPanel(cardLayoutPanelInput) {{
+            setOpaque(false);
+        }};
+        this.add(panelInput);
+
         dropAndDragComponent = new DropAndDragComponent();
-        this.add(dropAndDragComponent);
+        panelInput.add(new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0)) {{
+            setOpaque(false);
+            add(dropAndDragComponent);
+        }}, "file");
+
+        inputTextComponent = new OutputInputTextComponent("Nhập văn bản");
+        panelInput.add(inputTextComponent, "text");
 
         inputKeyComponent = new InputKeyComponent(this::loadFileKey);//100
         this.add(inputKeyComponent);
@@ -65,16 +84,22 @@ public class SignFilePage extends JPanel implements Observer {
         this.add(selectAlgorithmComponent);
         sizeController.addObserver(selectAlgorithmComponent);
 
-        this.add(new JButton("Ký") {{
+        action = new JButton("Ký") {{
             setPreferredSize(new Dimension(500, 50));
-            addActionListener(action -> signFile());
-        }}); // 50
+            addActionListener(action -> {
+                if (fileMode) signFile();
+                else signText();
+            });
+        }};
+        this.add(action); // 50
 
         resultComponent = new OutputInputTextComponent("Chữ kí file!") {{
             setEditable(false);
             clickToCopy(true);
         }};
         this.add(resultComponent);
+
+        signFileMode();
     }
 
 
@@ -82,16 +107,38 @@ public class SignFilePage extends JPanel implements Observer {
         DialogProgressHelper.runProcess(process -> {
             var file = dropAndDragComponent.getPathFile();
             var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateFile(file, process))
+            if (!ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(key, process))
                 return;
 
             try {
-                ISignFile signer = SignFileImpl.getInstance(alg, key.privateKey());
-                resultComponent.setTextJTextArea(signer.sign(file));
+                ISign signer = SignFileImpl.getInstance(alg, key.privateKey());
+                setSignatureString(signer.signFile(file));
+                JOptionPane.showMessageDialog(null, "Ký file thành công!");
             } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
                 process.dispose();
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
             } catch (IOException | SignatureException e) {
+                JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            process.dispose();
+        });
+    }
+
+    private void signText() {
+        DialogProgressHelper.runProcess(process -> {
+            var text = inputTextComponent.getText();
+            var alg = selectAlgorithmComponent.getAlgorithm();
+            if (!ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+                return;
+
+            try {
+                ISign signer = SignFileImpl.getInstance(alg, key.privateKey());
+                setSignatureString(signer.signText(text));
+                JOptionPane.showMessageDialog(null, "Ký file thành công!");
+            } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
+                process.dispose();
+                JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (SignatureException e) {
                 JOptionPane.showMessageDialog(null, "Thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
             }
             process.dispose();
@@ -111,10 +158,50 @@ public class SignFilePage extends JPanel implements Observer {
         return null;
     }
 
+    private void event() {
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control F"), "Ctrl_F");
+        getActionMap().put("Ctrl_F", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SignPage.this.signFileMode();
+            }
+        });
+
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control T"), "Ctrl_T");
+        getActionMap().put("Ctrl_T", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SignPage.this.signTextMode();
+            }
+        });
+    }
+
+    public void signFileMode() {
+        if (fileMode) return;
+        fileMode = true;
+        cardLayoutPanelInput.show(panelInput, "file");
+        action.setText("Ký file");
+        setSignatureString("");
+    }
+
+    public void signTextMode() {
+        if (!fileMode) return;
+        fileMode = false;
+        cardLayoutPanelInput.show(panelInput, "text");
+        action.setText("Ký văn bản");
+        setSignatureString("");
+    }
+
+    private void setSignatureString(String signature) {
+        resultComponent.setTextJTextArea(signature);
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         var sizeParent = this.getParent().getSize();
         resultComponent.setCustomSize(new Dimension(sizeParent.width - 200, 70));
+        panelInput.setPreferredSize(new Dimension(sizeParent.width - 200, sizeParent.height - V_GAP * 6 - 50 - 110 - 150 - resultComponent.getHeight()));
         dropAndDragComponent.setCustomSize(new Dimension(sizeParent.width - 400, sizeParent.height - V_GAP * 6 - 50 - 110 - 150 - resultComponent.getHeight()));
+        inputTextComponent.setCustomSize(panelInput.getSize());
     }
 }

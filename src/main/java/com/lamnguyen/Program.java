@@ -9,14 +9,9 @@
 package com.lamnguyen;
 
 import com.lamnguyen.ui.Application;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import java.security.Security;
 
 public class Program {
     public static void main(String[] args) {
-        Application.setup();
-        Security.addProvider(new BouncyCastleProvider());
-        new Application();
+        Application.run();
     }
 }

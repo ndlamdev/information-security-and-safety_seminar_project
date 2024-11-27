@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.security.*;
 
 public interface IASymmetricalDecrypt {
-    void loadKey(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
+    void loadKey(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException;
 
     byte[] decrypt(byte[] data) throws IllegalBlockSizeException, BadPaddingException;
 
@@ -25,7 +25,7 @@ public interface IASymmetricalDecrypt {
 
     void decryptFile(String source, String dest) throws AASymmetricalDecrypt.HeaderException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, IOException, BadPaddingException, NoSuchProviderException;
 
-     class HeaderException extends Exception {
+    class HeaderException extends Exception {
 
         public HeaderException(String message) {
             super(message);

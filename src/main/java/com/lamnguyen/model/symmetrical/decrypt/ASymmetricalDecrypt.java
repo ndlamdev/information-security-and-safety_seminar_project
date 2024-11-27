@@ -70,7 +70,7 @@ public abstract class ASymmetricalDecrypt extends ASymmetrical implements ISymme
         if (input.skip(skip) != skip) throw new IOException();
         byte[] buffer = new byte[10 * 1024];
         var bytesRead = 0;
-        var total = file.length();
+        var total = file.length() - skip;
         while ((bytesRead = input.read(buffer)) != -1) {
             if (total <= bytesRead) {
                 output.write(PaddingUtil.removePadding(cipher.doFinal(Arrays.copyOf(buffer, bytesRead))));

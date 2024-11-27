@@ -10,6 +10,7 @@ package com.lamnguyen.model.asymmetrical.decrypt;
 
 import com.lamnguyen.model.asymmetrical.AAsymmetrical;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
+import com.lamnguyen.model.symmetrical.SymmetricalKey;
 
 import javax.crypto.*;
 import java.io.DataInputStream;
@@ -23,7 +24,7 @@ import java.util.Base64;
 public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASymmetricalDecrypt {
     protected PrivateKey key;
 
-    public AASymmetricalDecrypt(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public AASymmetricalDecrypt(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
         this.loadKey(key);
     }
 
@@ -35,7 +36,7 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
         HeaderFileEncrypt header = loadHeader(source);
         if (header == null) throw new HeaderException("Không tồn tại header");
 
-        ISymmetrical.Factory.createDecrypt(header.algorithm, null, null, null).decryptFile(source, dest, header.skip);
+        ISymmetrical.Factory.createDecrypt(header.algorithm, header.mode(), header.padding, header.key).decryptFile(source, dest, header.skip);
     }
 
     private HeaderFileEncrypt loadHeader(String source) {
@@ -45,38 +46,30 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
         } catch (FileNotFoundException e) {
             return null;
         }
+
         try {
-            String algorithm = input.readUTF();
-            String base64Encode = input.readUTF();
+            var result = ISymmetrical.KeyFactory.readKey(input);
             long skip = input.readLong();
+            var arr = result.key().getAlgorithm().split("/");
+            HeaderFileEncrypt re;
+            if (arr.length == 1) re = new HeaderFileEncrypt(result, arr[0], null, null, skip);
+            else re = new HeaderFileEncrypt(result, arr[0], arr[1], arr[2], skip);
             input.close();
-            ISymmetrical.Algorithms alg;
-            try {
-                alg = ISymmetrical.Algorithms.valueOf(algorithm);
-            } catch (Exception e) {
-                return null;
-            }
-            String decodeKey = decryptBase64ToString(base64Encode);
-            SecretKey key = ISymmetrical.generateKeyByEncodeKey(decodeKey, algorithm);
-            if (key == null) {
-                return null;
-            }
-            return new HeaderFileEncrypt(key, alg, skip);
-        } catch (IOException | IllegalBlockSizeException | RuntimeException | BadPaddingException e) {
-            e.printStackTrace();
+            return re;
+        } catch (IOException e) {
             return null;
         }
     }
 
 
     @Override
-    public final void loadKey(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+    public final void loadKey(PrivateKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
         this.key = key;
         initCipher();
         cipher.init(Cipher.DECRYPT_MODE, key);
     }
 
-    private record HeaderFileEncrypt(SecretKey key, ISymmetrical.Algorithms algorithm, long skip) {
+    private record HeaderFileEncrypt(SymmetricalKey key, String algorithm, String mode, String padding, long skip) {
     }
 
     @Override

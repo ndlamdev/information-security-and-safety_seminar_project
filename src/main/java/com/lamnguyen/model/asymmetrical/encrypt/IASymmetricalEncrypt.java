@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.security.*;
 
 public interface IASymmetricalEncrypt {
-    void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException;
+    void loadKey(PublicKey key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException;
 
     AsymmetricalKey generateKey(int size) throws NoSuchAlgorithmException;
 
@@ -28,5 +28,5 @@ public interface IASymmetricalEncrypt {
 
     String encryptStringToBase64(String data) throws IllegalBlockSizeException, BadPaddingException;
 
-    void encryptFile(ISymmetrical.Algorithms algorithm, int sizeKey, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException;
+    void encryptFile(ISymmetrical.Algorithms algorithm, String mode, String padding, String source, String dest) throws IOException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException;
 }

@@ -83,10 +83,11 @@ public class VigenereCipher extends ATraditionalCipher {
     }
 
     @Override
-    public void loadKey(TraditionalKey<?> traditionalKey) throws Exception {
+    public void loadTraditionalKey(TraditionalKey<?> traditionalKey) throws Exception {
         try {
             var stringKey = (String) traditionalKey.contentKey();
             this.key = CharSetConfig.encodeStringToArrayCharEncode(stringKey, mapChar, new HashMap<>());
+            this.traditionalKey = traditionalKey;
         } catch (Exception e) {
             throw new Exception("Key must be a String!");
         }

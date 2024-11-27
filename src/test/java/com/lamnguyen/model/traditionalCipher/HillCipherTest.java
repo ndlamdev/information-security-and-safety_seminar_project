@@ -28,7 +28,7 @@ public class HillCipherTest {
 
     public void algorithmWIthKeyTest(String data, int[][] key) throws Exception {
         hillCipherEncrypt = new HillCipher(ITraditionalCipher.SecureLanguage.VN);
-        hillCipherEncrypt.loadKey(new TraditionalKey<>(key));
+        hillCipherEncrypt.loadTraditionalKey(new TraditionalKey<>(key));
         hillCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
         hillCipherDecrypt = new HillCipher(key, ITraditionalCipher.SecureLanguage.VN);
         hillCipherDecrypt.init(ITraditionalCipher.SecureMode.DECRYPT);
@@ -52,7 +52,7 @@ public class HillCipherTest {
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
             traditionalKey = (TraditionalKey<int[][]>) hillCipherEncrypt.generateKey("2");
-            hillCipherEncrypt.loadKey(traditionalKey);
+            hillCipherEncrypt.loadTraditionalKey(traditionalKey);
             hillCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             hillCipherDecrypt = new HillCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.VN);
             hillCipherDecrypt.init(ITraditionalCipher.SecureMode.DECRYPT);
@@ -76,7 +76,7 @@ public class HillCipherTest {
         var repeat = 1000;
         while (repeat-- > 0 && data.equals(decrypted)) {
             traditionalKey = (TraditionalKey<int[][]>) hillCipherEncrypt.generateKey("3");
-            hillCipherEncrypt.loadKey(traditionalKey);
+            hillCipherEncrypt.loadTraditionalKey(traditionalKey);
             hillCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             hillCipherDecrypt = new HillCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.EN);
             hillCipherDecrypt.init(ITraditionalCipher.SecureMode.DECRYPT);

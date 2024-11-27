@@ -58,7 +58,7 @@ public class MainMenuController implements ActionListener {
             mainMenu.changePageDecryptSymmetricalText();
             return;
         }
-        
+
         if (jMenuItem.equals(mainMenu.getEncryptTextTraditionalMenuItem())) {
             mainMenu.changePageEncryptTraditionalText();
             return;
@@ -79,8 +79,23 @@ public class MainMenuController implements ActionListener {
             return;
         }
 
+        if (jMenuItem.equals(mainMenu.getHashFileMenuItem())) {
+            mainMenu.changePageHashFile();
+            return;
+        }
+
+        if (jMenuItem.equals(mainMenu.getHashTextMenuItem())) {
+            mainMenu.changePageHashText();
+            return;
+        }
+
         if (jMenuItem.equals(mainMenu.getSignFileMenuItem())) {
             mainMenu.changePageSignFile();
+            return;
+        }
+
+        if (jMenuItem.equals(mainMenu.getSignTextMenuItem())) {
+            mainMenu.changePageSignText();
             return;
         }
 
@@ -89,8 +104,8 @@ public class MainMenuController implements ActionListener {
             return;
         }
 
-        if (jMenuItem.equals(mainMenu.getHashMenuItem())) {
-            mainMenu.changePageHashFile();
+        if (jMenuItem.equals(mainMenu.getVerifySignatureTextMenuItem())) {
+            mainMenu.changePageVerifySignatureText();
             return;
         }
 
@@ -104,7 +119,7 @@ public class MainMenuController implements ActionListener {
             return;
         }
 
-        if (jMenuItem.equals(mainMenu.getTraditionalKey())) {
+        if (jMenuItem.equals(mainMenu.getTraditionalKeyMenuItem())) {
             mainMenu.changePageGenerateTraditionalKey();
             return;
         }

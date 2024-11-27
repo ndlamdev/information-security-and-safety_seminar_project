@@ -9,7 +9,7 @@
 package com.lamnguyen.model.traditionalCipher;
 
 public interface ITraditionalCipherImpl {
-    TraditionalKey<?> getKey();
+    TraditionalKey<?> getTraditionalKey();
 
     byte[] doFinal(byte[] data) throws Exception;
 

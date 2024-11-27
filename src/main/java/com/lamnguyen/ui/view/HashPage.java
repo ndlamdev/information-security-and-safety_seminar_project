@@ -12,7 +12,6 @@ import com.lamnguyen.config.HashAlgorithmConfig;
 import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.ValidationHelper;
 import com.lamnguyen.model.hash.IHash;
-import com.lamnguyen.model.hash.impl.HashImpl;
 import com.lamnguyen.ui.Application;
 import com.lamnguyen.ui.component.dropAndDrag.DropAndDragComponent;
 import com.lamnguyen.ui.component.input.OutputInputTextComponent;
@@ -67,7 +66,7 @@ public class HashPage extends JPanel implements Observer {
             add(dropAndDragComponent);
         }}, "file");
 
-        inputTextComponent = new OutputInputTextComponent("Nhập văn bảng");
+        inputTextComponent = new OutputInputTextComponent("Nhập văn bản");
         panelInput.add(inputTextComponent, "text");
 
         selectHashAlgorithmComponent = new SelectHashAlgorithmComponent(this);
@@ -89,6 +88,8 @@ public class HashPage extends JPanel implements Observer {
             clickToCopy(true);
         }};
         this.add(output);
+
+        hashFileMode();
     }
 
     private void event() {
@@ -104,7 +105,7 @@ public class HashPage extends JPanel implements Observer {
         getActionMap().put("Ctrl_T", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                HashPage.this.hashTextFile();
+                HashPage.this.hashTextMode();
             }
         });
     }
@@ -166,11 +167,11 @@ public class HashPage extends JPanel implements Observer {
         selectHashAlgorithmComponent.setListAlg(HashAlgorithmConfig.getInstance().getHashAlgForFile());
     }
 
-    public void hashTextFile() {
+    public void hashTextMode() {
         if (!fileMode) return;
         fileMode = false;
         cardLayoutPanelInput.show(panelInput, "text");
-        action.setText("Hash text");
+        action.setText("Hash văn bản");
         setHashString("");
         selectHashAlgorithmComponent.setListAlg(HashAlgorithmConfig.getInstance().getHashAlgForText());
     }

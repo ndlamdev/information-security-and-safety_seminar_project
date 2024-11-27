@@ -67,8 +67,8 @@ public class ListKeyComponent extends JPanel implements Observer {
     }
 
     private void repaintKeys() {
-        panelListKey.setPreferredSize(new Dimension(scroll.getPreferredSize().width - 25, keys == null ? 0 : (keys.size() + 1) * 50)); //keys == null ? 0 : (keys.size() + 1) * 50
-        Arrays.stream(panelListKey.getComponents()).forEach(it -> it.setPreferredSize(new Dimension(panelListKey.getPreferredSize().width - 50, 50)));
+        panelListKey.setPreferredSize(new Dimension(scroll.getPreferredSize().width - 25, keys == null ? 0 : keys.size() * 50 + 85)); //keys == null ? 0 : (keys.size() + 1) * 50
+        Arrays.stream(panelListKey.getComponents()).forEach(it -> it.setPreferredSize(new Dimension(panelListKey.getPreferredSize().width - 25, 50)));
         panelListKey.updateUI();
         this.updateUI();
     }
@@ -91,6 +91,8 @@ public class ListKeyComponent extends JPanel implements Observer {
 
     public void setPath(String path) {
         this.path = path;
-        setListKey(getListKey(path));
+        var keys =  getListKey(path);
+        keys.sort(String::compareTo);
+        setListKey(keys);
     }
 }

@@ -12,11 +12,11 @@ import java.util.Map;
 
 public abstract class ATraditionalCipherImpl implements ITraditionalCipherImpl {
     protected final Map<Character, Integer> mapChar;
-    protected TraditionalKey<?> key;
+    protected TraditionalKey<?> traditionalKey;
 
     public ATraditionalCipherImpl(TraditionalKey<?> key, Map<Character, Integer> mapChar) {
         this.mapChar = mapChar;
-        this.key = key;
+        this.traditionalKey = key;
     }
 
     protected ATraditionalCipherImpl(Map<Character, Integer> mapChar) {
@@ -24,8 +24,8 @@ public abstract class ATraditionalCipherImpl implements ITraditionalCipherImpl {
     }
 
     @Override
-    public TraditionalKey<?> getKey() {
-        return this.key;
+    public TraditionalKey<?> getTraditionalKey() {
+        return this.traditionalKey;
     }
 }
 

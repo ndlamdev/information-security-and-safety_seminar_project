@@ -115,9 +115,11 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
             TraditionalKey<?> key;
             try {
                 key = cipher.generateKey(size);
-                cipher.loadKey(key);
+                cipher.loadTraditionalKey(key);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                JOptionPane.showMessageDialog(null, "Tạo khóa thất bại.", "Error", JOptionPane.ERROR_MESSAGE);
+                process.dispose();
+                return;
             }
 
             var contentKey = key.contentKey();
@@ -151,7 +153,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
 
     private void saveKey() {
         DialogProgressHelper.runProcess(process -> {
-            if (!ValidationHelper.validateKeyGenerate(cipher.getKey(), process))
+            if (!ValidationHelper.validateKeyGenerate(cipher, process))
                 return;
 
 

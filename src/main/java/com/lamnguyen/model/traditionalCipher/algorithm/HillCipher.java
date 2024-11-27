@@ -106,9 +106,10 @@ public class HillCipher extends ATraditionalCipher {
     }
 
     @Override
-    public void loadKey(TraditionalKey<?> traditionalKey) throws Exception {
+    public void loadTraditionalKey(TraditionalKey<?> traditionalKey) throws Exception {
         try {
             this.key = (int[][]) traditionalKey.contentKey();
+            this.traditionalKey = traditionalKey;
         } catch (Exception e) {
             throw new Exception("Key must be a int[][]!");
         }

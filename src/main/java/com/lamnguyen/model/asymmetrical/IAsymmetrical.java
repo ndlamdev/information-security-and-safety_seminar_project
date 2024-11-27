@@ -8,6 +8,11 @@
 
 package com.lamnguyen.model.asymmetrical;
 
+import com.lamnguyen.model.asymmetrical.decrypt.IASymmetricalDecrypt;
+import com.lamnguyen.model.asymmetrical.decrypt.RSADecrypt;
+import com.lamnguyen.model.asymmetrical.encrypt.IASymmetricalEncrypt;
+import com.lamnguyen.model.asymmetrical.encrypt.RSAEncrypt;
+
 import java.io.*;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -31,6 +36,52 @@ public interface IAsymmetrical {
         DSA,
         RSA,
         ECIES
+    }
+
+    class Factory {
+        public static IASymmetricalEncrypt createEncrypt(Algorithms algorithm) {
+            return switch (algorithm) {
+                case RSA -> new RSAEncrypt();
+                case null, default -> null;
+            };
+        }
+
+        public static IASymmetricalEncrypt createEncrypt(Algorithms algorithm, String mode, String padding) {
+            return switch (algorithm) {
+                case RSA -> new RSAEncrypt(mode, padding);
+                case null, default -> null;
+            };
+        }
+
+        public static IASymmetricalEncrypt createEncrypt(String algorithm, String mode, String padding) {
+            return createEncrypt(Algorithms.valueOf(algorithm), mode, padding);
+        }
+
+        public static IASymmetricalEncrypt createEncrypt(String algorithm) {
+            return createEncrypt(Algorithms.valueOf(algorithm));
+        }
+
+        public static IASymmetricalDecrypt createDecrypt(Algorithms algorithm) {
+            return switch (algorithm) {
+                case RSA -> new RSADecrypt();
+                case null, default -> null;
+            };
+        }
+
+        public static IASymmetricalDecrypt createDecrypt(Algorithms algorithm, String mode, String padding) {
+            return switch (algorithm) {
+                case RSA -> new RSADecrypt(mode, padding);
+                case null, default -> null;
+            };
+        }
+
+        public static IASymmetricalDecrypt createDecrypt(String algorithm) {
+            return createDecrypt(Algorithms.valueOf(algorithm));
+        }
+
+        public static IASymmetricalDecrypt createDecrypt(String algorithm, String mode, String padding) {
+            return createDecrypt(Algorithms.valueOf(algorithm), mode, padding);
+        }
     }
 
     class KeyFactory {

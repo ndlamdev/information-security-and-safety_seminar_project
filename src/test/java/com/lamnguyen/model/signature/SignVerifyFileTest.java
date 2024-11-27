@@ -18,8 +18,8 @@ import java.io.IOException;
 import java.security.*;
 
 public class SignVerifyFileTest {
-    private static ISignFile sign;
-    private static IVerifySignatureFile verify;
+    private static ISign sign;
+    private static IVerifySignature verify;
     private static String file;
 
     @BeforeAll
@@ -34,8 +34,8 @@ public class SignVerifyFileTest {
 
     @Test
     public void test() throws IOException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException {
-        String signature = sign.sign(file);
+        String signature = sign.signFile(file);
         System.out.println(signature);
-        Assertions.assertTrue(verify.verify(file, signature));
+        Assertions.assertTrue(verify.verifyFile(file, signature));
     }
 }

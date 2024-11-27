@@ -47,7 +47,7 @@ public class AffineCipherTest {
         while (repeat-- > 0 && data.equals(decrypted)) {
             traditionalKey = (TraditionalKey<AffineCipher.AffineKey>) affineCipherEncrypt.generateKey("100");
             System.out.println(traditionalKey.contentKey());
-            affineCipherEncrypt.loadKey(traditionalKey);
+            affineCipherEncrypt.loadTraditionalKey(traditionalKey);
             System.out.println(traditionalKey.contentKey());
             affineCipherEncrypt.init(ITraditionalCipher.SecureMode.ENCRYPT);
             affineCipherDecrypt = new AffineCipher(traditionalKey.contentKey(), ITraditionalCipher.SecureLanguage.VN);

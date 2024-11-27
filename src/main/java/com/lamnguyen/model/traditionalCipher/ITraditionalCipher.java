@@ -23,7 +23,7 @@ public interface ITraditionalCipher extends ITraditionalCipherImpl {
 
     TraditionalKey<?> generateKey(String size) throws Exception;
 
-    void loadKey(TraditionalKey<?> traditionalKey) throws Exception;
+    void loadTraditionalKey(TraditionalKey<?> traditionalKey) throws Exception;
 
     void saveKey(String file) throws IOException;
 

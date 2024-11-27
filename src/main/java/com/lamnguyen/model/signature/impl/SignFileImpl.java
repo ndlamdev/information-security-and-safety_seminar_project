@@ -8,28 +8,45 @@
 
 package com.lamnguyen.model.signature.impl;
 
-import com.lamnguyen.model.signature.ISignFile;
-import com.lamnguyen.model.signature.ISignVerifyFile;
+import com.lamnguyen.model.signature.ISign;
+import com.lamnguyen.model.signature.ISignAndVerifyHelper;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
 
-public class SignFileImpl implements ISignFile {
+public class SignFileImpl implements ISign {
     private static Signature signature;
 
-    private SignFileImpl(String algorithm, PrivateKey key) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+    private SignFileImpl(String algorithm, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException {
         signature = Signature.getInstance(algorithm);
         signature.initSign(key);
     }
 
-    public static ISignFile getInstance(String algorithm, PrivateKey key) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+    private SignFileImpl(String algorithm, String mode, String padding, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
+        String extension = (mode == null || mode.isBlank() ? "" : "/" + mode) + (padding == null || padding.isBlank() ? "" : "/" + padding);
+        signature = Signature.getInstance(algorithm + extension, "SunJCE");
+        signature.initSign(key);
+    }
+
+    public static ISign getInstance(String algorithm, PrivateKey key) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
         return new SignFileImpl(algorithm, key);
     }
 
+    public static ISign getInstance(String algorithm, String mode, String padding, PrivateKey key) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
+        return new SignFileImpl(algorithm, mode, padding, key);
+    }
+
     @Override
-    public String sign(String source) throws IOException, SignatureException {
-        ISignVerifyFile.signVerifyHelper(signature, source);
+    public String signFile(String source) throws IOException, SignatureException {
+        ISignAndVerifyHelper.signVerifyHelper(signature, source);
+        return Base64.getEncoder().encodeToString(signature.sign());
+    }
+
+    @Override
+    public String signText(String text) throws SignatureException {
+        signature.update(text.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(signature.sign());
     }
 }
