@@ -10,13 +10,19 @@ package com.lamnguyen.config;
 
 import lombok.Getter;
 
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HashAlgorithmConfig {
     @Getter
-    private List<String> hashs;
+    private List<String> hashAlgForText, hashAlgForFile;
     private static HashAlgorithmConfig instance;
+    private List<String> hashAlgNotForFile = new ArrayList<>() {{
+        add("HARAKA-256");
+        add("HARAKA-512");
+    }};
 
     private HashAlgorithmConfig() {
         initAlgorithms();
@@ -29,20 +35,8 @@ public class HashAlgorithmConfig {
 
 
     private void initAlgorithms() {
-        hashs = new ArrayList<>(){{
-            add("MD2");
-            add("MD5");
-            add("SHA-1");
-            add("SHA-224");
-            add("SHA-256");
-            add("SHA-384");
-            add("SHA-512");
-            add("SHA-512/224");
-            add("SHA-512/256");
-            add("SHA3-224");
-            add("SHA3-256");
-            add("SHA3-384");
-            add("SHA3-512");
-        }};
+        hashAlgForText = new ArrayList<>(Security.getAlgorithms("MessageDigest"));
+        hashAlgForFile = Security.getAlgorithms("MessageDigest").stream().filter(it -> !hashAlgNotForFile.contains(it)).toList();
+        hashAlgForText.add("BCrypt");
     }
 }

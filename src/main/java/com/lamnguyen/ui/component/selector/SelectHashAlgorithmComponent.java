@@ -9,10 +9,11 @@
 package com.lamnguyen.ui.component.selector;
 
 import com.lamnguyen.config.HashAlgorithmConfig;
-import com.lamnguyen.ui.view.HashFilePage;
+import com.lamnguyen.ui.view.HashPage;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -20,9 +21,9 @@ public class SelectHashAlgorithmComponent extends JPanel implements Observer {
     private final int RADIUS = 20;
     private final int STROKE_WIDTH = 2;
     private JComboBox<String> jcbAlgorithm;
-    private final HashFilePage hashFilePage;
+    private final HashPage hashFilePage;
 
-    public SelectHashAlgorithmComponent(HashFilePage hashFilePage) {
+    public SelectHashAlgorithmComponent(HashPage hashFilePage) {
         this.hashFilePage = hashFilePage;
         this.setOpaque(false);
         this.init();
@@ -33,9 +34,9 @@ public class SelectHashAlgorithmComponent extends JPanel implements Observer {
     }
 
     private void init() {
-        this.setBorder(BorderFactory.createEmptyBorder(25, 20, 20, 20));
+        this.setBorder(BorderFactory.createEmptyBorder(25, 10, 20, 20));
 
-        jcbAlgorithm = new JComboBox<>(HashAlgorithmConfig.getInstance().getHashs().toArray(String[]::new)) {{
+        jcbAlgorithm = new JComboBox<>(HashAlgorithmConfig.getInstance().getHashAlgForFile().toArray(String[]::new)) {{
             addActionListener(actionEvent -> {
                 hashFilePage.setHashString("");
             });
@@ -73,6 +74,10 @@ public class SelectHashAlgorithmComponent extends JPanel implements Observer {
     public void update(Observable observable, Object o) {
         var sizeParent = getParent().getWidth();
         this.setPreferredSize(new Dimension(sizeParent - 200, 100));
-        jcbAlgorithm.setPreferredSize(new Dimension(sizeParent - 300, 50));
+        jcbAlgorithm.setPreferredSize(new Dimension(sizeParent - 250, 50));
+    }
+
+    public void setListAlg(List<String> listAlg) {
+        jcbAlgorithm.setModel(new DefaultComboBoxModel<>(listAlg.toArray(String[]::new)));
     }
 }

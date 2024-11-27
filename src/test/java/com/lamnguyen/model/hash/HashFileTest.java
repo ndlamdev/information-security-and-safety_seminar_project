@@ -9,7 +9,7 @@
 package com.lamnguyen.model.hash;
 
 import com.lamnguyen.config.HashAlgorithmConfig;
-import com.lamnguyen.model.hash.impl.HashFileImpl;
+import com.lamnguyen.model.hash.impl.HashImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +26,14 @@ public class HashFileTest {
 
     @Test
     public void md5Test() throws NoSuchAlgorithmException, IOException {
-        System.out.println(HashFileImpl.getInstance("MD5").hash(file));
+        System.out.println(HashImpl.getInstance("MD5").hashFile(file));
     }
 
     @Test
     public void allTest() {
-        HashAlgorithmConfig.getInstance().getHashs().forEach(it -> {
+        HashAlgorithmConfig.getInstance().getHashAlgForText().forEach(it -> {
             try {
-                System.out.println(HashFileImpl.getInstance(it).hash(file));
+                System.out.println(HashImpl.getInstance(it).hashFile(file));
             } catch (NoSuchAlgorithmException | IOException e) {
                 e.printStackTrace();
             }
