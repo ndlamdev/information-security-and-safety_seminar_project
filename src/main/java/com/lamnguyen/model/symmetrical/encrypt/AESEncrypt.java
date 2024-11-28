@@ -19,7 +19,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
-import java.util.Base64;
 
 @NoArgsConstructor
 public class AESEncrypt extends ASymmetricalEncrypt {

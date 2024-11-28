@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainMenuController implements ActionListener {
-    private MainMenu mainMenu;
+    private final MainMenu mainMenu;
 
     public MainMenuController(MainMenu mainMenu) {
         this.mainMenu = mainMenu;
@@ -126,7 +126,6 @@ public class MainMenuController implements ActionListener {
 
         if (jMenuItem.equals(mainMenu.getOpenWorkSpace())) {
             mainMenu.selectWorkSpace();
-            return;
         }
     }
 }

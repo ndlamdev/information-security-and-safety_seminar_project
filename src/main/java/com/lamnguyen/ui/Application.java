@@ -9,6 +9,7 @@
 package com.lamnguyen.ui;
 
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.FileChooseHelper;
 import com.lamnguyen.helper.IconResizeHelper;
 import com.lamnguyen.helper.SettingHelper;
@@ -18,15 +19,12 @@ import com.lamnguyen.ui.component.tree.TreeFileComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
 import com.lamnguyen.ui.controller.navigation.IJNavigation;
 import com.lamnguyen.ui.controller.navigation.impl.JNavigation;
-import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.ui.view.*;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.security.Security;
 
 import static com.lamnguyen.ui.controller.navigation.IJNavigation.NamePage.GenerateTraditionalKeyPage;
 
@@ -65,7 +63,6 @@ public class Application extends JFrame {
 
     public static void run() {
         setupUIManager();
-        Security.addProvider(new BouncyCastleProvider());
         new Application();
     }
 
