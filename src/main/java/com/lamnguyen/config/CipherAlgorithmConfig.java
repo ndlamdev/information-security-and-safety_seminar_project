@@ -13,6 +13,7 @@ import com.lamnguyen.model.asymmetrical.IAsymmetrical;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class CipherAlgorithmConfig {
@@ -25,6 +26,8 @@ public class CipherAlgorithmConfig {
 
     private CipherAlgorithmConfig() {
         initAlgorithms();
+        algorithmSymmetrical.sort(Comparator.comparing(algorithm -> algorithm.alg));
+        algorithmAsymmetrical.sort(Comparator.comparing(algorithm -> algorithm.alg));
     }
 
     public static CipherAlgorithmConfig getInstance() {
@@ -34,45 +37,41 @@ public class CipherAlgorithmConfig {
 
 
     private void initAlgorithms() {
+        var modes = new ArrayList<String>() {{
+            add("");
+            add("CBC");
+            add("ECB");
+            add("CFB");
+        }};
+        var paddings = new ArrayList<String>() {{
+            add("");
+            add("PKCS5Padding");
+            add("PKCS7Padding");
+            add("ISO10126Padding");
+            add("X9.23Padding");
+        }};
         algorithmSymmetrical = new ArrayList<>() {{
-            add(new Algorithm(ISymmetrical.Algorithms.AES.name(), new ArrayList<>() {{
-                add("");
-                add("CBC");
-                add("ECB");
-            }}, new ArrayList<>() {{
-                add("");
+            add(new Algorithm(ISymmetrical.Algorithms.AES.name(), modes, new ArrayList<>(paddings) {{
                 add("NoPadding");
-                add("PKCS5Padding");
             }}));
-            add(new Algorithm(ISymmetrical.Algorithms.DES.name(), new ArrayList<>() {{
-                add("");
-                add("CBC");
-                add("ECB");
-            }}, new ArrayList<>() {{
-                add("");
+            add(new Algorithm(ISymmetrical.Algorithms.DES.name(), modes, new ArrayList<>(paddings) {{
                 add("NoPadding");
-                add("PKCS5Padding");
             }}));
-            add(new Algorithm(ISymmetrical.Algorithms.DESede.name(), new ArrayList<>() {{
-                add("");
-                add("CBC");
-                add("ECB");
-            }}, new ArrayList<>() {{
-                add("");
-                add("NoPadding");
-                add("PKCS5Padding");
-            }}));
+            add(new Algorithm(ISymmetrical.Algorithms.DESede.name(), modes, paddings));
+            add(new Algorithm(ISymmetrical.Algorithms.Camellia.name(), modes, paddings));
+            add(new Algorithm(ISymmetrical.Algorithms.Blowfish.name(), modes,paddings));
             add(new Algorithm(ISymmetrical.Algorithms.AESWrap.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.AESWrapPad.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.ARCFOUR.name(), new ArrayList<>(), new ArrayList<>()));
-            add(new Algorithm(ISymmetrical.Algorithms.Blowfish.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.ChaCha20.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.ChaCha20Poly1305.name(), new ArrayList<>(), new ArrayList<>()));
             add(new Algorithm(ISymmetrical.Algorithms.DESedeWrap.name(), new ArrayList<>(), new ArrayList<>()));
-            add(new Algorithm(ISymmetrical.Algorithms.RC2.name(), new ArrayList<>(), new ArrayList<>()));
-            add(new Algorithm(ISymmetrical.Algorithms.RC4.name(), new ArrayList<>(), new ArrayList<>()));
-//            add(new Algorithm(ISymmetrical.Algorithms.RC4.name(), new ArrayList<>(), new ArrayList<>()));
+            add(new Algorithm(ISymmetrical.Algorithms.RC2.name(), modes, paddings));
+            add(new Algorithm(ISymmetrical.Algorithms.RC4.name(), modes, paddings));
+            add(new Algorithm(ISymmetrical.Algorithms.RC5.name(), modes, paddings));
+            add(new Algorithm(ISymmetrical.Algorithms.RC6.name(), modes, paddings));
         }};
+
 
         algorithmAsymmetrical = new ArrayList<>() {{
             add(new Algorithm(IAsymmetrical.Algorithms.RSA.name(), new ArrayList<>() {{

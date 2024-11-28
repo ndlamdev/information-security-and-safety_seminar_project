@@ -77,7 +77,7 @@ public class AffineCipher extends ATraditionalCipher {
         return algorithm.doFinal(data);
     }
 
-    public TraditionalKey<AffineKey> generateKey(String sizeKey) throws Exception {
+    public TraditionalKey<AffineKey> generateTraditionalKey(String sizeKey) throws Exception {
         var arr = sizeKey.split("_");
         var a = Integer.parseInt(arr[0]);
         var b = Integer.parseInt(arr[1]);

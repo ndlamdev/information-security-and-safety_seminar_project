@@ -16,8 +16,8 @@ import com.lamnguyen.ui.controller.navigation.IJNavigation;
 import javax.swing.*;
 
 public class MainMenu extends JMenuBar {
-    private IJNavigation navigation;
-    private Application application;
+    private final IJNavigation navigation;
+    private final Application application;
     private MainMenuController mainMenuController;
     @Getter
     private JMenuItem openWorkSpace,
@@ -165,7 +165,7 @@ public class MainMenu extends JMenuBar {
     }
 
     private void initMenuHash() {
-        hashTextMenuItem = new JMenuItem("Hash text") {{
+        hashTextMenuItem = new JMenuItem("Hash văn bản") {{
             addActionListener(mainMenuController);
         }};
         hashMenu.add(hashTextMenuItem);
@@ -184,9 +184,7 @@ public class MainMenu extends JMenuBar {
 
         homeMenu.addSeparator();
         exitMenuItem = new JMenuItem("Thoát") {{
-            addActionListener(actionEvent -> {
-                System.exit(0);
-            });
+            addActionListener(actionEvent -> System.exit(0));
         }};
         homeMenu.add(exitMenuItem);
     }
@@ -272,69 +270,59 @@ public class MainMenu extends JMenuBar {
         System.exit(0);
     }
 
-    public void changePageGenerateKeySymmetrical() {
-        navigation.push(IJNavigation.NamePage.GenerateKeySymmetricalPage);
-    }
-
     public void selectWorkSpace() {
         application.selectWorkSpace();
     }
 
+    public void changePageGenerateKeySymmetrical() {
+        application.generateKeySymmetrical();
+    }
+
     public void changePageGenerateKeyAsymmetrical() {
-        navigation.push(IJNavigation.NamePage.GenerateKeyAsymmetricalPage);
+        application.generateKeyAsymmetrical();
     }
 
     public void changePageEncryptAsymmetricalText() {
         application.encryptTextAsymmetrical();
-        navigation.push(IJNavigation.NamePage.CipherTextAsymmetricalPage);
     }
 
     public void changePageDecryptAsymmetricalText() {
         application.decryptTextAsymmetrical();
-        navigation.push(IJNavigation.NamePage.CipherTextAsymmetricalPage);
     }
 
     public void changePageSignFile() {
         application.signFile();
-        navigation.push(IJNavigation.NamePage.SignPage);
     }
 
     public void changePageSignText() {
         application.signText();
-        navigation.push(IJNavigation.NamePage.SignPage);
     }
 
     public void changePageVerifySignatureFile() {
         application.verifySignatureFile();
-        navigation.push(IJNavigation.NamePage.VerifySignaturePage);
     }
 
     public void changePageVerifySignatureText() {
         application.verifySignatureText();
-        navigation.push(IJNavigation.NamePage.VerifySignaturePage);
     }
 
     public void changePageHashFile() {
         application.hashFile();
-        navigation.push(IJNavigation.NamePage.HashPage);
     }
 
     public void changePageGenerateTraditionalKey() {
-        navigation.push(IJNavigation.NamePage.GenerateTraditionalKeyPage);
+        application.generateTraditionalKey();
     }
 
     public void changePageEncryptTraditionalText() {
         application.encryptTextTraditional();
-        navigation.push(IJNavigation.NamePage.CipherTextTraditionalPage);
     }
 
     public void changePageDecryptTraditionalText() {
         application.decryptTextTraditional();
-        navigation.push(IJNavigation.NamePage.CipherTextTraditionalPage);
     }
 
     public void changePageHashText() {
         application.hashText();
-        navigation.push(IJNavigation.NamePage.HashPage);
     }
 }

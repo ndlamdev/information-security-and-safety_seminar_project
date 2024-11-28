@@ -90,7 +90,7 @@ public class HillCipher extends ATraditionalCipher {
         return det != 0 && ITraditionalCipher.gcd(det, language.totalChar) == 1;
     }
 
-    public TraditionalKey<int[][]> generateKey(String sizeKey) throws Exception {
+    public TraditionalKey<int[][]> generateTraditionalKey(String sizeKey) throws Exception {
         var size = Integer.parseInt(sizeKey);
         if (size <= 0) throw new Exception("Length key must be longer than 1!");
         var random = new SecureRandom();

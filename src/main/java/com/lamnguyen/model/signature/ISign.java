@@ -12,7 +12,17 @@ import java.io.IOException;
 import java.security.SignatureException;
 
 public interface ISign {
+    /**
+     * Ký file
+     *
+     * @param source String đường dẫn đến file cần ký
+     */
     String signFile(String source) throws IOException, SignatureException;
 
+    /**
+     * Ký văn bản
+     *
+     * @param text String chuổi ký tự cần được ký
+     */
     String signText(String text) throws SignatureException;
 }

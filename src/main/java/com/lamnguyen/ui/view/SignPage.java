@@ -27,10 +27,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
+import java.security.*;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -40,7 +37,7 @@ public class SignPage extends JPanel implements Observer {
     private InputKeyComponent inputKeyComponent;
     private SelectSignatureAlgorithmComponent selectAlgorithmComponent;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
-    private AsymmetricalKey key;
+    private PrivateKey privateKey;
     private OutputInputTextComponent resultComponent;
     private final int V_GAP = 20;
     private CardLayout cardLayoutPanelInput;
@@ -98,8 +95,6 @@ public class SignPage extends JPanel implements Observer {
             clickToCopy(true);
         }};
         this.add(resultComponent);
-
-        signFileMode();
     }
 
 
@@ -107,11 +102,11 @@ public class SignPage extends JPanel implements Observer {
         DialogProgressHelper.runProcess(process -> {
             var file = dropAndDragComponent.getPathFile();
             var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(key, process))
+            if (!ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(privateKey, process))
                 return;
 
             try {
-                ISign signer = SignFileImpl.getInstance(alg, key.privateKey());
+                ISign signer = SignFileImpl.getInstance(alg, privateKey);
                 setSignatureString(signer.signFile(file));
                 JOptionPane.showMessageDialog(null, "Ký file thành công!");
             } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
@@ -128,11 +123,11 @@ public class SignPage extends JPanel implements Observer {
         DialogProgressHelper.runProcess(process -> {
             var text = inputTextComponent.getText();
             var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+            if (!ValidationHelper.validateKey(privateKey, process) || !ValidationHelper.validateText(text, process))
                 return;
 
             try {
-                ISign signer = SignFileImpl.getInstance(alg, key.privateKey());
+                ISign signer = SignFileImpl.getInstance(alg, privateKey);
                 setSignatureString(signer.signText(text));
                 JOptionPane.showMessageDialog(null, "Ký file thành công!");
             } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException e) {
@@ -148,7 +143,7 @@ public class SignPage extends JPanel implements Observer {
     public Void loadFileKey(File file) {
         if (file == null) return null;
         try {
-            key = IAsymmetrical.KeyFactory.readKey(file.getAbsolutePath());
+            privateKey = IAsymmetrical.KeyFactory.readPrivateKey(file.getAbsolutePath());
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {
@@ -177,19 +172,19 @@ public class SignPage extends JPanel implements Observer {
     }
 
     public void signFileMode() {
-        if (fileMode) return;
         fileMode = true;
         cardLayoutPanelInput.show(panelInput, "file");
         action.setText("Ký file");
         setSignatureString("");
+        dropAndDragComponent.removeFile();
     }
 
     public void signTextMode() {
-        if (!fileMode) return;
         fileMode = false;
         cardLayoutPanelInput.show(panelInput, "text");
         action.setText("Ký văn bản");
         setSignatureString("");
+        inputTextComponent.setTextJTextArea("");
     }
 
     private void setSignatureString(String signature) {

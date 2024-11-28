@@ -17,15 +17,16 @@ import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 public interface ISymmetricalEncrypt extends ISymmetrical {
     /**
      * Tạo một khóa bí mật cho thuật toán mã hóa.
      *
      * @param size Kích thước của khóa cần tạo.
-     * @return Khóa bí mật được tạo.
+     * @return SecretKey Khóa bí mật được tạo.
      */
-    SecretKey generateKey(int size) throws NoSuchAlgorithmException;
+    SecretKey generateKey(int size) throws NoSuchAlgorithmException, NoSuchProviderException;
 
     /**
      * Mã hóa dữ liệu đã cho bằng khóa đã tải.

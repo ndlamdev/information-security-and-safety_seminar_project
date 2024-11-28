@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.security.*;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.function.Function;
 
 public class VerifySignaturePage extends JPanel implements Observer {
     private final Application application;
@@ -37,7 +38,7 @@ public class VerifySignaturePage extends JPanel implements Observer {
     private InputKeyComponent inputKeyComponent;
     private SelectSignatureAlgorithmComponent selectAlgorithmComponent;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
-    private AsymmetricalKey key;
+    private PublicKey publicKey;
     private OutputInputTextComponent inputSignComponent;
     private final int V_GAP = 20;
     private boolean fileMode;
@@ -92,8 +93,6 @@ public class VerifySignaturePage extends JPanel implements Observer {
             });
         }};
         this.add(action);
-
-        verifySignatureFileMode();
     }
 
     private void event() {
@@ -119,11 +118,11 @@ public class VerifySignaturePage extends JPanel implements Observer {
             var file = dropAndDragComponent.getPathFile();
             var alg = selectAlgorithmComponent.getAlgorithm();
             var signature = inputSignComponent.getText();
-            if (!ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateSignature(signature, process))
+            if (!ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(publicKey, process) || !ValidationHelper.validateSignature(signature, process))
                 return;
 
             try {
-                IVerifySignature verifier = VerifySignatureFileImpl.getInstance(alg, key.publicKey());
+                IVerifySignature verifier = VerifySignatureFileImpl.getInstance(alg, publicKey);
                 if (verifier.verifyFile(file, signature)) {
                     JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thành công!");
                     process.dispose();
@@ -144,11 +143,11 @@ public class VerifySignaturePage extends JPanel implements Observer {
             var text = inputTextComponent.getText();
             var alg = selectAlgorithmComponent.getAlgorithm();
             var signature = inputSignComponent.getText();
-            if (!ValidationHelper.validateText(text, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateSignature(signature, process))
+            if (!ValidationHelper.validateText(text, process) || !ValidationHelper.validateKey(publicKey, process) || !ValidationHelper.validateSignature(signature, process))
                 return;
 
             try {
-                IVerifySignature verifier = VerifySignatureFileImpl.getInstance(alg, key.publicKey());
+                IVerifySignature verifier = VerifySignatureFileImpl.getInstance(alg, publicKey);
                 if (verifier.verifyText(text, signature)) {
                     JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thành công!");
                     process.dispose();
@@ -167,7 +166,7 @@ public class VerifySignaturePage extends JPanel implements Observer {
     public Void loadFileKey(File file) {
         if (file == null) return null;
         try {
-            key = IAsymmetrical.KeyFactory.readKey(file.getAbsolutePath());
+            publicKey = IAsymmetrical.KeyFactory.readPublicKey(file.getAbsolutePath());
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {
@@ -178,17 +177,17 @@ public class VerifySignaturePage extends JPanel implements Observer {
     }
 
     public void verifySignatureFileMode() {
-        if (fileMode) return;
         fileMode = true;
         cardLayoutPanelInput.show(panelInput, "file");
         action.setText("Xác thực chữ ký file");
+        dropAndDragComponent.removeFile();
     }
 
     public void verifySignatureTextMode() {
-        if (!fileMode) return;
         fileMode = false;
         cardLayoutPanelInput.show(panelInput, "text");
         action.setText("Xác thực chữ ký văn bản");
+        inputTextComponent.setTextJTextArea("");
     }
 
     @Override

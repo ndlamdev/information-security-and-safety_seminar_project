@@ -122,7 +122,6 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {
-            e.printStackTrace(System.out);
             JOptionPane.showMessageDialog(null, "File key không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -132,11 +131,13 @@ public class CipherFileSymmetricalPage extends JPanel implements Observer {
     public void encryptMode() {
         encrypt = true;
         outputComponent.setTextButtonAction("Mã hóa!");
+        dropAndDragComponent.removeFile();
     }
 
     public void decryptMode() {
         encrypt = false;
         outputComponent.setTextButtonAction("Giải mã!");
+        dropAndDragComponent.removeFile();
     }
 
     private void encryptFile() {

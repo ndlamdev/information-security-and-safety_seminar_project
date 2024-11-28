@@ -26,6 +26,8 @@ public class HashAlgorithmConfig {
 
     private HashAlgorithmConfig() {
         initAlgorithms();
+        hashAlgForText.sort(String::compareTo);
+        hashAlgForText.sort(String::compareTo);
     }
 
     public static HashAlgorithmConfig getInstance() {

@@ -56,13 +56,14 @@ public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASy
 
     private ISymmetricalEncrypt initCipher(ISymmetrical.Algorithms algorithm, String mode, String padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
         return switch (algorithm) {
-            case AES, AESWrap, AESWrapPad -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 128);
+            case AES, AESWrap, AESWrapPad, Camellia ->
+                    ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 128);
             case Blowfish -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 32);
-            case ChaCha20, ChaCha20Poly1305 -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 256);
+            case ChaCha20, ChaCha20Poly1305, RC5, RC6 ->
+                    ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 256);
             case DES -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 56);
             case DESede, DESedeWrap -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 112);
             case RC2, RC4, ARCFOUR -> ISymmetrical.Factory.createEncrypt(algorithm, mode, padding, 113);
-            case RC5 -> null;
         };
     }
 

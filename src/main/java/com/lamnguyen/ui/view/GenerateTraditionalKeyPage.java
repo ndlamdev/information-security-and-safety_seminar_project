@@ -8,6 +8,7 @@
 
 package com.lamnguyen.ui.view;
 
+import com.lamnguyen.helper.DialogOverFileHelper;
 import com.lamnguyen.helper.DialogProgressHelper;
 import com.lamnguyen.helper.SettingHelper;
 import com.lamnguyen.helper.ValidationHelper;
@@ -35,9 +36,9 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
     private OutputInputTextComponent outputKey;
     private SelectAlgorithmGenerateTraditionalKeyComponent selectAlgorithmComponent;
     private OutputComponent outputComponent;
-    private SubjectSizeController sizeController = SubjectSizeController.getInstance();
+    private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private JButton buttonCreate;
-    private Application application;
+    private final Application application;
     private JComboBox<ITraditionalCipher.SecureLanguage> jcbLanguage;
     private final int V_GAP = 20;
 
@@ -100,7 +101,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
 
         var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
         outputComponent = new OutputComponent() {{
-            setPathFolder(SettingHelper.getInstance().getWorkSpace() + "/key");
+            setPathFolder(SettingHelper.getInstance().getWorkSpace() + File.separator + "key");
             setTextButtonAction("Xuất file");
             setFileName(algorithmKey.getName() + "_" + jcbLanguage.getSelectedItem() + (algorithmKey.getSize().isBlank() ? "" : "_" + algorithmKey.getSize()));
             setExtensionFile(".keys");
@@ -123,30 +124,23 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
             }
 
             var contentKey = key.contentKey();
-            switch (contentKey) {
-                case Integer intKey -> {
-                    outputKey.setTextJTextArea(String.valueOf(intKey));
-                }
-                case HashMap mapKey -> {
-                    var hash = (HashMap<Character, Character>) mapKey;
-                    var arrKey = hash.entrySet().stream().map(entry -> entry.getKey() + " -> " + entry.getValue()).toArray(String[]::new);
-                    outputKey.setTextJTextArea(String.join("\n", arrKey));
-                }
-                case AffineCipher.AffineKey affineKey -> {
-                    outputKey.setTextJTextArea("A: " + affineKey.a() + "\nB: " + affineKey.b());
-                }
-                case String string -> {
-                    outputKey.setTextJTextArea(string);
-                }
-                default -> {
-                    var k = (int[][]) contentKey;
-                    var stringKey = new StringBuilder();
-                    for (var row : k)
-                        stringKey.append("|\t").append(String.join("\t|\t", Arrays.stream(row).mapToObj(String::valueOf).toArray(String[]::new))).append("\t|\n");
-                    outputKey.setTextJTextArea(stringKey.toString());
-                }
+            if (contentKey instanceof Integer) {
+                outputKey.setTextJTextArea(String.valueOf(key));
+            } else if (contentKey instanceof HashMap mapKey) {
+                var hash = (HashMap<Character, Character>) mapKey;
+                var arrKey = hash.entrySet().stream().map(entry -> entry.getKey() + " -> " + entry.getValue()).toArray(String[]::new);
+                outputKey.setTextJTextArea(String.join("\n", arrKey));
+            } else if (contentKey instanceof AffineCipher.AffineKey affineKey) {
+                outputKey.setTextJTextArea("A: " + affineKey.a() + "\nB: " + affineKey.b());
+            } else if (contentKey instanceof String string) {
+                outputKey.setTextJTextArea(string);
+            } else {
+                var k = (int[][]) contentKey;
+                var stringKey = new StringBuilder();
+                for (var row : k)
+                    stringKey.append("|\t").append(String.join("\t|\t", Arrays.stream(row).mapToObj(String::valueOf).toArray(String[]::new))).append("\t|\n");
+                outputKey.setTextJTextArea(stringKey.toString());
             }
-
             process.dispose();
         });
     }
@@ -160,6 +154,7 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
             try {
                 var file = new File(outputComponent.getFolderDest());
                 if (!file.exists() && !file.mkdirs()) throw new IOException();
+                if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
                 cipher.saveKey(outputComponent.getFullPath());
                 if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpaceSync();
@@ -179,5 +174,10 @@ public class GenerateTraditionalKeyPage extends JPanel implements Observer {
         jcbLanguage.setPreferredSize(new Dimension(parentSize - 200, 50));
         var size = getParent().getHeight() - V_GAP * 6 - 110 - 50 * 2 - 130;
         outputKey.setCustomSize(new Dimension(parentSize - 500, size));
+    }
+
+    public void removePasswordGenerate() {
+        cipher = null;
+        outputKey.setTextJTextArea("");
     }
 }

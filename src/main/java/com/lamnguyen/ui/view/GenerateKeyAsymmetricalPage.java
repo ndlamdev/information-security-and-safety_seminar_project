@@ -77,7 +77,7 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
 
         var algorithmKey = selectAlgorithmComponent.getAlgorithmKey(); //110
         outputComponent = new OutputComponent() {{
-            setPathFolder(SettingHelper.getInstance().getWorkSpace() + "/key");
+            setPathFolder(SettingHelper.getInstance().getWorkSpace() + File.separator + "key");
             setTextButtonAction("Xuất file");
             setFileName(algorithmKey.getName() + "_" + algorithmKey.getSize());
             setExtensionFile(".keys");
@@ -89,15 +89,18 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
 
     private void saveKey() {
         DialogProgressHelper.runProcess(process -> {
-            if (!ValidationHelper.validateKeyGenerate(key, process))
+            var file = new File(outputComponent.getFolderDest());
+            var fileName = outputComponent.getFolderDest() + File.separator + outputComponent.getFileDest();
+            var fileNamePublicKey = fileName + "_public_key" + outputComponent.getExtensionFile();
+            var fileNamePrivateKey = fileName + "_private_key" + outputComponent.getExtensionFile();
+            if (!ValidationHelper.validateKeyGenerate(key, process) || !DialogOverFileHelper.overwriteFile(fileName, process))
                 return;
 
             try {
-                var file = new File(outputComponent.getFolderDest());
                 if (!file.exists() && !file.mkdirs()) throw new IOException();
-                if (!DialogOverFileHelper.overwriteFile(outputComponent.getFullPath(), process)) return;
-                IAsymmetrical.saveKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key, outputComponent.getFullPath());
-                if (outputComponent.getFullPath().startsWith(SettingHelper.getInstance().getWorkSpace()))
+                IAsymmetrical.savePublicKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key.publicKey(), fileNamePublicKey);
+                IAsymmetrical.savePrivateKey(selectAlgorithmComponent.getAlgorithmKey().getName(), key.privateKey(), fileNamePrivateKey);
+                if (outputComponent.getFolderDest().startsWith(SettingHelper.getInstance().getWorkSpace()))
                     application.reloadWorkSpaceSync();
                 JOptionPane.showMessageDialog(null, "Thành công!");
             } catch (IOException e) {
@@ -120,9 +123,16 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
             var algorithmKey = selectAlgorithmComponent.getAlgorithmKey();
             var name = IAsymmetrical.KeyFactory.Algorithms.valueOf(algorithmKey.getName());
             key = IAsymmetrical.KeyFactory.generateKey(name, algorithmKey.getSize());
+            if (!ValidationHelper.validateKey(key, process)) return;
             keyGenerateComponent.setPrivateKey(IAsymmetrical.encodeKeyToBase64(key.privateKey()));
             keyGenerateComponent.setPublicKey(IAsymmetrical.encodeKeyToBase64(key.publicKey()));
             process.dispose();
         });
+    }
+
+    public void removePasswordGenerate() {
+        key = null;
+        keyGenerateComponent.setPrivateKey("");
+        keyGenerateComponent.setPublicKey("");
     }
 }

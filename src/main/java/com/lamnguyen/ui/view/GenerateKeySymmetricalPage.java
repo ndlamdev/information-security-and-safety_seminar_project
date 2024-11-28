@@ -93,7 +93,9 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
             try {
                 encrypt = ISymmetrical.Factory.createEncrypt(name, null, null, algorithmKey.getSize());
                 keyGenerateComponent.setKey(ISymmetrical.encodeKeyToBase64(encrypt.getKey()));
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                e.printStackTrace(System.out);
+                JOptionPane.showMessageDialog(null, "Tạo khóa thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
             }
             process.dispose();
         });
@@ -129,5 +131,10 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
         buttonCreate.setPreferredSize(new Dimension(parentSize - 500, 50)); //50
         var sizeSpace = this.getHeight() - V_GAP * 6 - 110 * 2 - 50 - 130;
         panelSpace.setPreferredSize(new Dimension(parentSize - 200, sizeSpace));
+    }
+
+    public void removePasswordGenerate() {
+        encrypt = null;
+        keyGenerateComponent.setKey("");
     }
 }

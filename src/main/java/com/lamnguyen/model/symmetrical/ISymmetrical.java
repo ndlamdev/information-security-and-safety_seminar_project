@@ -44,6 +44,11 @@ public interface ISymmetrical {
      */
     SecretKey getKey();
 
+    /**
+     * Lấy iv của cipher.
+     *
+     * @return AlgorithmParameterSpec mội interface đại diện cho iv mà Cipher cần
+     */
     AlgorithmParameterSpec getIvSpec();
 
     /**
@@ -72,6 +77,14 @@ public interface ISymmetrical {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
+    /**
+     * Hỗ trợ tạo ra đối tượng mã hóa.
+     *
+     * @param algorithm Algorithms tên thuật toán
+     * @param mode      String mode sử dụng
+     * @param padding   String mode sử dụng
+     * @return ISymmetricalEncrypt: Một đối tượng dùng để mã hóa
+     */
     private static ISymmetricalEncrypt getInstanceSymmetricalEncrypt(Algorithms algorithm, String mode, String padding) {
         return switch (algorithm) {
             case AES -> new AESEncrypt(mode, padding);
@@ -87,9 +100,18 @@ public interface ISymmetrical {
             case RC2 -> new RC2Encrypt(mode, padding);
             case RC4 -> new RC4Encrypt(mode, padding);
             case RC5 -> new RC5Encrypt(mode, padding);
+            case RC6 -> new RC6Encrypt(mode, padding);
+            case Camellia -> new CamelliaEncrypt(mode, padding);
         };
     }
 
+    /**
+     * Hỗ trợ lưu khóa vào file khi đã có đối tượng outputStream
+     *
+     * @param outputStream DataOutputStream đối tượng ghi khóa vào file.
+     * @param key          SecretKey khóa cần lưu
+     * @param iv           AlgorithmParameterSpec iv của thuật toán nếu có
+     */
     static void save(DataOutputStream outputStream, SecretKey key, AlgorithmParameterSpec iv) throws IOException {
         outputStream.writeUTF(key.getAlgorithm());
         outputStream.writeUTF(Base64.getEncoder().encodeToString(key.getEncoded()));
@@ -97,27 +119,27 @@ public interface ISymmetrical {
             outputStream.writeUTF("None");
             return;
         }
-        switch (iv) {
-            case IvParameterSpec spec -> {
-                outputStream.writeUTF(IvParameterSpec.class.getName());
-                outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getIV()));
-            }
-            case ChaCha20ParameterSpec spec -> {
-                outputStream.writeUTF(ChaCha20ParameterSpec.class.getName());
-                outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getNonce()));
-                outputStream.writeInt(spec.getCounter());
-            }
-            case ChaCha20Poly1305Spec spec -> {
-                outputStream.writeUTF(ChaCha20Poly1305Spec.class.getName());
-                outputStream.writeUTF(spec.getAAD());
-                outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getIv().getIV()));
-            }
-            default -> {
-                outputStream.writeUTF("None");
-            }
+        if (iv instanceof IvParameterSpec spec) {
+            outputStream.writeUTF(IvParameterSpec.class.getName());
+            outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getIV()));
+        } else if (iv instanceof ChaCha20ParameterSpec spec) {
+            outputStream.writeUTF(ChaCha20ParameterSpec.class.getName());
+            outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getNonce()));
+            outputStream.writeInt(spec.getCounter());
+        } else if (iv instanceof ChaCha20Poly1305Spec spec) {
+            outputStream.writeUTF(ChaCha20Poly1305Spec.class.getName());
+            outputStream.writeUTF(spec.getAAD());
+            outputStream.writeUTF(Base64.getEncoder().encodeToString(spec.getIv().getIV()));
+        } else {
+            outputStream.writeUTF("None");
         }
     }
 
+    /**
+     * Lưu khóa vào file chỉ địch
+     *
+     * @param file String Vị trí file đích sẽ lưu khóa
+     */
     default void saveKey(String file) throws IOException {
         var key = getKey();
         var iv = getIvSpec();
@@ -126,7 +148,17 @@ public interface ISymmetrical {
         outputStream.close();
     }
 
+    /**
+     * Đây là một lớp hổ trợ làm việc với khóa bất đối xứng.
+     */
     class KeyFactory {
+
+        /**
+         * Hỗ trợ đọc khóa đối xứng từ file khóa.
+         *
+         * @param file String file nguồn để đọc khóa
+         * @return SymmetricalKey đối tượng khóa bất đối xứng.
+         */
         public static SymmetricalKey readKey(String file) throws IOException {
             DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file), 1024 * 10));
             var result = readKey(input);
@@ -134,6 +166,12 @@ public interface ISymmetrical {
             return result;
         }
 
+        /**
+         * Hỗ trợ đọc khóa đối xứng từ một inputStream.
+         *
+         * @param input DataInputStream đối tượng stream để đọc khóa.
+         * @return SymmetricalKey đối tượng khóa bất đối xứng.
+         */
         public static SymmetricalKey readKey(DataInputStream input) throws IOException {
             String algorithm = input.readUTF();
             String keyBase64 = input.readUTF();
@@ -151,40 +189,58 @@ public interface ISymmetrical {
 
     }
 
-    static Cipher getCipherInstance(Algorithms algorithms) throws NoSuchPaddingException, NoSuchAlgorithmException {
+    /**
+     * Hỗ trợ tạo ra 1 instance cipher từ tên thuật toán.
+     *
+     * @param algorithms Algorithms một enum thuật toán cần tạo
+     * @return Cipher đối tượng cipher.
+     */
+    static Cipher getCipherInstance(Algorithms algorithms) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         return switch (algorithms) {
-            case AES -> Cipher.getInstance("AES");
-            case AESWrap -> Cipher.getInstance("AESWrap");
-            case AESWrapPad -> Cipher.getInstance("AESWrapPad");
-            case ARCFOUR -> Cipher.getInstance("ARCFOUR");
-            case Blowfish -> Cipher.getInstance("Blowfish");
-            case ChaCha20 -> Cipher.getInstance("ChaCha20");
-            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20-Poly1305");
-            case DES -> Cipher.getInstance("DES");
-            case DESede -> Cipher.getInstance("DESede");
-            case DESedeWrap -> Cipher.getInstance("DESedeWrap");
-            case RC2 -> Cipher.getInstance("RC2");
-            case RC4 -> Cipher.getInstance("RC4");
-            case RC5 -> Cipher.getInstance("RC5");
+            case AES -> Cipher.getInstance(Algorithms.AES.name(), "BC");
+            case AESWrap -> Cipher.getInstance(Algorithms.AESWrap.name(), "BC");
+            case AESWrapPad -> Cipher.getInstance(Algorithms.AESWrapPad.name(), "BC");
+            case ARCFOUR -> Cipher.getInstance(Algorithms.ARCFOUR.name(), "BC");
+            case Blowfish -> Cipher.getInstance(Algorithms.Blowfish.name(), "BC");
+            case ChaCha20 -> Cipher.getInstance(Algorithms.ChaCha20.name(), "BC");
+            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20-Poly1305", "BC");
+            case DES -> Cipher.getInstance(Algorithms.DES.name(), "BC");
+            case DESede -> Cipher.getInstance(Algorithms.DESede.name(), "BC");
+            case DESedeWrap -> Cipher.getInstance(Algorithms.DESedeWrap.name(), "BC");
+            case RC2 -> Cipher.getInstance(Algorithms.RC2.name(), "BC");
+            case RC4 -> Cipher.getInstance(Algorithms.RC4.name(), "BC");
+            case RC5 -> Cipher.getInstance(Algorithms.RC5.name(), "BC");
+            case RC6 -> Cipher.getInstance(Algorithms.RC6.name(), "BC");
+            case Camellia -> Cipher.getInstance(Algorithms.Camellia.name(), "BC");
         };
     }
 
+    /**
+     * Hỗ trợ tạo ra 1 instance cipher từ tên thuật toán, tên mode và tên padding.
+     *
+     * @param algorithms Algorithms một enum thuật toán cần tạo
+     * @param mode       String mode cần dùng
+     * @param padding    String padding cần dùng
+     * @return Cipher đối tượng cipher.
+     */
     static Cipher getCipherInstance(Algorithms algorithms, String mode, String padding) throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException {
         String extension = (mode == null || mode.isBlank() ? "" : "/" + mode) + (padding == null || padding.isBlank() ? "" : "/" + padding);
         return switch (algorithms) {
-            case AES -> Cipher.getInstance("AES" + extension, "SunJCE");
-            case AESWrap -> Cipher.getInstance("AESWrap" + extension, "SunJCE");
-            case AESWrapPad -> Cipher.getInstance("AESWrapPad" + extension, "SunJCE");
-            case ARCFOUR -> Cipher.getInstance("ARCFOUR" + extension, "SunJCE");
-            case Blowfish -> Cipher.getInstance("Blowfish" + extension, "SunJCE");
-            case ChaCha20 -> Cipher.getInstance("ChaCha20" + extension, "SunJCE");
-            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20-Poly1305" + extension, "SunJCE");
-            case DES -> Cipher.getInstance("DES" + extension, "SunJCE");
-            case DESede -> Cipher.getInstance("DESede" + extension, "SunJCE");
-            case DESedeWrap -> Cipher.getInstance("DESedeWrap" + extension, "SunJCE");
-            case RC2 -> Cipher.getInstance("RC2" + extension, "SunJCE");
-            case RC4 -> Cipher.getInstance("RC4" + extension, "SunJCE");
-            case RC5 -> Cipher.getInstance("RC5" + extension, "SunJCE");
+            case AES -> Cipher.getInstance(Algorithms.AES.name() + extension, "BC");
+            case AESWrap -> Cipher.getInstance(Algorithms.AESWrap.name() + extension, "BC");
+            case AESWrapPad -> Cipher.getInstance(Algorithms.AESWrapPad.name() + extension, "BC");
+            case ARCFOUR -> Cipher.getInstance(Algorithms.ARCFOUR.name() + extension, "BC");
+            case Blowfish -> Cipher.getInstance(Algorithms.Blowfish.name() + extension, "BC");
+            case ChaCha20 -> Cipher.getInstance(Algorithms.ChaCha20.name() + extension, "BC");
+            case ChaCha20Poly1305 -> Cipher.getInstance("ChaCha20-Poly1305" + extension, "BC");
+            case DES -> Cipher.getInstance(Algorithms.DES.name() + extension, "BC");
+            case DESede -> Cipher.getInstance(Algorithms.DESede.name() + extension, "BC");
+            case DESedeWrap -> Cipher.getInstance(Algorithms.DESedeWrap.name() + extension, "BC");
+            case RC2 -> Cipher.getInstance(Algorithms.RC2.name() + extension, "BC");
+            case RC4 -> Cipher.getInstance(Algorithms.RC4.name() + extension, "BC");
+            case RC5 -> Cipher.getInstance(Algorithms.RC5.name() + extension, "BC");
+            case RC6 -> Cipher.getInstance(Algorithms.RC6.name() + extension, "BC");
+            case Camellia -> Cipher.getInstance(Algorithms.Camellia.name() + extension, "BC");
         };
     }
 
@@ -286,6 +342,8 @@ public interface ISymmetrical {
                 case RC2 -> new RC2Decrypt(key, mode, padding);
                 case RC4 -> new RC4Decrypt(key, mode, padding);
                 case RC5 -> new RC5Decrypt(key, mode, padding);
+                case RC6 -> new RC6Decrypt(key, mode, padding);
+                case Camellia -> new CamelliaDecrypt(key, mode, padding);
             };
         }
 
@@ -306,7 +364,10 @@ public interface ISymmetrical {
         }
     }
 
+    /**
+     * Enum các thuật toán mà phần mềm hổ trợ
+     */
     enum Algorithms {
-        AES, AESWrap, AESWrapPad, ARCFOUR, Blowfish, ChaCha20, ChaCha20Poly1305, DES, DESede, DESedeWrap, RC2, RC4, RC5,
+        AES, AESWrap, AESWrapPad, ARCFOUR, Blowfish, ChaCha20, ChaCha20Poly1305, DES, DESede, DESedeWrap, RC2, RC4, RC5, Camellia, RC6,
     }
 }

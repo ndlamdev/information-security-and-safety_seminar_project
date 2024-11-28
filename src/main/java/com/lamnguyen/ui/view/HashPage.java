@@ -88,8 +88,6 @@ public class HashPage extends JPanel implements Observer {
             clickToCopy(true);
         }};
         this.add(output);
-
-        hashFileMode();
     }
 
     private void event() {
@@ -159,21 +157,21 @@ public class HashPage extends JPanel implements Observer {
     }
 
     public void hashFileMode() {
-        if (fileMode) return;
         fileMode = true;
         cardLayoutPanelInput.show(panelInput, "file");
         action.setText("Hash file");
         setHashString("");
         selectHashAlgorithmComponent.setListAlg(HashAlgorithmConfig.getInstance().getHashAlgForFile());
+        dropAndDragComponent.removeFile();
     }
 
     public void hashTextMode() {
-        if (!fileMode) return;
         fileMode = false;
         cardLayoutPanelInput.show(panelInput, "text");
         action.setText("Hash văn bản");
         setHashString("");
         selectHashAlgorithmComponent.setListAlg(HashAlgorithmConfig.getInstance().getHashAlgForText());
+        inputTextComponent.setTextJTextArea("");
     }
 
     public void setHashString(String s) {

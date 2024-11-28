@@ -79,7 +79,7 @@ public class SubstitutionCipher extends ATraditionalCipher {
         return algorithm.doFinal(data);
     }
 
-    public TraditionalKey<Map<Character, Character>> generateKey(String sizeKey) throws Exception {
+    public TraditionalKey<Map<Character, Character>> generateTraditionalKey(String sizeKey) throws Exception {
         var listKey = CharSetConfig.getMapChar(ITraditionalCipher.SecureLanguage.VN).keySet().stream().toList();
         var listValue = CharSetConfig.getMapChar(ITraditionalCipher.SecureLanguage.VN, 13).entrySet().stream().toList();
         Map<Character, Character> key = new HashMap<>();

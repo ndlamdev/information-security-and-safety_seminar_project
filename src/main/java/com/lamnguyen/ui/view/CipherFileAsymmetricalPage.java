@@ -35,10 +35,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
@@ -51,7 +48,8 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
     private SelectCipherAlgorithmComponent selectCipherFileAlgorithmComponent, selectCipherKeyAlgorithmComponent;
     private boolean encrypt = true;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
-    private AsymmetricalKey key;
+    private PublicKey publicKey;
+    private PrivateKey privateKey;
     private final int V_GAP = 20;
     private int heightDrop;
 
@@ -126,7 +124,8 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
     public Void loadFileKey(File file) {
         if (file == null) return null;
         try {
-            key = IAsymmetrical.KeyFactory.readKey(file.getAbsolutePath());
+            if (encrypt) publicKey = IAsymmetrical.KeyFactory.readPublicKey(file.getAbsolutePath());
+            else privateKey = IAsymmetrical.KeyFactory.readPrivateKey(file.getAbsolutePath());
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {
@@ -144,6 +143,10 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
         selectCipherKeyAlgorithmComponent.setHeightItemComponent(new SelectCipherAlgorithmComponent.HeightItemComponent(20, 30, 15));
         var width = dropAndDragComponent.getSize().width;
         dropAndDragComponent.setCustomSize(new Dimension(width, heightDrop - selectCipherKeyAlgorithmComponent.getHeight() - selectCipherKeyAlgorithmComponent.getHeight() - V_GAP * 6));
+        dropAndDragComponent.removeFile();
+        publicKey = null;
+        inputKeyComponent.setPathFileKey("");
+        inputKeyComponent.setToolTipText("Nhập khóa công khai!");
     }
 
     public void decryptMode() {
@@ -154,6 +157,10 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
         selectCipherKeyAlgorithmComponent.setHeightItemComponent(new SelectCipherAlgorithmComponent.HeightItemComponent(20, 50, 20));
         var width = dropAndDragComponent.getSize().width;
         dropAndDragComponent.setCustomSize(new Dimension(width, heightDrop - selectCipherKeyAlgorithmComponent.getHeight() - V_GAP * 5));
+        dropAndDragComponent.removeFile();
+        privateKey = null;
+        inputKeyComponent.setPathFileKey("");
+        inputKeyComponent.setToolTipText("Nhập khóa riêng tư!");
     }
 
     private void encryptFile() {
@@ -161,11 +168,11 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
             var file = dropAndDragComponent.getPathFile();
             var algEncryptFile = selectCipherFileAlgorithmComponent.getAlgorithm();
             var algEncryptKey = selectCipherKeyAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateAlgorithm(algEncryptKey, process) || !ValidationHelper.validateAlgorithm(algEncryptFile, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateFile(file, process))
+            if (!ValidationHelper.validateAlgorithm(algEncryptKey, process) || !ValidationHelper.validateAlgorithm(algEncryptFile, process) || !ValidationHelper.validateKey(publicKey, process) || !ValidationHelper.validateFile(file, process))
                 return;
             var cipher = IAsymmetrical.Factory.createEncrypt(algEncryptKey.algorithm());
             try {
-                cipher.loadKey(key.publicKey());
+                cipher.loadKey(publicKey);
             } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
                      NoSuchProviderException e) {
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -192,11 +199,11 @@ public class CipherFileAsymmetricalPage extends JPanel implements Observer {
         DialogProgressHelper.runProcess(process -> {
             var file = dropAndDragComponent.getPathFile();
             var algDecryptFile = selectCipherKeyAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateAlgorithm(algDecryptFile, process) || !ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(key, process))
+            if (!ValidationHelper.validateAlgorithm(algDecryptFile, process) || !ValidationHelper.validateFile(file, process) || !ValidationHelper.validateKey(privateKey, process))
                 return;
             var cipher = IAsymmetrical.Factory.createDecrypt(algDecryptFile.algorithm());
             try {
-                cipher.loadKey(key.privateKey());
+                cipher.loadKey(privateKey);
             } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
                      NoSuchProviderException e) {
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);

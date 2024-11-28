@@ -66,7 +66,7 @@ public class ShiftCipher extends ATraditionalCipher {
         return algorithm.doFinal(data);
     }
 
-    public TraditionalKey<Integer> generateKey(String sizeKey) throws Exception {
+    public TraditionalKey<Integer> generateTraditionalKey(String sizeKey) throws Exception {
         var size = Integer.parseInt(sizeKey);
         if (size <= 2) throw new Exception("Length key must be longer than 2!");
         return new TraditionalKey<>(Math.abs(new SecureRandom().nextInt(2, size)));

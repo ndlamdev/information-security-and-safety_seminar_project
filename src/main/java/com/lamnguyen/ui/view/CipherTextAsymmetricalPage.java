@@ -30,10 +30,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.*;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -44,7 +41,8 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
     private SelectCipherAlgorithmComponent selectAlgorithmComponent;
     private final SubjectSizeController sizeController = SubjectSizeController.getInstance();
     private JButton action;
-    private AsymmetricalKey key;
+    private PublicKey publicKey;
+    private PrivateKey privateKey;
     private final int V_GAP = 20;
     private boolean encryptMode = true;
 
@@ -88,6 +86,8 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
             });
         }};
         this.add(action);
+
+        encryptMode();
     }
 
     private void event() {
@@ -112,22 +112,32 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
     public void encryptMode() {
         encryptMode = true;
         action.setText("Mã hóa");
+        publicKey = null;
+        inputKeyComponent.setPathFileKey("");
+        inputKeyComponent.setToolTipText("Nhập khóa công khai!");
+        inputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextJTextArea("");
     }
 
     public void decryptMode() {
         encryptMode = false;
         action.setText("Giải mã");
+        privateKey = null;
+        inputKeyComponent.setPathFileKey("");
+        inputKeyComponent.setToolTipText("Nhập khóa riêng tư!");
+        inputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextJTextArea("");
     }
 
     private void encrypt() {
         DialogProgressHelper.runProcess(process -> {
             var text = inputTextComponent.getText();
             var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(publicKey, process) || !ValidationHelper.validateText(text, process))
                 return;
             var cipher = IAsymmetrical.Factory.createEncrypt(alg.algorithm(), alg.mode(), alg.padding());
             try {
-                cipher.loadKey(key.publicKey());
+                cipher.loadKey(publicKey);
             } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
                      NoSuchProviderException e) {
                 e.printStackTrace(System.out);
@@ -150,11 +160,11 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
         DialogProgressHelper.runProcess(process -> {
             var text = inputTextComponent.getText();
             var alg = selectAlgorithmComponent.getAlgorithm();
-            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(key, process) || !ValidationHelper.validateText(text, process))
+            if (!ValidationHelper.validateAlgorithm(alg, process) || !ValidationHelper.validateKey(privateKey, process) || !ValidationHelper.validateText(text, process))
                 return;
             var cipher = IAsymmetrical.Factory.createDecrypt(alg.algorithm(), alg.mode(), alg.padding());
             try {
-                cipher.loadKey(key.privateKey());
+                cipher.loadKey(privateKey);
             } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException |
                      NoSuchProviderException e) {
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -177,7 +187,8 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
     public Void loadFileKey(File file) {
         if (file == null) return null;
         try {
-            key = IAsymmetrical.KeyFactory.readKey(file.getAbsolutePath());
+            if (encryptMode) publicKey = IAsymmetrical.KeyFactory.readPublicKey(file.getAbsolutePath());
+            else privateKey = IAsymmetrical.KeyFactory.readPrivateKey(file.getAbsolutePath());
             inputKeyComponent.setPathFileKey(file.getAbsolutePath());
             JOptionPane.showMessageDialog(null, "Load key thành công!");
         } catch (Exception e) {

@@ -112,11 +112,15 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
     public void encryptMode() {
         encryptMode = true;
         action.setText("Mã hóa");
+        inputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextJTextArea("");
     }
 
     public void decryptMode() {
         encryptMode = false;
         action.setText("Giải hóa");
+        inputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextJTextArea("");
     }
 
     private void encrypt() {

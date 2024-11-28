@@ -105,7 +105,7 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @return Đối tượng KeyGenerator đã được khởi tạo.
      * @throws NoSuchAlgorithmException Nếu thuật toán mã hóa không tồn tại.
      */
-    protected abstract KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException;
+    protected abstract KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException, NoSuchProviderException;
 
     /**
      * Tạo một khóa bí mật cho thuật toán mã hóa.
@@ -114,7 +114,7 @@ public abstract class ASymmetricalEncrypt extends ASymmetrical implements ISymme
      * @return Khóa bí mật được tạo.
      */
     @Override
-    public final SecretKey generateKey(int size) throws NoSuchAlgorithmException {
+    public final SecretKey generateKey(int size) throws NoSuchAlgorithmException, NoSuchProviderException {
         KeyGenerator keyGen = initKeyGenerator();
         keyGen.init(size);
         return keyGen.generateKey();

@@ -171,10 +171,12 @@ public class Application extends JFrame {
 
     public void encryptTextAsymmetrical() {
         asymmetricalTextPage.encryptMode();
+        navigation.push(IJNavigation.NamePage.CipherTextAsymmetricalPage);
     }
 
     public void decryptTextAsymmetrical() {
         asymmetricalTextPage.decryptMode();
+        navigation.push(IJNavigation.NamePage.CipherTextAsymmetricalPage);
     }
 
     public void selectWorkSpace() {
@@ -224,26 +226,32 @@ public class Application extends JFrame {
 
     public void signFile() {
         signPage.signFileMode();
+        navigation.push(IJNavigation.NamePage.SignPage);
     }
 
     public void signText() {
         signPage.signTextMode();
+        navigation.push(IJNavigation.NamePage.SignPage);
     }
 
     public void verifySignatureFile() {
         verifySignaturePage.verifySignatureFileMode();
+        navigation.push(IJNavigation.NamePage.VerifySignaturePage);
     }
 
     public void verifySignatureText() {
         verifySignaturePage.verifySignatureTextMode();
+        navigation.push(IJNavigation.NamePage.VerifySignaturePage);
     }
 
     public void encryptTextTraditional() {
         traditionalTextPage.encryptMode();
+        navigation.push(IJNavigation.NamePage.CipherTextTraditionalPage);
     }
 
     public void decryptTextTraditional() {
         traditionalTextPage.decryptMode();
+        navigation.push(IJNavigation.NamePage.CipherTextTraditionalPage);
     }
 
     private void addPropertyChangeListenerHelper(JSplitPane panel, int max, int min) {
@@ -265,9 +273,26 @@ public class Application extends JFrame {
 
     public void hashText() {
         hashPage.hashTextMode();
+        navigation.push(IJNavigation.NamePage.HashPage);
     }
 
     public void hashFile() {
         hashPage.hashFileMode();
+        navigation.push(IJNavigation.NamePage.HashPage);
+    }
+
+    public void generateTraditionalKey() {
+        generateTraditionalKeyPage.removePasswordGenerate();
+        navigation.push(IJNavigation.NamePage.GenerateTraditionalKeyPage);
+    }
+
+    public void generateKeyAsymmetrical() {
+        generateKeyAsymmetricalPage.removePasswordGenerate();
+        navigation.push(IJNavigation.NamePage.GenerateKeyAsymmetricalPage);
+    }
+
+    public void generateKeySymmetrical() {
+        generateKeySymmetricalPage.removePasswordGenerate();
+        navigation.push(IJNavigation.NamePage.GenerateKeySymmetricalPage);
     }
 }

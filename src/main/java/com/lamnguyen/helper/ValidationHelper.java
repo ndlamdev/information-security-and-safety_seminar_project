@@ -17,6 +17,8 @@ import com.lamnguyen.ui.component.selector.SelectCipherAlgorithmComponent;
 import javax.crypto.SecretKey;
 import javax.swing.*;
 import java.io.File;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 public class ValidationHelper {
     public static boolean validateAlgorithm(SelectCipherAlgorithmComponent.Algorithm alg, DialogProgressHelper.DialogProcess process) {
@@ -63,6 +65,22 @@ public class ValidationHelper {
     }
 
     public static boolean validateKey(AsymmetricalKey key, DialogProgressHelper.DialogProcess process) {
+        if (key != null) return true;
+
+        JOptionPane.showMessageDialog(null, "Vui lòng nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);
+        process.dispose();
+        return false;
+    }
+
+    public static boolean validateKey(PublicKey key, DialogProgressHelper.DialogProcess process) {
+        if (key != null) return true;
+
+        JOptionPane.showMessageDialog(null, "Vui lòng nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);
+        process.dispose();
+        return false;
+    }
+
+    public static boolean validateKey(PrivateKey key, DialogProgressHelper.DialogProcess process) {
         if (key != null) return true;
 
         JOptionPane.showMessageDialog(null, "Vui lòng nhập khóa!", "Error", JOptionPane.ERROR_MESSAGE);

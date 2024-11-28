@@ -39,7 +39,7 @@ public class RC5Encrypt extends ASymmetricalEncrypt {
      * @serialData Size key support:  0 - 2040, phổ biến là 128
      */
     @Override
-    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException {
-        return KeyGenerator.getInstance(Algorithms.RC5.name());
+    protected KeyGenerator initKeyGenerator() throws NoSuchAlgorithmException, NoSuchProviderException {
+        return KeyGenerator.getInstance(Algorithms.RC5.name(), "BC");
     }
 }

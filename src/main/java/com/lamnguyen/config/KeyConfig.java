@@ -13,10 +13,7 @@ import com.lamnguyen.model.asymmetrical.IAsymmetrical;
 import com.lamnguyen.model.symmetrical.ISymmetrical;
 import com.lamnguyen.model.traditionalCipher.ITraditionalCipher;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class KeyConfig {
     @Getter
@@ -35,7 +32,7 @@ public class KeyConfig {
     }
 
     private void initMapAlgorithmSymmetrical() {
-        mapAlgorithmSymmetrical = new HashMap<>() {{
+        mapAlgorithmSymmetrical = new TreeMap<>() {{
             put(ISymmetrical.Algorithms.DES.name(), new ArrayList<>() {{
                 add("56");
             }});
@@ -65,11 +62,21 @@ public class KeyConfig {
                 for (int i = 40; i <= 2048; i++)
                     add(String.valueOf(i));
             }});
-//            put(ISymmetrical.Algorithms.RC5.name(), new ArrayList<>() {{
-//                for (int i = 0; i <= 2040; i++)
-//                    add(String.valueOf(i));
-//            }});
+            put(ISymmetrical.Algorithms.RC5.name(), new ArrayList<>() {{
+                for (int i = 32; i <= 2040; i++)
+                    add(String.valueOf(i));
+            }});
+            put(ISymmetrical.Algorithms.RC6.name(), new ArrayList<>() {{
+                add("128");
+                add("192");
+                add("256");
+            }});
             put(ISymmetrical.Algorithms.AES.name(), new ArrayList<>() {{
+                add("128");
+                add("192");
+                add("256");
+            }});
+            put(ISymmetrical.Algorithms.Camellia.name(), new ArrayList<>() {{
                 add("128");
                 add("192");
                 add("256");
@@ -78,7 +85,7 @@ public class KeyConfig {
     }
 
     private void initMapAlgorithmAsymmetrical() {
-        mapAlgorithmAsymmetrical = new HashMap<>() {{
+        mapAlgorithmAsymmetrical = new TreeMap<>() {{
             put(IAsymmetrical.KeyFactory.Algorithms.DiffieHellman.name(), new ArrayList<>() {
                 {
                     add("1024");
@@ -151,7 +158,7 @@ public class KeyConfig {
     }
 
     private void initAlgorithmTraditional() {
-        mapAlgorithmTraditional = new HashMap<>() {{
+        mapAlgorithmTraditional = new TreeMap<>() {{
             put(ITraditionalCipher.Algorithms.HILL.name(), new ArrayList<>() {{
                 add("2");
                 add("3");
