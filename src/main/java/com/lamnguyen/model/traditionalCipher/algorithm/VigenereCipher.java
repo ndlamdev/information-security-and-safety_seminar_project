@@ -69,7 +69,8 @@ public class VigenereCipher extends ATraditionalCipher {
         return algorithm.doFinal(data);
     }
 
-    public TraditionalKey<String> generateTraditionalKey(String sizeKey) throws Exception {
+    @Override
+    public TraditionalKey<String> generateKey(String sizeKey) throws Exception {
         var size = Integer.parseInt(sizeKey);
         if (size <= 2) throw new Exception("Length key must be longer than 2!");
         StringBuilder builder = new StringBuilder();
