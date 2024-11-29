@@ -117,6 +117,7 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
         inputKeyComponent.setToolTipText("Nhập khóa công khai!");
         inputTextComponent.setTextJTextArea("");
         outputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextLabel("Văn bản đã mã hóa");
     }
 
     public void decryptMode() {
@@ -127,6 +128,7 @@ public class CipherTextAsymmetricalPage extends JPanel implements Observer {
         inputKeyComponent.setToolTipText("Nhập khóa riêng tư!");
         inputTextComponent.setTextJTextArea("");
         outputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextLabel("Văn bản đã giải mã");
     }
 
     private void encrypt() {

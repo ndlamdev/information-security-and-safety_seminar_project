@@ -114,6 +114,7 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
         action.setText("Mã hóa");
         inputTextComponent.setTextJTextArea("");
         outputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextLabel("Văn bản đã mã hóa");
     }
 
     public void decryptMode() {
@@ -121,6 +122,7 @@ public class CipherTextSymmetricalPage extends JPanel implements Observer {
         action.setText("Giải hóa");
         inputTextComponent.setTextJTextArea("");
         outputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextLabel("Văn bản đã giải mã");
     }
 
     private void encrypt() {

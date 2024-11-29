@@ -74,7 +74,7 @@ public class VerifySignaturePage extends JPanel implements Observer {
         inputTextComponent = new OutputInputTextComponent("Nhập văn bản");
         panelInput.add(inputTextComponent, "text");
 
-        inputSignComponent = new OutputInputTextComponent("Chữ kí file!");
+        inputSignComponent = new OutputInputTextComponent("Chữ ký file!");
         this.add(inputSignComponent);
 
         inputKeyComponent = new InputKeyComponent(this::loadFileKey);
@@ -149,7 +149,7 @@ public class VerifySignaturePage extends JPanel implements Observer {
             try {
                 IVerifySignature verifier = VerifySignatureFileImpl.getInstance(alg, publicKey);
                 if (verifier.verifyText(text, signature)) {
-                    JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thành công!");
+                    JOptionPane.showMessageDialog(null, "Xác thực chữ ký văn bản thành công!");
                     process.dispose();
                 } else throw new SignatureException();
 
@@ -157,7 +157,7 @@ public class VerifySignaturePage extends JPanel implements Observer {
                 JOptionPane.showMessageDialog(null, "Khóa không hợp lệ!", "Error", JOptionPane.ERROR_MESSAGE);
                 process.dispose();
             } catch (SignatureException e) {
-                JOptionPane.showMessageDialog(null, "Xác thực chữ ký file thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Xác thực chữ ký văn bản thất bại!", "Error", JOptionPane.ERROR_MESSAGE);
                 process.dispose();
             }
         });
@@ -181,6 +181,8 @@ public class VerifySignaturePage extends JPanel implements Observer {
         cardLayoutPanelInput.show(panelInput, "file");
         action.setText("Xác thực chữ ký file");
         dropAndDragComponent.removeFile();
+        inputSignComponent.setTextLabel("Chữ ký file");
+        inputSignComponent.setTextJTextArea("");
     }
 
     public void verifySignatureTextMode() {
@@ -188,6 +190,8 @@ public class VerifySignaturePage extends JPanel implements Observer {
         cardLayoutPanelInput.show(panelInput, "text");
         action.setText("Xác thực chữ ký văn bản");
         inputTextComponent.setTextJTextArea("");
+        inputSignComponent.setTextLabel("Chữ ký văn bản");
+        inputSignComponent.setTextJTextArea("");
     }
 
     @Override

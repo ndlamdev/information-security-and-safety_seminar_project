@@ -90,7 +90,7 @@ public class SignPage extends JPanel implements Observer {
         }};
         this.add(action); // 50
 
-        resultComponent = new OutputInputTextComponent("Chữ kí file!") {{
+        resultComponent = new OutputInputTextComponent("Chữ ký file!") {{
             setEditable(false);
             clickToCopy(true);
         }};

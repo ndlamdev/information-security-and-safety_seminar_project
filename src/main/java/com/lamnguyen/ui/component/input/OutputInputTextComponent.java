@@ -98,7 +98,7 @@ public class OutputInputTextComponent extends JPanel implements Observer {
         g2.drawRoundRect(0, heightTitle, getWidth() - STROKE_WIDTH, getHeight() - STROKE_WIDTH - heightTitle, RADIUS, RADIUS);
 
         g2.setColor(Color.white);
-        g2.fillRect(20, 0, (int)(textLabel.length() * 5.7) + 20, 28);
+        g2.fillRect(20, 0, (int) (textLabel.length() * 5.7) + 20, 28);
         g2.setColor(Color.BLACK);
         g2.drawString(textLabel, 30, 15);
 
@@ -126,6 +126,12 @@ public class OutputInputTextComponent extends JPanel implements Observer {
         this.scrollPane.setPreferredSize(new Dimension(dimension.width - 40, customSize.height - 40));
         this.setSize(this.getPreferredSize());
         this.scrollPane.setSize(this.scrollPane.getPreferredSize());
+        this.updateUI();
+        this.repaint();
+    }
+
+    public void setTextLabel(String title) {
+        this.textLabel = title;
         this.updateUI();
         this.repaint();
     }

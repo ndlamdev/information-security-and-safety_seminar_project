@@ -117,6 +117,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
         action.setText("Mã hóa");
         inputTextComponent.setTextJTextArea("");
         outputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextLabel("Văn bản đã mã hóa");
     }
 
     public void decryptMode() {
@@ -124,6 +125,7 @@ public class CipherTextTraditionalPage extends JPanel implements Observer {
         action.setText("Giải hóa");
         inputTextComponent.setTextJTextArea("");
         outputTextComponent.setTextJTextArea("");
+        outputTextComponent.setTextLabel("Văn bản đã giải mã");
     }
 
     private void doFinal(ITraditionalCipher.SecureMode mode) {
