@@ -47,6 +47,8 @@ public abstract class AASymmetricalEncrypt extends AAsymmetrical implements IASy
         var key = cipherEncrypt.getKey();
         var iv = cipherEncrypt.getIvSpec();
         DataOutputStream output = new DataOutputStream(new FileOutputStream(dest));
+        output.writeUTF(mode == null ? "" : mode);
+        output.writeUTF(padding == null ? "" : padding);
         ISymmetrical.save(output, key, iv);
         output.flush();
         output.writeLong(output.size() + 8);

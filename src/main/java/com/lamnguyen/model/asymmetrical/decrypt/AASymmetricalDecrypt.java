@@ -48,12 +48,13 @@ public abstract class AASymmetricalDecrypt extends AAsymmetrical implements IASy
         }
 
         try {
+            var mode = input.readUTF();
+            var padding = input.readUTF();
             var result = ISymmetrical.KeyFactory.readKey(input);
             long skip = input.readLong();
-            var arr = result.key().getAlgorithm().split("/");
+            var alg = result.key().getAlgorithm();
             HeaderFileEncrypt re;
-            if (arr.length == 1) re = new HeaderFileEncrypt(result, arr[0], null, null, skip);
-            else re = new HeaderFileEncrypt(result, arr[0], arr[1], arr[2], skip);
+            re = new HeaderFileEncrypt(result, alg, mode, padding, skip);
             input.close();
             return re;
         } catch (IOException e) {
