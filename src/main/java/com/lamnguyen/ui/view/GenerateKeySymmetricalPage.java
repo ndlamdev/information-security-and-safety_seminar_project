@@ -20,6 +20,7 @@ import com.lamnguyen.ui.component.output.KeySymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.controller.WorkSpaceReload;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +30,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
 
-public class GenerateKeySymmetricalPage extends JPanel implements Observer {
+public class GenerateKeySymmetricalPage extends JPanel implements Observer, WorkSpaceReload {
     private KeySymmetricalGenerateComponent keyGenerateComponent;
     private SelectAlgorithmGenerateKeyComponent selectAlgorithmComponent;
     private OutputComponent outputComponent;
@@ -136,5 +137,10 @@ public class GenerateKeySymmetricalPage extends JPanel implements Observer {
     public void removePasswordGenerate() {
         encrypt = null;
         keyGenerateComponent.setKey("");
+    }
+
+    @Override
+    public void reload() {
+        outputComponent.setPathFolder(SettingHelper.getInstance().getWorkSpace() + File.separator + "key");
     }
 }

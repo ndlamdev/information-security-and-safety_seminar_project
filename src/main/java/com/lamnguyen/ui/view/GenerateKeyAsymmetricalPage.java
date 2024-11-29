@@ -20,6 +20,7 @@ import com.lamnguyen.ui.component.output.KeyAsymmetricalGenerateComponent;
 import com.lamnguyen.ui.component.output.OutputComponent;
 import com.lamnguyen.ui.component.selector.SelectAlgorithmGenerateKeyComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.controller.WorkSpaceReload;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +30,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Function;
 
-public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
+public class GenerateKeyAsymmetricalPage extends JPanel implements Observer, WorkSpaceReload {
     private AsymmetricalKey key;
     private KeyAsymmetricalGenerateComponent keyGenerateComponent;
     private SelectAlgorithmGenerateKeyComponent selectAlgorithmComponent;
@@ -134,5 +135,10 @@ public class GenerateKeyAsymmetricalPage extends JPanel implements Observer {
         key = null;
         keyGenerateComponent.setPrivateKey("");
         keyGenerateComponent.setPublicKey("");
+    }
+
+    @Override
+    public void reload() {
+        outputComponent.setPathFolder(SettingHelper.getInstance().getWorkSpace() + File.separator + "key");
     }
 }

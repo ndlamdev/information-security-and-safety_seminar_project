@@ -17,6 +17,7 @@ import com.lamnguyen.ui.component.list.ListKeyComponent;
 import com.lamnguyen.ui.component.menu.MainMenu;
 import com.lamnguyen.ui.component.tree.TreeFileComponent;
 import com.lamnguyen.ui.controller.SubjectSizeController;
+import com.lamnguyen.ui.controller.WorkSpaceReload;
 import com.lamnguyen.ui.controller.navigation.IJNavigation;
 import com.lamnguyen.ui.controller.navigation.impl.JNavigation;
 import com.lamnguyen.ui.view.*;
@@ -25,6 +26,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.lamnguyen.ui.controller.navigation.IJNavigation.NamePage.GenerateTraditionalKeyPage;
 
@@ -49,6 +52,7 @@ public class Application extends JFrame {
     private CipherTextTraditionalPage traditionalTextPage;
     private int width, height;
     private CipherFileAsymmetricalPage asymmetricalFilePage;
+    private List<WorkSpaceReload> workSpaceReloadList;
 
     private Application() {
         toolkit = Toolkit.getDefaultToolkit();
@@ -68,6 +72,7 @@ public class Application extends JFrame {
 
     private void init() {
         sizeController = SubjectSizeController.getInstance();
+        workSpaceReloadList = new ArrayList<>();
 
         this.setTitle("Phần mềm mã hóa/giải mã file Lam Nguyễn");
         this.setIconImage(IconResizeHelper.initImageIcon("logo.png", 50, 50).getImage());
@@ -110,6 +115,7 @@ public class Application extends JFrame {
         generateKeySymmetricalPage = new GenerateKeySymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.GenerateKeySymmetricalPage.name(), generateKeySymmetricalPage);
         sizeController.addObserver(generateKeySymmetricalPage);
+        workSpaceReloadList.add(generateKeySymmetricalPage);
 
         generateKeyAsymmetricalPage = new GenerateKeyAsymmetricalPage(this);
         panelRight.add(IJNavigation.NamePage.GenerateKeyAsymmetricalPage.name(), generateKeyAsymmetricalPage);
@@ -118,6 +124,7 @@ public class Application extends JFrame {
         generateTraditionalKeyPage = new GenerateTraditionalKeyPage(this);
         panelRight.add(GenerateTraditionalKeyPage.name(), generateTraditionalKeyPage);
         sizeController.addObserver(generateTraditionalKeyPage);
+        workSpaceReloadList.add(generateTraditionalKeyPage);
 
         signPage = new SignPage(this);
         panelRight.add(IJNavigation.NamePage.SignPage.name(), signPage);
@@ -185,6 +192,7 @@ public class Application extends JFrame {
         SettingHelper.getInstance().setWorkSpace(file.getAbsolutePath());
         pathWorkSpace = file.getAbsolutePath();
         reloadWorkSpaceAsync();
+        workSpaceReloadList.forEach(WorkSpaceReload::reload);
     }
 
     public void reloadWorkSpaceAsync() {

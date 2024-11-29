@@ -26,9 +26,14 @@
             <artifactId>flatlaf</artifactId>
             <version>3.5.2</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.bouncycastle</groupId>-->
+<!--            <artifactId>bcprov-jdk18on</artifactId>-->
+<!--            <version>1.79</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
+            <artifactId>bcpkix-jdk18on</artifactId>
             <version>1.79</version>
         </dependency>
     </dependencies>
